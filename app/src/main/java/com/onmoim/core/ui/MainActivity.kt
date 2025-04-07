@@ -1,4 +1,4 @@
-package com.onmoim
+package com.onmoim.core.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.onmoim.ui.theme.OnmoimTheme
+import com.onmoim.core.ui.theme.OnmoimTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

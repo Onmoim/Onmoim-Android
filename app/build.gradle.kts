@@ -21,6 +21,8 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "BASE_URL", "\"\"")
     }
 
     buildTypes {
@@ -83,7 +85,7 @@ dependencies {
     implementation(libs.okHttp)
     implementation(libs.okHttp.logging)
     implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
 
     implementation(libs.coil.compose)
 
