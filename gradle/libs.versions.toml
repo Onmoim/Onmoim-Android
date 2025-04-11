@@ -21,6 +21,7 @@ okHttp = "4.12.0"
 retrofit = "2.11.0"
 androidx-paging = "3.3.6"
 gms = "4.4.2"
+kakao = "2.21.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -56,6 +57,7 @@ retrofit-converter-kotlinx-serialization = { module = "com.squareup.retrofit2:co
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 androidx-paging-runtimeKtx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "androidx-paging" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "androidx-paging" }
+kakao = { module = "com.kakao.sdk:v2-user", version.ref = "kakao" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

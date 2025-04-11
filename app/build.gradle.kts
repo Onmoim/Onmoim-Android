@@ -23,7 +23,14 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = getLocalPropertyValue("kakao.native.app.key")
+
         buildConfigField("String", "BASE_URL", "\"https://onmoim.store\"")
+        buildConfigField(
+            "String",
+            "KAKAO_NATIVE_APP_KEY",
+            "\"${getLocalPropertyValue("kakao.native.app.key")}\""
+        )
     }
 
     signingConfigs {
@@ -108,6 +115,7 @@ dependencies {
     implementation(libs.retrofit.converter.kotlinx.serialization)
 
     implementation(libs.coil.compose)
+    implementation(libs.kakao)
 
     implementation(libs.kotlinx.serialization.json)
 
