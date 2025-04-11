@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.gms.googleServices)
 }
 
 android {
@@ -22,16 +23,35 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "BASE_URL", "\"\"")
+        buildConfigField("String", "BASE_URL", "\"https://onmoim.store\"")
+    }
+
+    signingConfigs {
+        create("debugKey") {
+            storeFile = file("../keystore/onmoim_debug_key.jks")
+            storePassword = getLocalPropertyValue("store.password")
+            keyAlias = getLocalPropertyValue("debug.key.alias")
+            keyPassword = getLocalPropertyValue("key.password")
+        }
+        create("releaseKey") {
+            storeFile = file("../keystore/onmoim_release_key.jks")
+            storePassword = getLocalPropertyValue("store.password")
+            keyAlias = getLocalPropertyValue("release.key.alias")
+            keyPassword = getLocalPropertyValue("key.password")
+        }
     }
 
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debugKey")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("releaseKey")
         }
     }
     compileOptions {
@@ -90,4 +110,7 @@ dependencies {
     implementation(libs.coil.compose)
 
     implementation(libs.kotlinx.serialization.json)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 }

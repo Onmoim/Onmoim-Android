@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "809915801803",
+    "project_id": "onmoim-4c3f1",
+    "storage_bucket": "onmoim-4c3f1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:809915801803:android:ebc3ce8723d888d64ffb4e",
+        "android_client_info": {
+          "package_name": "com.onmoim"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDa0y4a9oj31YVCmdhSycN3X-GUVsv8gtE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
