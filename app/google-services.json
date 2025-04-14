@@ -12,7 +12,24 @@
           "package_name": "com.onmoim"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "809915801803-hequ4vu5bdn4q40hju0dno0i2gpgcq5k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.onmoim",
+            "certificate_hash": "17cf7c2b1f2e9f27803c6433f21b92dcca626c93"
+          }
+        },
+        {
+          "client_id": "809915801803-pkspdpd6j4v77geo7vlmfvrsc8r0rgf0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.onmoim",
+            "certificate_hash": "1b7410f0e41e38a0380ac5f6e2fb33781a3ba8d7"
+          }
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDa0y4a9oj31YVCmdhSycN3X-GUVsv8gtE"
