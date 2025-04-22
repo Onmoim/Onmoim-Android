@@ -22,5 +22,5 @@ object ConverterFactoryModule {
     @Singleton
     @KotlinxSerializationConverterFactory
     fun provideKotlinxSerializationConverterFactory() =
-        Json.asConverterFactory("application/json; charset=UTF8".toMediaType())
+        Json.asConverterFactory("application/json; charset=UTF-8".toMediaType())
 }
