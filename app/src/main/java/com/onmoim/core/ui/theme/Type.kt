@@ -22,6 +22,7 @@ val pretendard = FontFamily(
 )
 
 private val pretendardStyle = TextStyle(
+    color = TextBlack,
     fontFamily = pretendard
 )
 

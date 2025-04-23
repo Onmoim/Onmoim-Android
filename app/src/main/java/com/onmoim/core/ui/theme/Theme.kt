@@ -12,16 +12,18 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 internal val ColorPalette = OnmoimColors(
-    backgroundColor = ColorWhite,
-    c565656 = Color565656,
-    c69999999 = Color69999999,
-    c2781FC = Color2781FC,
-    c21C3AB = Color21C3AB,
-    cEF61DF = ColorEF61DF,
-    cF8F8F8 = ColorF8F8F8,
-    cCDCDCD = ColorCDCDCD,
-    cF97D7D = ColorF97D7D,
-    cFF0033 = ColorFF0033,
+    backgroundColor = BgWhite,
+    primaryBlue = PrimaryBlue,
+    primaryMint = PrimaryMint,
+    primaryPink = PrimaryPink,
+    gray01 = Gray01,
+    gray02 = Gray02,
+    gray03 = Gray03,
+    gray04 = Gray04,
+    gray05 = Gray05,
+    gray06 = Gray06,
+    accentSoftRed = AccentSoftRed,
+    alertRed = AlertRed,
 )
 
 internal val LocalOnmoimColors = staticCompositionLocalOf<OnmoimColors> {
@@ -60,60 +62,70 @@ object OnmoimTheme {
 @Stable
 class OnmoimColors(
     backgroundColor: Color,
-    c565656: Color,
-    c69999999: Color,
-    c2781FC: Color,
-    c21C3AB: Color,
-    cEF61DF: Color,
-    cF8F8F8: Color,
-    cCDCDCD: Color,
-    cF97D7D: Color,
-    cFF0033: Color,
+    primaryBlue: Color,
+    primaryMint: Color,
+    primaryPink: Color,
+    gray01: Color,
+    gray02: Color,
+    gray03: Color,
+    gray04: Color,
+    gray05: Color,
+    gray06: Color,
+    accentSoftRed: Color,
+    alertRed: Color,
 ) {
     var backgroundColor by mutableStateOf(backgroundColor)
         private set
-    var c565656 by mutableStateOf(c565656)
+    var primaryBlue by mutableStateOf(primaryBlue)
         private set
-    var c69999999 by mutableStateOf(c69999999)
+    var primaryMint by mutableStateOf(primaryMint)
         private set
-    var c2781FC by mutableStateOf(c2781FC)
+    var primaryPink by mutableStateOf(primaryPink)
         private set
-    var c21C3AB by mutableStateOf(c21C3AB)
+    var gray01 by mutableStateOf(gray01)
         private set
-    var cEF61DF by mutableStateOf(cEF61DF)
+    var gray02 by mutableStateOf(gray02)
         private set
-    var cF8F8F8 by mutableStateOf(cF8F8F8)
+    var gray03 by mutableStateOf(gray03)
         private set
-    var cCDCDCD by mutableStateOf(cCDCDCD)
+    var gray04 by mutableStateOf(gray04)
         private set
-    var cF97D7D by mutableStateOf(cF97D7D)
+    var gray05 by mutableStateOf(gray05)
         private set
-    var cFF0033 by mutableStateOf(cFF0033)
+    var gray06 by mutableStateOf(gray06)
+        private set
+    var accentSoftRed by mutableStateOf(accentSoftRed)
+        private set
+    var alertRed by mutableStateOf(alertRed)
         private set
 
     fun update(other: OnmoimColors) {
         backgroundColor = other.backgroundColor
-        c565656 = other.c565656
-        c69999999 = other.c69999999
-        c2781FC = other.c2781FC
-        c21C3AB = other.c21C3AB
-        cEF61DF = other.cEF61DF
-        cF8F8F8 = other.cF8F8F8
-        cCDCDCD = other.cCDCDCD
-        cF97D7D = other.cF97D7D
-        cFF0033 = other.cFF0033
+        primaryBlue = other.primaryBlue
+        primaryMint = other.primaryMint
+        primaryPink = other.primaryPink
+        gray01 = other.gray01
+        gray02 = other.gray02
+        gray03 = other.gray03
+        gray04 = other.gray04
+        gray05 = other.gray05
+        gray06 = other.gray06
+        accentSoftRed = other.accentSoftRed
+        alertRed = other.alertRed
     }
 
     fun copy(): OnmoimColors = OnmoimColors(
         backgroundColor = backgroundColor,
-        c565656 = c565656,
-        c69999999 = c69999999,
-        c2781FC = c2781FC,
-        c21C3AB = c21C3AB,
-        cEF61DF = cEF61DF,
-        cF8F8F8 = cF8F8F8,
-        cCDCDCD = cCDCDCD,
-        cF97D7D = cF97D7D,
-        cFF0033 = cFF0033,
+        primaryBlue = primaryBlue,
+        primaryMint = primaryMint,
+        primaryPink = primaryPink,
+        gray01 = gray01,
+        gray02 = gray02,
+        gray03 = gray03,
+        gray04 = gray04,
+        gray05 = gray05,
+        gray06 = gray06,
+        accentSoftRed = accentSoftRed,
+        alertRed = alertRed,
     )
 }
