@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Onmoim</string>
+
+    <!-- 버튼 -->
+    <string name="btn_google_login">구글로 로그인</string>
+    <string name="btn_kakao_login">카카오톡으로 로그인</string>
+
+    <!-- 로그인 화면 -->
+    <string name="login_title">우리 동네 취미 모임</string>
+    <string name="sns_login_title">SNS 계정으로 간편 로그인하기</string>
 </resources>

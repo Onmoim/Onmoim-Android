@@ -6,8 +6,23 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.sp
 import com.onmoim.R
+
+private val fontProvider = GoogleFont.Provider(
+    providerAuthority = "com.google.android.gms.fonts",
+    providerPackage = "com.google.android.gms",
+    certificates = R.array.com_google_android_gms_fonts_certs
+)
+
+val inter = FontFamily(
+    androidx.compose.ui.text.googlefonts.Font(
+        googleFont = GoogleFont("Inter"),
+        fontProvider = fontProvider,
+        weight = FontWeight.W700
+    )
+)
 
 val pretendard = FontFamily(
     Font(R.font.pretendard_thin, FontWeight.W100),
@@ -22,7 +37,6 @@ val pretendard = FontFamily(
 )
 
 private val pretendardStyle = TextStyle(
-    color = TextBlack,
     fontFamily = pretendard
 )
 

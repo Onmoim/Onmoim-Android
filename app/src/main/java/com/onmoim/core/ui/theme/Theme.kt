@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 
 internal val ColorPalette = OnmoimColors(
     backgroundColor = BgWhite,
+    textColor = TextBlack,
     primaryBlue = PrimaryBlue,
     primaryMint = PrimaryMint,
     primaryPink = PrimaryPink,
@@ -62,6 +63,7 @@ object OnmoimTheme {
 @Stable
 class OnmoimColors(
     backgroundColor: Color,
+    textColor: Color,
     primaryBlue: Color,
     primaryMint: Color,
     primaryPink: Color,
@@ -75,6 +77,8 @@ class OnmoimColors(
     alertRed: Color,
 ) {
     var backgroundColor by mutableStateOf(backgroundColor)
+        private set
+    var textColor by mutableStateOf(textColor)
         private set
     var primaryBlue by mutableStateOf(primaryBlue)
         private set
@@ -101,6 +105,7 @@ class OnmoimColors(
 
     fun update(other: OnmoimColors) {
         backgroundColor = other.backgroundColor
+        textColor = other.textColor
         primaryBlue = other.primaryBlue
         primaryMint = other.primaryMint
         primaryPink = other.primaryPink
@@ -116,6 +121,7 @@ class OnmoimColors(
 
     fun copy(): OnmoimColors = OnmoimColors(
         backgroundColor = backgroundColor,
+        textColor = textColor,
         primaryBlue = primaryBlue,
         primaryMint = primaryMint,
         primaryPink = primaryPink,
