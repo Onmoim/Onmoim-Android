@@ -22,7 +22,10 @@ retrofit = "2.11.0"
 androidx-paging = "3.3.6"
 gms = "4.4.2"
 kakao = "2.21.1"
+timber = "5.0.1"
 uiTextGoogleFonts = "1.8.0"
+androidx-credentials = "1.5.0"
+googleId = "1.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -60,6 +63,10 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 androidx-paging-runtimeKtx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "androidx-paging" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "androidx-paging" }
 kakao = { module = "com.kakao.sdk:v2-user", version.ref = "kakao" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "androidx-credentials" }
+androidx-credentials-playServicesAuth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "androidx-credentials" }
+googleId = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleId" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

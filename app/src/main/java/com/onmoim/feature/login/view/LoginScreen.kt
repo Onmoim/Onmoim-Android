@@ -37,16 +37,7 @@ import com.onmoim.core.ui.theme.inter
 import com.onmoim.core.ui.theme.pretendard
 
 @Composable
-fun LoginScreen() {
-    LoginScreenImpl(
-        onClickLogin = { type ->
-
-        }
-    )
-}
-
-@Composable
-private fun LoginScreenImpl(
+fun LoginScreen(
     onClickLogin: (type: SocialType) -> Unit
 ) {
     Surface(
@@ -166,7 +157,7 @@ private fun LoginScreenBackground() {
 @Composable
 private fun LoginScreenPreview() {
     OnmoimTheme {
-        LoginScreenImpl(
+        LoginScreen(
             onClickLogin = {}
         )
     }

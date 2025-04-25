@@ -1,17 +1,13 @@
-package com.onmoim.feature.login
+package com.onmoim.feature.login.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.onmoim.feature.login.view.LoginScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
 object LoginNavigation
-
-@Serializable
-object LoginRoute
 
 fun NavGraphBuilder.loginGraph(
     navController: NavController
@@ -20,7 +16,14 @@ fun NavGraphBuilder.loginGraph(
         startDestination = LoginRoute
     ) {
         composable<LoginRoute> {
-            LoginScreen()
+            LoginRoute(
+                onNavigateToHome = {
+
+                },
+                onNavigateToSignUp = {
+
+                }
+            )
         }
     }
 }

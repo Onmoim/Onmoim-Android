@@ -31,6 +31,11 @@ android {
             "KAKAO_NATIVE_APP_KEY",
             "\"${getLocalPropertyValue("kakao.native.app.key")}\""
         )
+        buildConfigField(
+            "String",
+            "GOOGLE_SIGN_IN_SERVER_CLIENT_ID",
+            "\"${getLocalPropertyValue("google.sign.in.server.client.id")}\""
+        )
     }
 
     signingConfigs {
@@ -122,4 +127,10 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.playServicesAuth)
+    implementation(libs.googleId)
+
+    implementation(libs.timber)
 }
