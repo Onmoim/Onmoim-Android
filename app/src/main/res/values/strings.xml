@@ -1,5 +1,11 @@
 <resources>
+    <!-- 공통 -->
     <string name="app_name">Onmoim</string>
+    <string name="name">이름</string>
+    <string name="birth">생년월일</string>
+    <string name="location">지역</string>
+    <string name="male">남</string>
+    <string name="female">여</string>
 
     <!-- 버튼 -->
     <string name="btn_ok">확인</string>
@@ -11,4 +17,7 @@
     <string name="login_title">우리 동네 취미 모임</string>
     <string name="sns_login_title">SNS 계정으로 간편 로그인하기</string>
     <string name="login_error_message">로그인 진행 중 문제가 발생하였습니다.</string>
+
+    <!-- 프로필 설정 화면 -->
+    <string name="profile_setting_title">프로필 설정</string>
 </resources>

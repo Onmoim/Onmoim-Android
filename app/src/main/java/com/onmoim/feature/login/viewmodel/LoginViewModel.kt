@@ -31,7 +31,7 @@ class LoginViewModel @Inject constructor(
                 sendEvent(LoginEvent.ShowErrorDialog(it))
             }.collect {
                 // FIXME: 추후 수정 필요
-                sendEvent(LoginEvent.NavigateToSignUp)
+                sendEvent(LoginEvent.NavigateToProfileSetting)
             }
         }
     }

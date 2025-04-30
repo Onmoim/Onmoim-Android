@@ -14,93 +14,151 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Surface
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.onmoim.R
 import com.onmoim.core.constant.SocialType
-import com.onmoim.core.ui.advancedShadow
-import com.onmoim.core.ui.shadow1
 import com.onmoim.core.ui.theme.OnmoimTheme
+import com.onmoim.core.ui.theme.advancedShadow
 import com.onmoim.core.ui.theme.inter
 import com.onmoim.core.ui.theme.pretendard
+import com.onmoim.core.ui.theme.shadow1
+import com.onmoim.feature.login.state.LoginEvent
+import com.onmoim.feature.login.viewmodel.LoginViewModel
+import timber.log.Timber
 
 @Composable
-fun LoginScreen(
+fun LoginRoute(
+    loginViewModel: LoginViewModel = hiltViewModel(),
+    onNavigateToHome: () -> Unit,
+    onNavigateToProfileSetting: () -> Unit
+) {
+    val context = LocalContext.current
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showErrorDialog = false
+            },
+            title = {
+                Text(errorMessage)
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showErrorDialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.btn_ok))
+                }
+            }
+        )
+    }
+
+    LoginScreen(
+        onClickLogin = loginViewModel::signIn
+    )
+
+    LaunchedEffect(Unit) {
+        loginViewModel.receiveEvent.collect { event ->
+            when (event) {
+                LoginEvent.NavigateToHome -> onNavigateToHome()
+                LoginEvent.NavigateToProfileSetting -> onNavigateToProfileSetting()
+                is LoginEvent.ShowErrorDialog -> {
+                    val error = event.t
+                    Timber.e(error, error?.message.toString())
+                    errorMessage = ContextCompat.getString(context, R.string.login_error_message)
+                    showErrorDialog = true
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LoginScreen(
     onClickLogin: (type: SocialType) -> Unit
 ) {
-    Surface(
+    Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize()
+        LoginScreenBackground()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            LoginScreenBackground()
+            Text(
+                text = stringResource(R.string.login_title),
+                fontFamily = inter,
+                fontWeight = FontWeight.W700,
+                fontSize = 20.sp,
+                color = OnmoimTheme.colors.textColor
+            )
+            Spacer(Modifier.height(46.dp))
+            Image(
+                painter = painterResource(R.drawable.ic_logo),
+                contentDescription = null,
+                modifier = Modifier.padding(vertical = 27.dp)
+            )
+            Spacer(Modifier.height(64.dp))
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 18.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.login_title),
-                    fontFamily = inter,
-                    fontWeight = FontWeight.W700,
-                    fontSize = 20.sp,
-                    color = OnmoimTheme.colors.textColor
+                    text = stringResource(R.string.sns_login_title),
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.W400,
+                    fontSize = 13.sp,
+                    color = OnmoimTheme.colors.gray06
                 )
-                Spacer(Modifier.height(46.dp))
-                Image(
-                    painter = painterResource(R.drawable.ic_logo),
-                    contentDescription = null,
-                    modifier = Modifier.padding(vertical = 27.dp)
-                )
-                Spacer(Modifier.height(64.dp))
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = stringResource(R.string.sns_login_title),
-                        fontFamily = pretendard,
-                        fontWeight = FontWeight.W400,
-                        fontSize = 13.sp,
-                        color = OnmoimTheme.colors.gray06
-                    )
-                    SocialType.entries.forEach { type ->
-                        Box(
-                            modifier = Modifier
-                                .widthIn(min = 240.dp)
-                                .shadow1(999.dp)
-                                .background(color = type.color, shape = CircleShape)
-                                .clip(CircleShape)
-                                .clickable {
-                                    onClickLogin(type)
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = stringResource(type.labelId),
-                                modifier = Modifier.padding(vertical = 8.dp),
-                                fontFamily = pretendard,
-                                fontWeight = FontWeight.W600,
-                                fontSize = 15.sp,
-                                lineHeight = 22.sp,
-                                color = OnmoimTheme.colors.textColor
-                            )
-                        }
+                SocialType.entries.forEach { type ->
+                    Box(
+                        modifier = Modifier
+                            .widthIn(min = 240.dp)
+                            .shadow1(999.dp)
+                            .background(color = type.color, shape = CircleShape)
+                            .clip(CircleShape)
+                            .clickable {
+                                onClickLogin(type)
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(type.labelId),
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.W600,
+                            fontSize = 15.sp,
+                            lineHeight = 22.sp,
+                            color = OnmoimTheme.colors.textColor
+                        )
                     }
                 }
             }
@@ -153,7 +211,7 @@ private fun LoginScreenBackground() {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun LoginScreenPreview() {
     OnmoimTheme {

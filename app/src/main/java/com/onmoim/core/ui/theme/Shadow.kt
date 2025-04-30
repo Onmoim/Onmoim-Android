@@ -1,4 +1,4 @@
-package com.onmoim.core.ui
+package com.onmoim.core.ui.theme
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind

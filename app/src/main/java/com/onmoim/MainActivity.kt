@@ -1,9 +1,11 @@
-package com.onmoim.core.ui
+package com.onmoim
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.onmoim.core.ui.OnmoimApp
+import com.onmoim.core.ui.rememberOnmoimAppState
 import com.onmoim.core.ui.theme.OnmoimTheme
 import dagger.hilt.android.AndroidEntryPoint
 
