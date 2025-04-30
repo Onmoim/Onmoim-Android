@@ -43,8 +43,7 @@ fun OnmoimTheme(
     ) {
         MaterialTheme(
             colorScheme = MaterialTheme.colorScheme.copy(
-                background = ColorPalette.backgroundColor,
-                surface = ColorPalette.backgroundColor
+                background = colorPalette.backgroundColor
             ),
             content = content
         )

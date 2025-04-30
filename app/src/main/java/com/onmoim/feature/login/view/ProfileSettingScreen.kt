@@ -103,7 +103,9 @@ private fun ProfileSettingScreen(
     onClickComplete: () -> Unit
 ) {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .background(OnmoimTheme.colors.backgroundColor)
+            .fillMaxSize()
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
@@ -355,7 +357,7 @@ private fun ProfileSettingCompleteButton(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun ProfileSettingScreenPreview() {
     var profileSettingState by remember {

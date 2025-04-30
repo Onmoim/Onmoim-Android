@@ -103,7 +103,9 @@ private fun LoginScreen(
     onClickLogin: (type: SocialType) -> Unit
 ) {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .background(OnmoimTheme.colors.backgroundColor)
+            .fillMaxSize()
     ) {
         LoginScreenBackground()
         Column(
@@ -211,7 +213,7 @@ private fun LoginScreenBackground() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun LoginScreenPreview() {
     OnmoimTheme {
