@@ -21,6 +21,9 @@ val Gray06 = Color(0xFF565656)
 // Text
 val TextBlack = Color(0xFF000000)
 
-// Other
+// Red
 val AccentSoftRed = Color(0xFFF97D7D)
 val AlertRed = Color(0xFFFF0033)
+
+// Black
+val Black40 = Color(0x66000000)

@@ -25,6 +25,7 @@ internal val ColorPalette = OnmoimColors(
     gray06 = Gray06,
     accentSoftRed = AccentSoftRed,
     alertRed = AlertRed,
+    black40 = Black40,
 )
 
 internal val LocalOnmoimColors = staticCompositionLocalOf<OnmoimColors> {
@@ -74,6 +75,7 @@ class OnmoimColors(
     gray06: Color,
     accentSoftRed: Color,
     alertRed: Color,
+    black40: Color,
 ) {
     var backgroundColor by mutableStateOf(backgroundColor)
         private set
@@ -101,6 +103,8 @@ class OnmoimColors(
         private set
     var alertRed by mutableStateOf(alertRed)
         private set
+    var black40 by mutableStateOf(black40)
+        private set
 
     fun update(other: OnmoimColors) {
         backgroundColor = other.backgroundColor
@@ -116,6 +120,7 @@ class OnmoimColors(
         gray06 = other.gray06
         accentSoftRed = other.accentSoftRed
         alertRed = other.alertRed
+        black40 = other.black40
     }
 
     fun copy(): OnmoimColors = OnmoimColors(
@@ -132,5 +137,6 @@ class OnmoimColors(
         gray06 = gray06,
         accentSoftRed = accentSoftRed,
         alertRed = alertRed,
+        black40 = black40
     )
 }
