@@ -1,8 +1,5 @@
 package com.onmoim.feature.login.view
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,8 +16,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -37,7 +32,6 @@ import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,9 +39,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.onmoim.R
 import com.onmoim.core.constant.Sex
+import com.onmoim.core.ui.component.CommonAppBar
+import com.onmoim.core.ui.component.CommonTextField
 import com.onmoim.core.ui.text.DateVisualTransformation
 import com.onmoim.core.ui.theme.OnmoimTheme
-import com.onmoim.core.ui.theme.TopAppBarHeight
 import com.onmoim.core.ui.theme.pretendard
 import com.onmoim.feature.login.state.ProfileSettingEvent
 import com.onmoim.feature.login.state.ProfileSettingState
@@ -110,7 +105,14 @@ private fun ProfileSettingScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            ProfileSettingTitle()
+            CommonAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.profile_setting_title),
+                        style = OnmoimTheme.typography.body1SemiBold
+                    )
+                }
+            )
             Spacer(Modifier.height(8.dp))
             Column(
                 modifier = Modifier
@@ -122,12 +124,10 @@ private fun ProfileSettingScreen(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    ProfileSettingTextField(
+                    CommonTextField(
                         value = profileSettingState.name,
                         onValueChange = onNameChanged,
-                        modifier = Modifier
-                            .weight(1f)
-                            .heightIn(min = 37.dp),
+                        modifier = Modifier.weight(1f),
                         hint = stringResource(R.string.name)
                     )
                     SexToggle(
@@ -136,24 +136,21 @@ private fun ProfileSettingScreen(
                         modifier = Modifier.width(100.dp)
                     )
                 }
-                ProfileSettingTextField(
+                CommonTextField(
                     value = profileSettingState.birth,
                     onValueChange = onBirthChanged,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 37.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     hint = stringResource(R.string.birth),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
                     ),
                     visualTransformation = DateVisualTransformation()
                 )
-                ProfileSettingTextField(
+                CommonTextField(
                     value = profileSettingState.location,
                     onValueChange = {},
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 37.dp)
                         .clickable(
                             indication = null,
                             interactionSource = remember { MutableInteractionSource() },
@@ -184,83 +181,6 @@ private fun ProfileSettingScreen(
             ) {
                 CircularProgressIndicator()
             }
-        }
-    }
-}
-
-@Composable
-private fun ProfileSettingTitle() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(TopAppBarHeight),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = stringResource(R.string.profile_setting_title),
-            style = OnmoimTheme.typography.body1SemiBold.copy(
-                color = OnmoimTheme.colors.textColor
-            )
-        )
-    }
-}
-
-@Composable
-private fun ProfileSettingTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    hint: String? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    singleLine: Boolean = true,
-    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
-    minLines: Int = 1,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-) {
-    BasicTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier,
-        enabled = enabled,
-        textStyle = OnmoimTheme.typography.body2Regular.copy(
-            color = OnmoimTheme.colors.textColor
-        ),
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        singleLine = singleLine,
-        maxLines = maxLines,
-        minLines = minLines,
-        visualTransformation = visualTransformation
-    ) { innerTextField ->
-        Box(
-            modifier = Modifier
-                .background(
-                    color = OnmoimTheme.colors.gray01,
-                    shape = RoundedCornerShape(10.dp)
-                )
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 8.5.dp
-                ),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            AnimatedVisibility(
-                visible = value.isEmpty() && hint != null,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                hint?.let {
-                    Text(
-                        text = it,
-                        style = OnmoimTheme.typography.body2Regular.copy(
-                            color = OnmoimTheme.colors.gray04
-                        )
-                    )
-                }
-            }
-            innerTextField()
         }
     }
 }
