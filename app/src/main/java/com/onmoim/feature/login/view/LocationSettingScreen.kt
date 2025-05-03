@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.onmoim.R
 import com.onmoim.core.ui.component.CommonAppBar
@@ -39,7 +40,7 @@ import com.onmoim.feature.login.viewmodel.LocationSettingViewModel
 
 @Composable
 fun LocationSettingRoute(
-    locationSettingViewModel: LocationSettingViewModel,
+    locationSettingViewModel: LocationSettingViewModel = hiltViewModel(),
     onBack: (address: String?) -> Unit
 ) {
     val searchKeyword = locationSettingViewModel.searchKeyword.collectAsStateWithLifecycle()

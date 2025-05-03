@@ -51,7 +51,7 @@ import com.onmoim.feature.login.viewmodel.ProfileSettingViewModel
 fun ProfileSettingRoute(
     profileSettingViewModel: ProfileSettingViewModel,
     onNavigateToLocationSetting: () -> Unit,
-    onNavigateToSelectInterest: () -> Unit
+    onNavigateToInterestSelect: () -> Unit
 ) {
     val profileSettingState by profileSettingViewModel.profileSettingState.collectAsStateWithLifecycle()
     var showLoading by remember { mutableStateOf(false) }
@@ -79,7 +79,7 @@ fun ProfileSettingRoute(
                 }
 
                 ProfileSettingEvent.ProfileSettingSuccess -> {
-                    onNavigateToSelectInterest()
+                    onNavigateToInterestSelect()
                 }
             }
         }

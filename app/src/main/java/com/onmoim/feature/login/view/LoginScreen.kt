@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.onmoim.R
 import com.onmoim.core.constant.SocialType
 import com.onmoim.core.ui.theme.OnmoimTheme
@@ -49,9 +50,10 @@ import timber.log.Timber
 
 @Composable
 fun LoginRoute(
-    loginViewModel: LoginViewModel,
+    loginViewModel: LoginViewModel = hiltViewModel(),
     onNavigateToHome: () -> Unit,
-    onNavigateToProfileSetting: () -> Unit
+    onNavigateToProfileSetting: () -> Unit,
+    onNavigateToInterestSelect: () -> Unit
 ) {
     val context = LocalContext.current
     var showErrorDialog by remember { mutableStateOf(false) }
@@ -84,14 +86,16 @@ fun LoginRoute(
     LaunchedEffect(Unit) {
         loginViewModel.receiveEvent.collect { event ->
             when (event) {
-                LoginEvent.NavigateToHome -> onNavigateToHome()
-                LoginEvent.NavigateToProfileSetting -> onNavigateToProfileSetting()
                 is LoginEvent.ShowErrorDialog -> {
                     val error = event.t
                     Timber.e(error, error?.message.toString())
                     errorMessage = ContextCompat.getString(context, R.string.login_error_message)
                     showErrorDialog = true
                 }
+
+                LoginEvent.NavigateToHome -> onNavigateToHome()
+                LoginEvent.NavigateToProfileSetting -> onNavigateToProfileSetting()
+                LoginEvent.NavigateToInterestSelect -> onNavigateToInterestSelect()
             }
         }
     }

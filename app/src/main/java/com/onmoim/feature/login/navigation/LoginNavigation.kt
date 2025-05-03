@@ -6,7 +6,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
 import androidx.navigation.navigation
+import com.onmoim.feature.login.view.InterestSelectRoute
 import com.onmoim.feature.login.view.LocationSettingRoute
 import com.onmoim.feature.login.view.LoginRoute
 import com.onmoim.feature.login.view.ProfileSettingRoute
@@ -25,6 +27,9 @@ data object ProfileSettingRoute
 @Serializable
 data object LocationSettingRoute
 
+@Serializable
+data object InterestSelectRoute
+
 fun NavController.navigateToLogin(navOptions: NavOptions? = null) {
     navigate(LoginRoute, navOptions)
 }
@@ -37,6 +42,10 @@ fun NavController.navigateToLocationSetting(navOptions: NavOptions? = null) {
     navigate(LocationSettingRoute, navOptions)
 }
 
+fun NavController.navigateToInterestSelect(navOptions: NavOptions? = null) {
+    navigate(InterestSelectRoute, navOptions)
+}
+
 fun NavGraphBuilder.loginGraph(
     navController: NavController
 ) {
@@ -45,12 +54,14 @@ fun NavGraphBuilder.loginGraph(
     ) {
         composable<LoginRoute> {
             LoginRoute(
-                loginViewModel = hiltViewModel(),
                 onNavigateToHome = {
 
                 },
                 onNavigateToProfileSetting = {
                     navController.navigateToProfileSetting()
+                },
+                onNavigateToInterestSelect = {
+                    navController.navigateToInterestSelect()
                 }
             )
         }
@@ -66,8 +77,12 @@ fun NavGraphBuilder.loginGraph(
                 onNavigateToLocationSetting = {
                     navController.navigateToLocationSetting()
                 },
-                onNavigateToSelectInterest = {
-
+                onNavigateToInterestSelect = {
+                    navController.navigateToInterestSelect(navOptions {
+                        popUpTo(LoginRoute) {
+                            inclusive = true
+                        }
+                    })
                 }
             )
 
@@ -77,12 +92,21 @@ fun NavGraphBuilder.loginGraph(
         }
         composable<LocationSettingRoute> {
             LocationSettingRoute(
-                locationSettingViewModel = hiltViewModel(),
                 onBack = { address ->
                     navController.previousBackStackEntry?.savedStateHandle?.apply {
                         set(LoginNavigationBundleKey.LOCATION, address)
                     }
                     navController.popBackStack()
+                }
+            )
+        }
+        composable<InterestSelectRoute> {
+            InterestSelectRoute(
+                onBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToHome = {
+
                 }
             )
         }
