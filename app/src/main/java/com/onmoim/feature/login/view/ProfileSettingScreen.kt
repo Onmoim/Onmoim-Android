@@ -35,7 +35,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.onmoim.R
 import com.onmoim.core.constant.Sex
@@ -50,7 +49,7 @@ import com.onmoim.feature.login.viewmodel.ProfileSettingViewModel
 
 @Composable
 fun ProfileSettingRoute(
-    profileSettingViewModel: ProfileSettingViewModel = hiltViewModel(),
+    profileSettingViewModel: ProfileSettingViewModel,
     onNavigateToLocationSetting: () -> Unit,
     onNavigateToSelectInterest: () -> Unit
 ) {
@@ -60,9 +59,9 @@ fun ProfileSettingRoute(
     ProfileSettingScreen(
         profileSettingState = profileSettingState,
         showLoading = showLoading,
-        onNameChanged = profileSettingViewModel::onNameChanged,
-        onSexChanged = profileSettingViewModel::onSexChanged,
-        onBirthChanged = profileSettingViewModel::onBirthChanged,
+        onNameChange = profileSettingViewModel::onNameChange,
+        onSexChange = profileSettingViewModel::onSexChange,
+        onBirthChange = profileSettingViewModel::onBirthChange,
         onClickLocation = onNavigateToLocationSetting,
         onClickComplete = profileSettingViewModel::onClickComplete
     )
@@ -91,9 +90,9 @@ fun ProfileSettingRoute(
 private fun ProfileSettingScreen(
     profileSettingState: ProfileSettingState,
     showLoading: Boolean,
-    onNameChanged: (String) -> Unit,
-    onSexChanged: (Sex) -> Unit,
-    onBirthChanged: (String) -> Unit,
+    onNameChange: (String) -> Unit,
+    onSexChange: (Sex) -> Unit,
+    onBirthChange: (String) -> Unit,
     onClickLocation: () -> Unit,
     onClickComplete: () -> Unit
 ) {
@@ -109,7 +108,9 @@ private fun ProfileSettingScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.profile_setting_title),
-                        style = OnmoimTheme.typography.body1SemiBold
+                        style = OnmoimTheme.typography.body1SemiBold.copy(
+                            color = OnmoimTheme.colors.textColor
+                        )
                     )
                 }
             )
@@ -126,21 +127,35 @@ private fun ProfileSettingScreen(
                 ) {
                     CommonTextField(
                         value = profileSettingState.name,
-                        onValueChange = onNameChanged,
+                        onValueChange = onNameChange,
                         modifier = Modifier.weight(1f),
-                        hint = stringResource(R.string.name)
+                        placeholder = {
+                            Text(
+                                text = stringResource(R.string.name),
+                                style = OnmoimTheme.typography.body2Regular.copy(
+                                    color = OnmoimTheme.colors.gray04
+                                )
+                            )
+                        }
                     )
                     SexToggle(
                         value = profileSettingState.sex,
-                        onValueChanged = onSexChanged,
+                        onValueChange = onSexChange,
                         modifier = Modifier.width(100.dp)
                     )
                 }
                 CommonTextField(
                     value = profileSettingState.birth,
-                    onValueChange = onBirthChanged,
+                    onValueChange = onBirthChange,
                     modifier = Modifier.fillMaxWidth(),
-                    hint = stringResource(R.string.birth),
+                    placeholder = {
+                        Text(
+                            text = stringResource(R.string.birth),
+                            style = OnmoimTheme.typography.body2Regular.copy(
+                                color = OnmoimTheme.colors.gray04
+                            )
+                        )
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
                     ),
@@ -157,7 +172,14 @@ private fun ProfileSettingScreen(
                             onClick = onClickLocation
                         ),
                     enabled = false,
-                    hint = stringResource(R.string.location)
+                    placeholder = {
+                        Text(
+                            text = stringResource(R.string.location),
+                            style = OnmoimTheme.typography.body2Regular.copy(
+                                color = OnmoimTheme.colors.gray04
+                            )
+                        )
+                    }
                 )
             }
             Spacer(Modifier.height(40.dp))
@@ -174,7 +196,7 @@ private fun ProfileSettingScreen(
             Box(
                 modifier = Modifier
                     .pointerInteropFilter {
-                        false
+                        true
                     }
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -188,7 +210,7 @@ private fun ProfileSettingScreen(
 @Composable
 private fun SexToggle(
     value: Sex?,
-    onValueChanged: (Sex) -> Unit,
+    onValueChange: (Sex) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -205,7 +227,7 @@ private fun SexToggle(
             Box(
                 modifier = Modifier
                     .clickable {
-                        onValueChanged(it)
+                        onValueChange(it)
                     }
                     .weight(1f)
                     .heightIn(min = 38.dp)
@@ -288,13 +310,13 @@ private fun ProfileSettingScreenPreview() {
         ProfileSettingScreen(
             profileSettingState = profileSettingState,
             showLoading = false,
-            onNameChanged = {
+            onNameChange = {
                 profileSettingState = profileSettingState.copy(name = it)
             },
-            onSexChanged = {
+            onSexChange = {
                 profileSettingState = profileSettingState.copy(sex = it)
             },
-            onBirthChanged = {
+            onBirthChange = {
                 if (it.length <= 8) {
                     profileSettingState = profileSettingState.copy(birth = it)
                 }

@@ -6,6 +6,7 @@
     <string name="location">지역</string>
     <string name="male">남</string>
     <string name="female">여</string>
+    <string name="back">뒤로 가기</string>
 
     <!-- 버튼 -->
     <string name="btn_ok">확인</string>
@@ -20,4 +21,8 @@
 
     <!-- 프로필 설정 화면 -->
     <string name="profile_setting_title">프로필 설정</string>
+
+    <!-- 지역 설정 화면 -->
+    <string name="location_setting_title">지역 설정</string>
+    <string name="find_location_placeholder">동・읍・면 찾기</string>
 </resources>

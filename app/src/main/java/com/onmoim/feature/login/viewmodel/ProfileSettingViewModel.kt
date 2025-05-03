@@ -15,26 +15,28 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileSettingViewModel @Inject constructor(): ViewModel() {
+class ProfileSettingViewModel @Inject constructor(
+
+) : ViewModel() {
     private val _profileSettingState = MutableStateFlow(ProfileSettingState())
     val profileSettingState = _profileSettingState.asStateFlow()
 
     private val _eventChannel = Channel<ProfileSettingEvent>(Channel.BUFFERED)
     val receiveEvent = _eventChannel.receiveAsFlow()
 
-    fun onNameChanged(name: String) {
+    fun onNameChange(name: String) {
         _profileSettingState.update {
             it.copy(name = name)
         }
     }
 
-    fun onSexChanged(sex: Sex) {
+    fun onSexChange(sex: Sex) {
         _profileSettingState.update {
             it.copy(sex = sex)
         }
     }
 
-    fun onBirthChanged(birth: String) {
+    fun onBirthChange(birth: String) {
         if (birth.length <= 8) {
             _profileSettingState.update {
                 it.copy(birth = birth)
@@ -42,7 +44,7 @@ class ProfileSettingViewModel @Inject constructor(): ViewModel() {
         }
     }
 
-    fun onLocationChanged(location: String) {
+    fun onLocationChange(location: String) {
         _profileSettingState.update {
             it.copy(location = location)
         }

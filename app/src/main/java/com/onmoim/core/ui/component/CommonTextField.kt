@@ -33,7 +33,7 @@ fun CommonTextField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    hint: String? = null,
+    placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -71,21 +71,16 @@ fun CommonTextField(
                 ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            leadingIcon?.let {
-                it.invoke()
+            if (leadingIcon != null) {
+                leadingIcon()
                 Spacer(Modifier.width(8.dp))
             }
             Box(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.CenterStart
             ) {
-                if (value.isEmpty() && hint != null) {
-                    Text(
-                        text = hint,
-                        style = OnmoimTheme.typography.body2Regular.copy(
-                            color = OnmoimTheme.colors.gray04
-                        )
-                    )
+                if (value.isEmpty() && placeholder != null) {
+                    placeholder()
                 }
                 innerTextField()
             }
@@ -105,7 +100,14 @@ private fun CommonTextFieldPreview() {
                 value = it
             },
             modifier = Modifier.width(300.dp),
-            hint = "hint",
+            placeholder = {
+                Text(
+                    text = "hint",
+                    style = OnmoimTheme.typography.body2Regular.copy(
+                        color = OnmoimTheme.colors.gray04
+                    )
+                )
+            },
             leadingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.ic_search),

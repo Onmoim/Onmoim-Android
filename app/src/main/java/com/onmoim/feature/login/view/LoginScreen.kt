@@ -36,7 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.onmoim.R
 import com.onmoim.core.constant.SocialType
 import com.onmoim.core.ui.theme.OnmoimTheme
@@ -50,7 +49,7 @@ import timber.log.Timber
 
 @Composable
 fun LoginRoute(
-    loginViewModel: LoginViewModel = hiltViewModel(),
+    loginViewModel: LoginViewModel,
     onNavigateToHome: () -> Unit,
     onNavigateToProfileSetting: () -> Unit
 ) {
