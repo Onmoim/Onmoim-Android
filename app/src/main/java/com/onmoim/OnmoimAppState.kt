@@ -1,4 +1,4 @@
-package com.onmoim.core.ui
+package com.onmoim
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable

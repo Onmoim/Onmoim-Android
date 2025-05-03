@@ -1,4 +1,4 @@
-package com.onmoim.core.ui
+package com.onmoim
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
