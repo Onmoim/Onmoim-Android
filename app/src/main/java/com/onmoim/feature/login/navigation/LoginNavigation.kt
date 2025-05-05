@@ -22,13 +22,13 @@ object LoginNavigation
 object LoginRoute
 
 @Serializable
-data object ProfileSettingRoute
+object ProfileSettingRoute
 
 @Serializable
-data object LocationSettingRoute
+object LocationSettingRoute
 
 @Serializable
-data object InterestSelectRoute
+object InterestSelectRoute
 
 fun NavController.navigateToLogin(navOptions: NavOptions? = null) {
     navigate(LoginRoute, navOptions)
