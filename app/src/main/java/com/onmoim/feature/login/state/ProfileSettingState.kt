@@ -1,6 +1,6 @@
 package com.onmoim.feature.login.state
 
-import com.onmoim.core.constant.Sex
+import com.onmoim.core.constant.Gender
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -9,12 +9,12 @@ import java.time.format.ResolverStyle
 
 data class ProfileSettingState(
     val name: String = "",
-    val sex: Sex? = null,
+    val gender: Gender? = null,
     val birth: String = "",
     val location: String = ""
 ) {
     val isValidInputValue: Boolean
-        get() = isValidKoreanNameFormat() && sex != null && isValidBirthDate() && location.isNotBlank()
+        get() = isValidKoreanNameFormat() && gender != null && isValidBirthDate() && location.isNotBlank()
 
     private fun isValidBirthDate(): Boolean {
         if (birth.length != 8 || !birth.all { it.isDigit() }) {

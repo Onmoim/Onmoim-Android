@@ -2,7 +2,7 @@ package com.onmoim.feature.login.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.onmoim.core.constant.Sex
+import com.onmoim.core.constant.Gender
 import com.onmoim.feature.login.state.ProfileSettingEvent
 import com.onmoim.feature.login.state.ProfileSettingState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,9 +30,9 @@ class ProfileSettingViewModel @Inject constructor(
         }
     }
 
-    fun onSexChange(sex: Sex) {
+    fun onGenderChange(gender: Gender) {
         _profileSettingState.update {
-            it.copy(sex = sex)
+            it.copy(gender = gender)
         }
     }
 

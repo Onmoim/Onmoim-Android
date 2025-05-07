@@ -1,5 +1,5 @@
 package com.onmoim.core.constant
 
-enum class Sex {
-    MALE, FEMALE
+enum class Gender {
+    MAN, WOMAN
 }

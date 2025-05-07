@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.onmoim.R
-import com.onmoim.core.constant.Sex
+import com.onmoim.core.constant.Gender
 import com.onmoim.core.ui.component.CommonAppBar
 import com.onmoim.core.ui.component.CommonTextField
 import com.onmoim.core.ui.text.DateVisualTransformation
@@ -60,7 +60,7 @@ fun ProfileSettingRoute(
         profileSettingState = profileSettingState,
         showLoading = showLoading,
         onNameChange = profileSettingViewModel::onNameChange,
-        onSexChange = profileSettingViewModel::onSexChange,
+        onGenderChange = profileSettingViewModel::onGenderChange,
         onBirthChange = profileSettingViewModel::onBirthChange,
         onClickLocation = onNavigateToLocationSetting,
         onClickComplete = profileSettingViewModel::onClickComplete
@@ -91,7 +91,7 @@ private fun ProfileSettingScreen(
     profileSettingState: ProfileSettingState,
     showLoading: Boolean,
     onNameChange: (String) -> Unit,
-    onSexChange: (Sex) -> Unit,
+    onGenderChange: (Gender) -> Unit,
     onBirthChange: (String) -> Unit,
     onClickLocation: () -> Unit,
     onClickComplete: () -> Unit
@@ -138,9 +138,9 @@ private fun ProfileSettingScreen(
                             )
                         }
                     )
-                    SexToggle(
-                        value = profileSettingState.sex,
-                        onValueChange = onSexChange,
+                    GenderToggle(
+                        value = profileSettingState.gender,
+                        onValueChange = onGenderChange,
                         modifier = Modifier.width(100.dp)
                     )
                 }
@@ -208,9 +208,9 @@ private fun ProfileSettingScreen(
 }
 
 @Composable
-private fun SexToggle(
-    value: Sex?,
-    onValueChange: (Sex) -> Unit,
+private fun GenderToggle(
+    value: Gender?,
+    onValueChange: (Gender) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -223,7 +223,7 @@ private fun SexToggle(
             .clip(RoundedCornerShape(10.dp)),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Sex.entries.forEach {
+        Gender.entries.forEach {
             Box(
                 modifier = Modifier
                     .clickable {
@@ -233,23 +233,23 @@ private fun SexToggle(
                     .heightIn(min = 38.dp)
                     .padding(
                         start = when (it) {
-                            Sex.MALE -> 0.dp
-                            Sex.FEMALE -> 15.dp
+                            Gender.MAN -> 0.dp
+                            Gender.WOMAN -> 15.dp
                         },
                         end = when (it) {
-                            Sex.MALE -> 15.dp
-                            Sex.FEMALE -> 0.dp
+                            Gender.MAN -> 15.dp
+                            Gender.WOMAN -> 0.dp
                         }
                     ),
                 contentAlignment = when (it) {
-                    Sex.MALE -> Alignment.CenterEnd
-                    Sex.FEMALE -> Alignment.CenterStart
+                    Gender.MAN -> Alignment.CenterEnd
+                    Gender.WOMAN -> Alignment.CenterStart
                 }
             ) {
                 Text(
                     text = when (it) {
-                        Sex.MALE -> stringResource(R.string.male)
-                        Sex.FEMALE -> stringResource(R.string.female)
+                        Gender.MAN -> stringResource(R.string.man)
+                        Gender.WOMAN -> stringResource(R.string.woman)
                     },
                     style = OnmoimTheme.typography.body2Regular.copy(
                         color = if (value == it) {
@@ -313,8 +313,8 @@ private fun ProfileSettingScreenPreview() {
             onNameChange = {
                 profileSettingState = profileSettingState.copy(name = it)
             },
-            onSexChange = {
-                profileSettingState = profileSettingState.copy(sex = it)
+            onGenderChange = {
+                profileSettingState = profileSettingState.copy(gender = it)
             },
             onBirthChange = {
                 if (it.length <= 8) {
