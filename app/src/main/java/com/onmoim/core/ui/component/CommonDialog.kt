@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -61,17 +62,22 @@ fun CommonDialog(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, start = 40.dp, end = 40.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(top = 16.dp, start = 40.dp, end = 40.dp)
                 ) {
                     Text(
                         text = title,
-                        style = OnmoimTheme.typography.body2SemiBold
+                        modifier = Modifier.fillMaxWidth(),
+                        style = OnmoimTheme.typography.body2SemiBold.copy(
+                            textAlign = TextAlign.Center
+                        )
                     )
                     Spacer(Modifier.height(24.dp))
                     Text(
                         text = content,
-                        style = OnmoimTheme.typography.body2Regular
+                        modifier = Modifier.fillMaxWidth(),
+                        style = OnmoimTheme.typography.body2Regular.copy(
+                            textAlign = TextAlign.Center
+                        )
                     )
                     Spacer(Modifier.height(24.dp))
                 }
