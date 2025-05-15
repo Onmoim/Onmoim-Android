@@ -123,7 +123,7 @@ private fun InterestSelectScreen(
                 actions = {
                     if (selectedInterestCategories.isNotEmpty()) {
                         Text(
-                            text = stringResource(R.string.btn_ok),
+                            text = stringResource(R.string.confirm),
                             modifier = Modifier
                                 .clickable(
                                     onClick = onClickOk,

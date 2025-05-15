@@ -289,7 +289,7 @@ private fun ProfileSettingCompleteButton(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = stringResource(R.string.btn_ok),
+            text = stringResource(R.string.confirm),
             fontFamily = pretendard,
             fontWeight = FontWeight.W600,
             fontSize = 15.sp,

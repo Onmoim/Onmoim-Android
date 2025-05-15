@@ -14,9 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,6 +37,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.onmoim.R
 import com.onmoim.core.constant.SocialType
+import com.onmoim.core.ui.component.CommonDialog
 import com.onmoim.core.ui.theme.OnmoimTheme
 import com.onmoim.core.ui.theme.advancedShadow
 import com.onmoim.core.ui.theme.inter
@@ -60,21 +59,13 @@ fun LoginRoute(
     var errorMessage by remember { mutableStateOf("") }
 
     if (showErrorDialog) {
-        AlertDialog(
+        CommonDialog(
             onDismissRequest = {
                 showErrorDialog = false
             },
-            title = {
-                Text(errorMessage)
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showErrorDialog = false
-                    }
-                ) {
-                    Text(stringResource(R.string.btn_ok))
-                }
+            content = errorMessage,
+            onClickConfirm = {
+                showErrorDialog = false
             }
         )
     }
