@@ -10,6 +10,7 @@
     <string name="confirm">확인</string>
     <string name="cancel">취소</string>
     <string name="guide">안내</string>
+    <string name="date_select">날짜 선택</string>
 
     <!-- 버튼 -->
     <string name="btn_google_login">구글로 로그인</string>
@@ -42,6 +43,7 @@
 
     <!-- 프로필 설정 화면 -->
     <string name="profile_setting_title">프로필 설정</string>
+    <string name="error_name_format">이름에는 특수문자를 사용할 수 없어요</string>
 
     <!-- 지역 설정 화면 -->
     <string name="location_setting_title">지역 설정</string>

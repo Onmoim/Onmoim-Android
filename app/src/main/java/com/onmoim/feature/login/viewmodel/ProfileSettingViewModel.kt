@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,8 +23,8 @@ class ProfileSettingViewModel @Inject constructor(
     private val _profileSettingState = MutableStateFlow(ProfileSettingState())
     val profileSettingState = _profileSettingState.asStateFlow()
 
-    private val _eventChannel = Channel<ProfileSettingEvent>(Channel.BUFFERED)
-    val receiveEvent = _eventChannel.receiveAsFlow()
+    private val _event = Channel<ProfileSettingEvent>(Channel.BUFFERED)
+    val event = _event.receiveAsFlow()
 
     fun onNameChange(name: String) {
         _profileSettingState.update {
@@ -36,11 +38,12 @@ class ProfileSettingViewModel @Inject constructor(
         }
     }
 
-    fun onBirthChange(birth: String) {
-        if (birth.length <= 8) {
-            _profileSettingState.update {
-                it.copy(birth = birth)
-            }
+    fun onBirthChange(localDate: LocalDate) {
+        val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+        val birth = formatter.format(localDate)
+
+        _profileSettingState.update {
+            it.copy(birth = birth)
         }
     }
 
@@ -52,7 +55,7 @@ class ProfileSettingViewModel @Inject constructor(
 
     fun onClickComplete() {
         viewModelScope.launch {
-            _eventChannel.send(ProfileSettingEvent.Loading)
+            _event.send(ProfileSettingEvent.Loading)
             // TODO: API 호출
         }
     }

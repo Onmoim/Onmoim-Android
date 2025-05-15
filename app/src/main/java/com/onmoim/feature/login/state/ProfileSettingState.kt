@@ -14,7 +14,7 @@ data class ProfileSettingState(
     val location: String = ""
 ) {
     val isValidInputValue: Boolean
-        get() = isValidKoreanNameFormat() && gender != null && isValidBirthDate() && location.isNotBlank()
+        get() = isValidName() && gender != null && isValidBirthDate() && location.isNotBlank()
 
     private fun isValidBirthDate(): Boolean {
         if (birth.length != 8 || !birth.all { it.isDigit() }) {
@@ -41,7 +41,7 @@ data class ProfileSettingState(
         }
     }
 
-    private fun isValidKoreanNameFormat(minLength: Int = 2, maxLength: Int = 10): Boolean {
+    private fun isValidName(minLength: Int = 2, maxLength: Int = 12): Boolean {
         if (name.isBlank()) {
             Timber.d("이름은 비어있거나 공백만 있을 수 없음.")
             return false
@@ -52,8 +52,7 @@ data class ProfileSettingState(
             return false
         }
 
-        val koreanNameRegex = Regex("^[가-힣]+$")
-        if (!koreanNameRegex.matches(name)) {
+        if (!isValidKoreanNameFormat()) {
             Timber.d("이름은 한글('가'~'힣')로만 구성되어야 함. (입력값: '${name}')")
             val invalidChars = name.filterNot { it in '가'..'힣' }
             if (invalidChars.isNotEmpty()) {
@@ -63,5 +62,10 @@ data class ProfileSettingState(
         }
 
         return true
+    }
+
+    fun isValidKoreanNameFormat(): Boolean {
+        val koreanNameRegex = Regex("^[가-힣]+$")
+        return koreanNameRegex.matches(name)
     }
 }

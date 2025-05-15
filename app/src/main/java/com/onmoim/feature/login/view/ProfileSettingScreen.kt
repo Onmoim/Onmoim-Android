@@ -1,5 +1,6 @@
 package com.onmoim.feature.login.view
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -39,13 +40,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.onmoim.R
 import com.onmoim.core.constant.Gender
 import com.onmoim.core.ui.component.CommonAppBar
+import com.onmoim.core.ui.component.CommonDatePickerDialog
 import com.onmoim.core.ui.component.CommonTextField
-import com.onmoim.core.ui.text.DateVisualTransformation
 import com.onmoim.core.ui.theme.OnmoimTheme
 import com.onmoim.core.ui.theme.pretendard
 import com.onmoim.feature.login.state.ProfileSettingEvent
 import com.onmoim.feature.login.state.ProfileSettingState
 import com.onmoim.feature.login.viewmodel.ProfileSettingViewModel
+import java.time.LocalDate
 
 @Composable
 fun ProfileSettingRoute(
@@ -55,19 +57,42 @@ fun ProfileSettingRoute(
 ) {
     val profileSettingState by profileSettingViewModel.profileSettingState.collectAsStateWithLifecycle()
     var showLoading by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    if (showDatePicker) {
+        CommonDatePickerDialog(
+            onDismissRequest = {
+                showDatePicker = false
+            },
+            initialDate = if (profileSettingState.birth.isNotBlank()) {
+                val year = profileSettingState.birth.substring(0, 4).toInt()
+                val month = profileSettingState.birth.substring(4, 6).toInt()
+                val day = profileSettingState.birth.substring(6).toInt()
+                LocalDate.of(year, month, day)
+            } else {
+                LocalDate.now()
+            },
+            onClickConfirm = { localDate ->
+                showDatePicker = false
+                profileSettingViewModel.onBirthChange(localDate)
+            }
+        )
+    }
 
     ProfileSettingScreen(
         profileSettingState = profileSettingState,
         showLoading = showLoading,
         onNameChange = profileSettingViewModel::onNameChange,
         onGenderChange = profileSettingViewModel::onGenderChange,
-        onBirthChange = profileSettingViewModel::onBirthChange,
+        onClickBirth = {
+            showDatePicker = true
+        },
         onClickLocation = onNavigateToLocationSetting,
         onClickComplete = profileSettingViewModel::onClickComplete
     )
 
     LaunchedEffect(Unit) {
-        profileSettingViewModel.receiveEvent.collect { event ->
+        profileSettingViewModel.event.collect { event ->
             when (event) {
                 ProfileSettingEvent.Loading -> {
                     showLoading = true
@@ -92,7 +117,7 @@ private fun ProfileSettingScreen(
     showLoading: Boolean,
     onNameChange: (String) -> Unit,
     onGenderChange: (Gender) -> Unit,
-    onBirthChange: (String) -> Unit,
+    onClickBirth: () -> Unit,
     onClickLocation: () -> Unit,
     onClickComplete: () -> Unit
 ) {
@@ -144,10 +169,28 @@ private fun ProfileSettingScreen(
                         modifier = Modifier.width(100.dp)
                     )
                 }
+                AnimatedVisibility(
+                    visible = profileSettingState.name.isNotBlank() &&
+                            !profileSettingState.isValidKoreanNameFormat()
+                ) {
+                    Text(
+                        text = stringResource(R.string.error_name_format),
+                        style = OnmoimTheme.typography.caption2Regular.copy(
+                            color = OnmoimTheme.colors.alertRed
+                        )
+                    )
+                }
                 CommonTextField(
                     value = profileSettingState.birth,
-                    onValueChange = onBirthChange,
-                    modifier = Modifier.fillMaxWidth(),
+                    onValueChange = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() },
+                            onClick = onClickBirth
+                        ),
+                    enabled = false,
                     placeholder = {
                         Text(
                             text = stringResource(R.string.birth),
@@ -158,8 +201,7 @@ private fun ProfileSettingScreen(
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
-                    ),
-                    visualTransformation = DateVisualTransformation()
+                    )
                 )
                 CommonTextField(
                     value = profileSettingState.location,
@@ -316,11 +358,7 @@ private fun ProfileSettingScreenPreview() {
             onGenderChange = {
                 profileSettingState = profileSettingState.copy(gender = it)
             },
-            onBirthChange = {
-                if (it.length <= 8) {
-                    profileSettingState = profileSettingState.copy(birth = it)
-                }
-            },
+            onClickBirth = {},
             onClickLocation = {},
             onClickComplete = {}
         )
