@@ -7,20 +7,24 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import com.onmoim.feature.login.navigation.LoginNavigation
 import com.onmoim.feature.login.navigation.loginGraph
 
 private const val PAGE_TURN_DURATION_MS = 450
 
 @Composable
 fun OnmoimNavHost(
-    navController: NavHostController
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+    topBar: @Composable () -> Unit,
+    bottomBar: @Composable () -> Unit
 ) {
     NavHost(
         navController = navController,
-        startDestination = LoginNavigation, // FIXME: 추후 수정 필요
+        startDestination = TopLevelNavigation, // FIXME: 추후 수정 필요
+        modifier = modifier,
         enterTransition = {
             slideInHorizontally(
                 initialOffsetX = { fullWidth -> fullWidth },
@@ -48,6 +52,11 @@ fun OnmoimNavHost(
             ) + fadeOut(animationSpec = tween(PAGE_TURN_DURATION_MS))
         }
     ) {
+        topLevelGraph(
+            navController = navController,
+            topBar = topBar,
+            bottomBar = bottomBar
+        )
         loginGraph(
             navController = navController
         )

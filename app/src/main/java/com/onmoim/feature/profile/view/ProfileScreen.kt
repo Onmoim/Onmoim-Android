@@ -1,0 +1,49 @@
+package com.onmoim.feature.profile.view
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.onmoim.core.ui.theme.OnmoimTheme
+
+@Composable
+fun ProfileRoute(
+    topBar: @Composable () -> Unit,
+    bottomBar: @Composable () -> Unit
+) {
+
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        topBar()
+        ProfileScreen(
+            modifier = Modifier.weight(1f)
+        )
+        bottomBar()
+    }
+}
+
+@Composable
+private fun ProfileScreen(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+
+    }
+}
+
+@Preview
+@Composable
+private fun ProfileScreenPreview() {
+    OnmoimTheme {
+        ProfileScreen(
+            modifier = Modifier
+                .background(OnmoimTheme.colors.backgroundColor)
+                .fillMaxSize()
+        )
+    }
+}
