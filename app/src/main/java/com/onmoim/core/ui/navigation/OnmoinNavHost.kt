@@ -23,7 +23,7 @@ fun OnmoimNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = TopLevelNavigation, // FIXME: 추후 수정 필요
+        startDestination = HomeRoute, // FIXME: 추후 수정 필요
         modifier = modifier,
         enterTransition = {
             slideInHorizontally(

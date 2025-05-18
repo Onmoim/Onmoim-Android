@@ -6,11 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.navigation
 import com.onmoim.R
 import com.onmoim.feature.category.view.CategoryRoute
 import com.onmoim.feature.home.view.HomeRoute
-import com.onmoim.feature.mymeeting.view.MyMeetingRoute
+import com.onmoim.feature.mymeet.view.MyMeetRoute
 import com.onmoim.feature.profile.view.ProfileRoute
 import kotlinx.serialization.Serializable
 
@@ -22,16 +21,13 @@ data class TopLevelRoute<T : Any>(
 )
 
 @Serializable
-object TopLevelNavigation
-
-@Serializable
 object HomeRoute
 
 @Serializable
 object CategoryRoute
 
 @Serializable
-object MyMeetingRoute
+object MyMeetRoute
 
 @Serializable
 object ProfileRoute
@@ -50,10 +46,10 @@ val topLevelRoutes = listOf(
         route = CategoryRoute
     ),
     TopLevelRoute(
-        labelId = R.string.my_meeting,
-        selectedIconId = R.drawable.ic_meeting_selected,
-        unselectedIconId = R.drawable.ic_meeting_unselected,
-        route = MyMeetingRoute
+        labelId = R.string.my_meet,
+        selectedIconId = R.drawable.ic_meet_selected,
+        unselectedIconId = R.drawable.ic_meet_unselected,
+        route = MyMeetRoute
     ),
     TopLevelRoute(
         labelId = R.string.profile,
@@ -68,52 +64,48 @@ fun NavGraphBuilder.topLevelGraph(
     topBar: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit
 ) {
-    navigation<TopLevelNavigation>(
-        startDestination = HomeRoute
+    composable<HomeRoute>(
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
     ) {
-        composable<HomeRoute>(
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
-            popEnterTransition = { EnterTransition.None },
-            popExitTransition = { ExitTransition.None }
-        ) {
-            HomeRoute(
-                topBar = topBar,
-                bottomBar = bottomBar
-            )
-        }
-        composable<CategoryRoute>(
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
-            popEnterTransition = { EnterTransition.None },
-            popExitTransition = { ExitTransition.None }
-        ) {
-            CategoryRoute(
-                topBar = topBar,
-                bottomBar = bottomBar
-            )
-        }
-        composable<MyMeetingRoute>(
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
-            popEnterTransition = { EnterTransition.None },
-            popExitTransition = { ExitTransition.None }
-        ) {
-            MyMeetingRoute(
-                topBar = topBar,
-                bottomBar = bottomBar
-            )
-        }
-        composable<ProfileRoute>(
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
-            popEnterTransition = { EnterTransition.None },
-            popExitTransition = { ExitTransition.None }
-        ) {
-            ProfileRoute(
-                topBar = topBar,
-                bottomBar = bottomBar
-            )
-        }
+        HomeRoute(
+            topBar = topBar,
+            bottomBar = bottomBar
+        )
+    }
+    composable<CategoryRoute>(
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
+    ) {
+        CategoryRoute(
+            topBar = topBar,
+            bottomBar = bottomBar
+        )
+    }
+    composable<MyMeetRoute>(
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
+    ) {
+        MyMeetRoute(
+            topBar = topBar,
+            bottomBar = bottomBar
+        )
+    }
+    composable<ProfileRoute>(
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None }
+    ) {
+        ProfileRoute(
+            topBar = topBar,
+            bottomBar = bottomBar
+        )
     }
 }

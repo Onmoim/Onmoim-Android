@@ -28,7 +28,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.onmoim.core.ui.navigation.CategoryRoute
 import com.onmoim.core.ui.navigation.HomeRoute
-import com.onmoim.core.ui.navigation.MyMeetingRoute
+import com.onmoim.core.ui.navigation.MyMeetRoute
 import com.onmoim.core.ui.navigation.ProfileRoute
 import com.onmoim.core.ui.navigation.topLevelRoutes
 import com.onmoim.core.ui.theme.OnmoimTheme
@@ -79,7 +79,7 @@ fun BottomNavigationBar(
                             top = when (topLevelRoute.route) {
                                 is HomeRoute -> 4.dp
                                 is CategoryRoute -> 6.dp
-                                is MyMeetingRoute -> 4.dp
+                                is MyMeetRoute -> 4.dp
                                 is ProfileRoute -> 3.dp
                                 else -> 0.dp
                             }
