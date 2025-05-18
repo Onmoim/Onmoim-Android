@@ -56,7 +56,7 @@ fun BottomNavigationBar(
                 start = 21.dp,
                 end = 21.dp,
                 top = 8.dp,
-                bottom = 12.dp
+                bottom = 10.dp
             )
             .selectableGroup(),
         horizontalArrangement = Arrangement.SpaceAround
