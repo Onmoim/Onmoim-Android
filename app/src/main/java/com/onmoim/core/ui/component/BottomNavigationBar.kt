@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -41,7 +43,7 @@ fun BottomNavigationBar(
     currentDestination: NavDestination?,
     onClick: (Any) -> Unit
 ) {
-    Row(
+    Box(
         modifier = Modifier
             .background(
                 color = OnmoimTheme.colors.backgroundColor
@@ -53,63 +55,69 @@ fun BottomNavigationBar(
                 )
             )
             .padding(
-                start = 21.dp,
-                end = 21.dp,
                 top = 8.dp,
                 bottom = 10.dp
             )
             .selectableGroup(),
-        horizontalArrangement = Arrangement.SpaceAround
+        contentAlignment = Alignment.Center
     ) {
-        topLevelRoutes.forEach { topLevelRoute ->
-            val selected = currentDestination?.hierarchy?.any {
-                it.hasRoute(topLevelRoute.route::class)
-            } == true
+        Row(
+            modifier = Modifier
+                .widthIn(max = 360.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 21.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            topLevelRoutes.forEach { topLevelRoute ->
+                val selected = currentDestination?.hierarchy?.any {
+                    it.hasRoute(topLevelRoute.route::class)
+                } == true
 
-            Column(
-                modifier = Modifier
-                    .selectable(
-                        selected = selected,
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        role = Role.Tab,
-                        onClick = {
-                            onClick(topLevelRoute.route)
-                        }
+                Column(
+                    modifier = Modifier
+                        .selectable(
+                            selected = selected,
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            role = Role.Tab,
+                            onClick = {
+                                onClick(topLevelRoute.route)
+                            }
+                        )
+                        .size(42.dp)
+                        .padding(
+                            top = when (topLevelRoute.route) {
+                                is HomeRoute -> 4.dp
+                                is CategoryRoute -> 6.dp
+                                is MyMeetingRoute -> 4.dp
+                                is ProfileRoute -> 3.dp
+                                else -> 0.dp
+                            }
+                        ),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(
+                            id = if (selected) {
+                                topLevelRoute.selectedIconId
+                            } else {
+                                topLevelRoute.unselectedIconId
+                            }
+                        ),
+                        contentDescription = stringResource(topLevelRoute.labelId)
                     )
-                    .size(42.dp)
-                    .padding(
-                        top = when (topLevelRoute.route) {
-                            is HomeRoute -> 4.dp
-                            is CategoryRoute -> 6.dp
-                            is MyMeetingRoute -> 4.dp
-                            is ProfileRoute -> 3.dp
-                            else -> 0.dp
-                        }
-                    ),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = painterResource(
-                        id = if (selected) {
-                            topLevelRoute.selectedIconId
-                        } else {
-                            topLevelRoute.unselectedIconId
-                        }
-                    ),
-                    contentDescription = stringResource(topLevelRoute.labelId)
-                )
-                BasicText(
-                    text = stringResource(topLevelRoute.labelId),
-                    style = OnmoimTheme.typography.caption3Regular.copy(
-                        color = if (selected) {
-                            OnmoimTheme.colors.textColor
-                        } else {
-                            OnmoimTheme.colors.gray05
-                        }
+                    BasicText(
+                        text = stringResource(topLevelRoute.labelId),
+                        style = OnmoimTheme.typography.caption3Regular.copy(
+                            color = if (selected) {
+                                OnmoimTheme.colors.textColor
+                            } else {
+                                OnmoimTheme.colors.gray05
+                            }
+                        )
                     )
-                )
+                }
             }
         }
     }
