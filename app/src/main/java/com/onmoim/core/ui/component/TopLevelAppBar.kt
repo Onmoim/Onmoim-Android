@@ -41,8 +41,8 @@ fun TopLevelAppBar(
             .fillMaxWidth()
             .height(39.dp)
             .padding(
-                start = 15.dp,
-                end = 7.dp
+                start = 16.dp,
+                end = 8.dp
             ),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
