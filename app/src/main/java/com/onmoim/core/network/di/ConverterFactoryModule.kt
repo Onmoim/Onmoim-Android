@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import retrofit2.Converter
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -21,6 +22,10 @@ object ConverterFactoryModule {
     @Provides
     @Singleton
     @KotlinxSerializationConverterFactory
-    fun provideKotlinxSerializationConverterFactory() =
-        Json.asConverterFactory("application/json; charset=UTF-8".toMediaType())
+    fun provideKotlinxSerializationConverterFactory(): Converter.Factory {
+        val json = Json {
+            ignoreUnknownKeys = true
+        }
+        return json.asConverterFactory("application/json; charset=UTF-8".toMediaType())
+    }
 }

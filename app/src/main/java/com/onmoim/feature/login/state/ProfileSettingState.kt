@@ -11,10 +11,11 @@ data class ProfileSettingState(
     val name: String = "",
     val gender: Gender? = null,
     val birth: String = "",
-    val location: String = ""
+    val address: String = "",
+    val addressId: Int = 0,
 ) {
     val isValidInputValue: Boolean
-        get() = isValidName() && gender != null && isValidBirthDate() && location.isNotBlank()
+        get() = isValidName() && gender != null && isValidBirthDate() && address.isNotBlank()
 
     private fun isValidBirthDate(): Boolean {
         if (birth.length != 8 || !birth.all { it.isDigit() }) {
