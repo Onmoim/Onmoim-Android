@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.onmoim.feature.login.navigation.LoginNavigation
 import com.onmoim.feature.login.navigation.loginGraph
 
 private const val PAGE_TURN_DURATION_MS = 450
@@ -23,7 +24,7 @@ fun OnmoimNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = HomeRoute, // FIXME: 추후 수정 필요
+        startDestination = LoginNavigation,
         modifier = modifier,
         enterTransition = {
             slideInHorizontally(
