@@ -4,20 +4,24 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,39 +40,48 @@ import com.onmoim.core.ui.component.CommonAppBar
 import com.onmoim.core.ui.component.CommonTextField
 import com.onmoim.core.ui.component.NavigationIconButton
 import com.onmoim.core.ui.theme.OnmoimTheme
+import com.onmoim.feature.login.state.LocationSettingUiState
 import com.onmoim.feature.login.viewmodel.LocationSettingViewModel
 
 @Composable
 fun LocationSettingRoute(
     locationSettingViewModel: LocationSettingViewModel = hiltViewModel(),
-    onBack: (address: String?) -> Unit
+    onBack: (address: String?, addressId: Int?) -> Unit
 ) {
-    val searchKeyword = locationSettingViewModel.searchKeyword.collectAsStateWithLifecycle()
+    val uiState by locationSettingViewModel.uiState.collectAsStateWithLifecycle()
+    val searchKeyword by locationSettingViewModel.searchKeyword.collectAsStateWithLifecycle()
 
     BackHandler {
-        onBack(null)
+        onBack(null, null)
     }
 
     LocationSettingScreen(
         onBack = onBack,
-        searchKeyword = searchKeyword.value,
+        uiState = uiState,
+        searchKeyword = searchKeyword,
         onSearchKeywordChange = locationSettingViewModel::onSearchKeywordChange,
         onSearch = {
-            locationSettingViewModel.fetchLocationSearch(searchKeyword.value)
+            locationSettingViewModel.fetchLocationSearch(searchKeyword)
+        },
+        onClickRefresh = {
+            locationSettingViewModel.fetchLocationSearch(searchKeyword)
         }
     )
 }
 
 @Composable
 private fun LocationSettingScreen(
-    onBack: (address: String?) -> Unit,
+    onBack: (address: String?, addressId: Int?) -> Unit,
+    uiState: LocationSettingUiState,
     searchKeyword: String,
     onSearchKeywordChange: (String) -> Unit,
     onSearch: () -> Unit,
+    onClickRefresh: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .imePadding()
             .background(
                 color = OnmoimTheme.colors.backgroundColor
             )
@@ -85,7 +98,7 @@ private fun LocationSettingScreen(
             navigationIcon = {
                 NavigationIconButton(
                     onClick = {
-                        onBack(null)
+                        onBack(null, null)
                     }
                 ) {
                     Icon(
@@ -124,21 +137,61 @@ private fun LocationSettingScreen(
                 }
             )
         )
-        LazyColumn(
+        Box(
             modifier = Modifier.weight(1f)
         ) {
-            // FIXME: 지역 검색 결과 더미 데이터
-            item {
-                LocationItem(
-                    onClick = {
-                        onBack("연남동")
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 15.dp),
-                    label = "연남동",
-                    subLabel = "서울특별시 마포구"
-                )
+            when (uiState) {
+                is LocationSettingUiState.Error -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(R.string.temporary_error),
+                            style = OnmoimTheme.typography.body1SemiBold.copy(
+                                color = OnmoimTheme.colors.textColor
+                            )
+                        )
+                        Spacer(Modifier.height(20.dp))
+                        Text(
+                            text = stringResource(R.string.try_again_later),
+                            style = OnmoimTheme.typography.body2Regular.copy(
+                                color = OnmoimTheme.colors.gray04
+                            )
+                        )
+                        Spacer(Modifier.height(44.dp))
+                        Text(
+                            text = stringResource(R.string.refresh),
+                            modifier = Modifier.clickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() },
+                                onClick = onClickRefresh
+                            ),
+                            style = OnmoimTheme.typography.caption1Regular.copy(
+                                color = OnmoimTheme.colors.textColor
+                            )
+                        )
+                    }
+                }
+
+                is LocationSettingUiState.Result -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(uiState.locations) {
+                            LocationItem(
+                                onClick = {
+                                    onBack(it.dong, it.id)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 15.dp),
+                                label = it.dong,
+                                subLabel = "${it.city} ${it.district}"
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -194,12 +247,14 @@ private fun LocationSettingScreenPreview() {
 
     OnmoimTheme {
         LocationSettingScreen(
-            onBack = {},
+            onBack = { _, _ -> },
+            uiState = LocationSettingUiState.Result(emptyList()),
             searchKeyword = searchKeyword.value,
             onSearchKeywordChange = {
                 searchKeyword.value = it
             },
-            onSearch = {}
+            onSearch = {},
+            onClickRefresh = {}
         )
     }
 }

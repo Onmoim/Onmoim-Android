@@ -47,9 +47,9 @@ class ProfileSettingViewModel @Inject constructor(
         }
     }
 
-    fun onLocationChange(location: String) {
+    fun onAddressChange(address: String, addressId: Int) {
         _profileSettingState.update {
-            it.copy(location = location)
+            it.copy(address = address, addressId = addressId)
         }
     }
 

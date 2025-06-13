@@ -67,8 +67,10 @@ fun NavGraphBuilder.loginGraph(
         }
         composable<ProfileSettingRoute> {
             val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
-            val location = savedStateHandle?.get<String>(LoginNavigationBundleKey.LOCATION)
-            savedStateHandle?.remove<String>(LoginNavigationBundleKey.LOCATION)
+            val address = savedStateHandle?.get<String>(LoginNavigationBundleKey.ADDRESS) ?: ""
+            val addressId = savedStateHandle?.get<Int>(LoginNavigationBundleKey.ADDRESS_ID) ?: 0
+            savedStateHandle?.remove<String>(LoginNavigationBundleKey.ADDRESS)
+            savedStateHandle?.remove<Int>(LoginNavigationBundleKey.ADDRESS_ID)
 
             val profileSettingViewModel = hiltViewModel<ProfileSettingViewModel>()
 
@@ -87,14 +89,15 @@ fun NavGraphBuilder.loginGraph(
             )
 
             LaunchedEffect(Unit) {
-                profileSettingViewModel.onLocationChange(location ?: "")
+                profileSettingViewModel.onAddressChange(address, addressId)
             }
         }
         composable<LocationSettingRoute> {
             LocationSettingRoute(
-                onBack = { address ->
+                onBack = { address, addressId ->
                     navController.previousBackStackEntry?.savedStateHandle?.apply {
-                        set(LoginNavigationBundleKey.LOCATION, address)
+                        set(LoginNavigationBundleKey.ADDRESS, address)
+                        set(LoginNavigationBundleKey.ADDRESS_ID, addressId)
                     }
                     navController.popBackStack()
                 }
