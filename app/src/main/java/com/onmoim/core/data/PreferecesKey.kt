@@ -1,4 +1,4 @@
-package com.onmoim.core.datastore
+package com.onmoim.core.data
 
 object PreferencesKey {
     const val ACCESS_TOKEN = "accessToken"

@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onmoim.core.constant.AccountStatus
 import com.onmoim.core.constant.SocialType
-import com.onmoim.core.data.repository.AuthRepository
 import com.onmoim.core.helper.SocialSignInHelper
+import com.onmoim.domain.usecase.SignInUseCase
 import com.onmoim.feature.login.state.LoginEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val socialSignInHelper: SocialSignInHelper,
-    private val authRepository: AuthRepository
+    private val signInUseCase: SignInUseCase
 ) : ViewModel() {
     private val _event = Channel<LoginEvent>(Channel.BUFFERED)
     val event = _event.receiveAsFlow()
@@ -43,7 +43,7 @@ class LoginViewModel @Inject constructor(
                     SocialType.GOOGLE -> "google"
                     SocialType.KAKAO -> "kakao"
                 }
-                authRepository.signIn(provider, token)
+                signInUseCase(provider, token)
             }.catch {
                 Timber.e(it, "로그인 에러")
                 sendEvent(LoginEvent.ShowErrorDialog(it))
