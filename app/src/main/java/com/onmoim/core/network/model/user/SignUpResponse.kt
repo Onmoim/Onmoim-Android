@@ -7,11 +7,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SignUpResponse(
     @SerialName("accessToken")
-    val accessToken: String?,
+    val accessToken: String,
     @SerialName("refreshToken")
-    val refreshToken: String?,
+    val refreshToken: String,
     @SerialName("status")
-    val status: String?,
+    val status: String,
     @SerialName("userId")
-    val userId: Int?
+    val userId: Int
 )
