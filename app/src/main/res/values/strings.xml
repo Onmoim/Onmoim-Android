@@ -53,6 +53,7 @@
     <!-- 프로필 설정 화면 -->
     <string name="profile_setting_title">프로필 설정</string>
     <string name="error_name_format">이름에는 특수문자를 사용할 수 없어요</string>
+    <string name="profile_setting_error">프로필 설정 중 문제가 발생했어요.\n잠시 후 다시 시도해주세요.</string>
 
     <!-- 지역 설정 화면 -->
     <string name="location_setting_title">지역 설정</string>

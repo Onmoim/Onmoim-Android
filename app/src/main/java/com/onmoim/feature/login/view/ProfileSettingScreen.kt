@@ -30,17 +30,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.onmoim.R
 import com.onmoim.core.constant.Gender
 import com.onmoim.core.ui.component.CommonAppBar
 import com.onmoim.core.ui.component.CommonDatePickerDialog
+import com.onmoim.core.ui.component.CommonDialog
 import com.onmoim.core.ui.component.CommonTextField
 import com.onmoim.core.ui.theme.OnmoimTheme
 import com.onmoim.core.ui.theme.pretendard
@@ -59,6 +62,9 @@ fun ProfileSettingRoute(
     val profileSettingState by profileSettingViewModel.profileSettingState.collectAsStateWithLifecycle()
     var showLoading by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     if (showDatePicker) {
         CommonDatePickerDialog(
@@ -69,6 +75,18 @@ fun ProfileSettingRoute(
             onClickConfirm = { localDate ->
                 showDatePicker = false
                 profileSettingViewModel.onBirthChange(localDate)
+            }
+        )
+    }
+
+    if (showErrorDialog) {
+        CommonDialog(
+            onDismissRequest = {
+                showErrorDialog = false
+            },
+            content = errorMessage,
+            onClickConfirm = {
+                showErrorDialog = false
             }
         )
     }
@@ -94,7 +112,8 @@ fun ProfileSettingRoute(
 
                 is ProfileSettingEvent.ProfileSettingFailed -> {
                     showLoading = false
-                    // TODO: 에러 처리
+                    errorMessage = ContextCompat.getString(context, R.string.profile_setting_error)
+                    showErrorDialog = true
                 }
 
                 ProfileSettingEvent.ProfileSettingSuccess -> {
