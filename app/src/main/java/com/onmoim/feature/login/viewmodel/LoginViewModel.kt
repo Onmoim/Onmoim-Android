@@ -2,36 +2,65 @@ package com.onmoim.feature.login.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.onmoim.core.constant.AccountStatus
 import com.onmoim.core.constant.SocialType
+import com.onmoim.core.data.repository.AuthRepository
 import com.onmoim.core.helper.SocialSignInHelper
 import com.onmoim.feature.login.state.LoginEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val socialSignInHelper: SocialSignInHelper
+    private val socialSignInHelper: SocialSignInHelper,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
-    private val _eventChannel = Channel<LoginEvent>(Channel.BUFFERED)
-    val receiveEvent = _eventChannel.receiveAsFlow()
+    private val _event = Channel<LoginEvent>(Channel.BUFFERED)
+    val event = _event.receiveAsFlow()
 
     private fun sendEvent(event: LoginEvent) {
         viewModelScope.launch {
-            _eventChannel.send(event)
+            _event.send(event)
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun signIn(type: SocialType) {
         viewModelScope.launch {
-            socialSignInHelper.signIn(type).catch {
+            socialSignInHelper.signIn(type).flatMapConcat { token ->
+                requireNotNull(token) {
+                    "token이 null임."
+                }
+                val provider = when (type) {
+                    SocialType.GOOGLE -> "google"
+                    SocialType.KAKAO -> "kakao"
+                }
+                authRepository.signIn(provider, token)
+            }.catch {
+                Timber.e(it, "로그인 에러")
                 sendEvent(LoginEvent.ShowErrorDialog(it))
-            }.collect {
-                // FIXME: 추후 수정 필요
-                sendEvent(LoginEvent.NavigateToProfileSetting)
+            }.collectLatest { status ->
+                when (status) {
+                    AccountStatus.EXISTS -> {
+                        _event.send(LoginEvent.NavigateToHome)
+                    }
+
+                    AccountStatus.NOT_EXISTS -> {
+                        _event.send(LoginEvent.NavigateToProfileSetting)
+                    }
+
+                    AccountStatus.NO_CATEGORY -> {
+                        _event.send(LoginEvent.NavigateToInterestSelect)
+                    }
+                }
             }
         }
     }
