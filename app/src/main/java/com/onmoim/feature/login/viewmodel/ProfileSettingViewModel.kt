@@ -39,11 +39,8 @@ class ProfileSettingViewModel @Inject constructor(
     }
 
     fun onBirthChange(localDate: LocalDate) {
-        val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
-        val birth = formatter.format(localDate)
-
         _profileSettingState.update {
-            it.copy(birth = birth)
+            it.copy(birth = localDate)
         }
     }
 

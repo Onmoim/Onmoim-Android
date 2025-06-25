@@ -48,6 +48,7 @@ import com.onmoim.feature.login.state.ProfileSettingEvent
 import com.onmoim.feature.login.state.ProfileSettingState
 import com.onmoim.feature.login.viewmodel.ProfileSettingViewModel
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ProfileSettingRoute(
@@ -64,14 +65,7 @@ fun ProfileSettingRoute(
             onDismissRequest = {
                 showDatePicker = false
             },
-            initialDate = if (profileSettingState.birth.isNotBlank()) {
-                val year = profileSettingState.birth.substring(0, 4).toInt()
-                val month = profileSettingState.birth.substring(4, 6).toInt()
-                val day = profileSettingState.birth.substring(6).toInt()
-                LocalDate.of(year, month, day)
-            } else {
-                LocalDate.now()
-            },
+            initialDate = profileSettingState.birth ?: LocalDate.now(),
             onClickConfirm = { localDate ->
                 showDatePicker = false
                 profileSettingViewModel.onBirthChange(localDate)
@@ -181,7 +175,9 @@ private fun ProfileSettingScreen(
                     )
                 }
                 CommonTextField(
-                    value = profileSettingState.birth,
+                    value = profileSettingState.birth?.let {
+                        DateTimeFormatter.ofPattern("yyyyMMdd").format(it)
+                    } ?: "",
                     onValueChange = {},
                     modifier = Modifier
                         .fillMaxWidth()
@@ -275,23 +271,23 @@ private fun GenderToggle(
                     .heightIn(min = 38.dp)
                     .padding(
                         start = when (it) {
-                            Gender.MAN -> 0.dp
-                            Gender.WOMAN -> 15.dp
+                            Gender.MALE -> 0.dp
+                            Gender.FEMALE -> 15.dp
                         },
                         end = when (it) {
-                            Gender.MAN -> 15.dp
-                            Gender.WOMAN -> 0.dp
+                            Gender.MALE -> 15.dp
+                            Gender.FEMALE -> 0.dp
                         }
                     ),
                 contentAlignment = when (it) {
-                    Gender.MAN -> Alignment.CenterEnd
-                    Gender.WOMAN -> Alignment.CenterStart
+                    Gender.MALE -> Alignment.CenterEnd
+                    Gender.FEMALE -> Alignment.CenterStart
                 }
             ) {
                 Text(
                     text = when (it) {
-                        Gender.MAN -> stringResource(R.string.man)
-                        Gender.WOMAN -> stringResource(R.string.woman)
+                        Gender.MALE -> stringResource(R.string.male)
+                        Gender.FEMALE -> stringResource(R.string.female)
                     },
                     style = OnmoimTheme.typography.body2Regular.copy(
                         color = if (value == it) {
