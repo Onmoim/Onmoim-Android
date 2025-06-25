@@ -1,6 +1,8 @@
 package com.onmoim.core.network.di
 
 import com.onmoim.core.data.repository.TokenRepository
+import com.onmoim.core.dispatcher.Dispatcher
+import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.HttpClientType
 import com.onmoim.core.network.OnmoimAuthInterceptor
 import com.onmoim.core.network.OnmoimAuthenticator
@@ -9,6 +11,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.Authenticator
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -51,12 +54,14 @@ object OkHttpClientModule {
     @Singleton
     fun provideOnmoimAuthenticator(
         tokenRepository: TokenRepository,
-        @HttpClientType(OnmoimHttpClientType.DEFAULT) okHttpClient: OkHttpClient
-    ): Authenticator = OnmoimAuthenticator(tokenRepository, okHttpClient)
+        @HttpClientType(OnmoimHttpClientType.DEFAULT) okHttpClient: OkHttpClient,
+        @Dispatcher(OnmoimDispatcher.IO) ioDispatcher: CoroutineDispatcher
+    ): Authenticator = OnmoimAuthenticator(tokenRepository, okHttpClient, ioDispatcher)
 
     @Provides
     @Singleton
     fun provideOnmoimAuthInterceptor(
-        tokenRepository: TokenRepository
-    ): Interceptor = OnmoimAuthInterceptor(tokenRepository)
+        tokenRepository: TokenRepository,
+        @Dispatcher(OnmoimDispatcher.IO) ioDispatcher: CoroutineDispatcher
+    ): Interceptor = OnmoimAuthInterceptor(tokenRepository, ioDispatcher)
 }

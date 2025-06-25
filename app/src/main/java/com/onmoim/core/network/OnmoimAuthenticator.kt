@@ -2,9 +2,11 @@ package com.onmoim.core.network
 
 import com.onmoim.BuildConfig
 import com.onmoim.core.data.repository.TokenRepository
+import com.onmoim.core.dispatcher.Dispatcher
+import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.model.auth.ReissueTokenRequest
 import com.onmoim.core.network.model.auth.TokenDto
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import okhttp3.Authenticator
@@ -19,7 +21,8 @@ import javax.inject.Inject
 
 class OnmoimAuthenticator @Inject constructor(
     private val tokenRepository: TokenRepository,
-    @HttpClientType(OnmoimHttpClientType.DEFAULT) private val client: OkHttpClient
+    @HttpClientType(OnmoimHttpClientType.DEFAULT) private val client: OkHttpClient,
+    @Dispatcher(OnmoimDispatcher.IO) private val ioDispatcher: CoroutineDispatcher
 ) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
         val authorizationHeader = response.request.header("Authorization")
@@ -27,7 +30,7 @@ class OnmoimAuthenticator @Inject constructor(
 
         return if (hasBearerToken && response.retryCount() < 3) {
             synchronized(this) {
-                val currentAccessToken = runBlocking(Dispatchers.IO) {
+                val currentAccessToken = runBlocking(ioDispatcher) {
                     tokenRepository.getAccessToken()
                 }
                 val failedRequestToken =
@@ -39,7 +42,7 @@ class OnmoimAuthenticator @Inject constructor(
                     }.build()
                 }
 
-                val refreshToken = runBlocking(Dispatchers.IO) {
+                val refreshToken = runBlocking(ioDispatcher) {
                     tokenRepository.getRefreshToken()
                 } ?: return null
                 val refreshResp = try {
@@ -60,7 +63,7 @@ class OnmoimAuthenticator @Inject constructor(
                     val respJson = refreshResp.body?.string() ?: return null
                     val respData = Json.decodeFromString<TokenDto>(respJson)
 
-                    runBlocking(Dispatchers.IO) {
+                    runBlocking(ioDispatcher) {
                         tokenRepository.setJwt(respData.accessToken, respData.refreshToken)
                     }
 
@@ -68,7 +71,7 @@ class OnmoimAuthenticator @Inject constructor(
                         header("Authorization", "Bearer ${respData.accessToken}")
                     }.build()
                 } else {
-                    runBlocking(Dispatchers.IO) {
+                    runBlocking(ioDispatcher) {
                         tokenRepository.clearJwt()
                     }
                     return null
