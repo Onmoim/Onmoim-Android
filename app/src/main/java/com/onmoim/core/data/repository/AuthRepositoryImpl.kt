@@ -1,8 +1,8 @@
 package com.onmoim.core.data.repository
 
 import com.onmoim.core.constant.AccountStatus
+import com.onmoim.core.data.PreferencesKey
 import com.onmoim.core.datastore.DataStorePreferences
-import com.onmoim.core.datastore.PreferencesKey
 import com.onmoim.core.network.api.AuthApi
 import com.onmoim.core.network.model.auth.SignInRequest
 import kotlinx.coroutines.flow.Flow
@@ -23,10 +23,7 @@ class AuthRepositoryImpl @Inject constructor(
         val data = resp.body()?.data
 
         if (resp.isSuccessful && data != null) {
-            dataStorePreferences.putString(PreferencesKey.ACCESS_TOKEN, data.accessToken)
-            data.refreshToken?.let {
-                dataStorePreferences.putString(PreferencesKey.REFRESH_TOKEN, it)
-            }
+            setJwt(data.accessToken, data.refreshToken)
 
             val accountStatus = when (data.status) {
                 "EXISTS" -> AccountStatus.EXISTS
@@ -37,5 +34,17 @@ class AuthRepositoryImpl @Inject constructor(
         } else {
             throw HttpException(resp)
         }
+    }
+
+    override suspend fun setJwt(accessToken: String, refreshToken: String?) {
+        dataStorePreferences.putString(PreferencesKey.ACCESS_TOKEN, accessToken)
+        refreshToken?.let {
+            dataStorePreferences.putString(PreferencesKey.REFRESH_TOKEN, it)
+        }
+    }
+
+    override suspend fun clearJwt() {
+        dataStorePreferences.remove(PreferencesKey.ACCESS_TOKEN)
+        dataStorePreferences.remove(PreferencesKey.REFRESH_TOKEN)
     }
 }

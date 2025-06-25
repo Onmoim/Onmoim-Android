@@ -5,4 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
     fun signIn(provider: String, token: String): Flow<AccountStatus>
+    suspend fun setJwt(accessToken: String, refreshToken: String?)
+    suspend fun clearJwt()
 }
