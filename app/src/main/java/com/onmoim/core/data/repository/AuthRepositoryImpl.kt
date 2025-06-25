@@ -1,8 +1,6 @@
 package com.onmoim.core.data.repository
 
-import com.onmoim.core.constant.AccountStatus
 import com.onmoim.core.data.model.Account
-import com.onmoim.core.data.model.Jwt
 import com.onmoim.core.network.api.AuthApi
 import com.onmoim.core.network.model.auth.SignInRequest
 import kotlinx.coroutines.flow.Flow
@@ -22,13 +20,7 @@ class AuthRepositoryImpl @Inject constructor(
         val data = resp.body()?.data
 
         if (resp.isSuccessful && data != null) {
-            val jwt = Jwt(data.accessToken, data.refreshToken)
-            val accountStatus = when (data.status) {
-                "EXISTS" -> AccountStatus.EXISTS
-                "NO_CATEGORY" -> AccountStatus.NO_CATEGORY
-                else -> AccountStatus.NOT_EXISTS
-            }
-            val account = Account(jwt, accountStatus)
+            val account = Account.create(data.accessToken, data.refreshToken, data.status)
             emit(account)
         } else {
             throw HttpException(resp)

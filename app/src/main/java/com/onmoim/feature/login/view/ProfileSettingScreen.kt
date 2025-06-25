@@ -30,17 +30,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.onmoim.R
 import com.onmoim.core.constant.Gender
 import com.onmoim.core.ui.component.CommonAppBar
 import com.onmoim.core.ui.component.CommonDatePickerDialog
+import com.onmoim.core.ui.component.CommonDialog
 import com.onmoim.core.ui.component.CommonTextField
 import com.onmoim.core.ui.theme.OnmoimTheme
 import com.onmoim.core.ui.theme.pretendard
@@ -48,6 +51,7 @@ import com.onmoim.feature.login.state.ProfileSettingEvent
 import com.onmoim.feature.login.state.ProfileSettingState
 import com.onmoim.feature.login.viewmodel.ProfileSettingViewModel
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ProfileSettingRoute(
@@ -58,23 +62,31 @@ fun ProfileSettingRoute(
     val profileSettingState by profileSettingViewModel.profileSettingState.collectAsStateWithLifecycle()
     var showLoading by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     if (showDatePicker) {
         CommonDatePickerDialog(
             onDismissRequest = {
                 showDatePicker = false
             },
-            initialDate = if (profileSettingState.birth.isNotBlank()) {
-                val year = profileSettingState.birth.substring(0, 4).toInt()
-                val month = profileSettingState.birth.substring(4, 6).toInt()
-                val day = profileSettingState.birth.substring(6).toInt()
-                LocalDate.of(year, month, day)
-            } else {
-                LocalDate.now()
-            },
+            initialDate = profileSettingState.birth ?: LocalDate.now(),
             onClickConfirm = { localDate ->
                 showDatePicker = false
                 profileSettingViewModel.onBirthChange(localDate)
+            }
+        )
+    }
+
+    if (showErrorDialog) {
+        CommonDialog(
+            onDismissRequest = {
+                showErrorDialog = false
+            },
+            content = errorMessage,
+            onClickConfirm = {
+                showErrorDialog = false
             }
         )
     }
@@ -88,7 +100,7 @@ fun ProfileSettingRoute(
             showDatePicker = true
         },
         onClickLocation = onNavigateToLocationSetting,
-        onClickComplete = profileSettingViewModel::onClickComplete
+        onClickComplete = profileSettingViewModel::onClickConfirm
     )
 
     LaunchedEffect(Unit) {
@@ -100,7 +112,8 @@ fun ProfileSettingRoute(
 
                 is ProfileSettingEvent.ProfileSettingFailed -> {
                     showLoading = false
-                    // TODO: 에러 처리
+                    errorMessage = ContextCompat.getString(context, R.string.profile_setting_error)
+                    showErrorDialog = true
                 }
 
                 ProfileSettingEvent.ProfileSettingSuccess -> {
@@ -181,7 +194,9 @@ private fun ProfileSettingScreen(
                     )
                 }
                 CommonTextField(
-                    value = profileSettingState.birth,
+                    value = profileSettingState.birth?.let {
+                        DateTimeFormatter.ofPattern("yyyyMMdd").format(it)
+                    } ?: "",
                     onValueChange = {},
                     modifier = Modifier
                         .fillMaxWidth()
@@ -275,23 +290,23 @@ private fun GenderToggle(
                     .heightIn(min = 38.dp)
                     .padding(
                         start = when (it) {
-                            Gender.MAN -> 0.dp
-                            Gender.WOMAN -> 15.dp
+                            Gender.MALE -> 0.dp
+                            Gender.FEMALE -> 15.dp
                         },
                         end = when (it) {
-                            Gender.MAN -> 15.dp
-                            Gender.WOMAN -> 0.dp
+                            Gender.MALE -> 15.dp
+                            Gender.FEMALE -> 0.dp
                         }
                     ),
                 contentAlignment = when (it) {
-                    Gender.MAN -> Alignment.CenterEnd
-                    Gender.WOMAN -> Alignment.CenterStart
+                    Gender.MALE -> Alignment.CenterEnd
+                    Gender.FEMALE -> Alignment.CenterStart
                 }
             ) {
                 Text(
                     text = when (it) {
-                        Gender.MAN -> stringResource(R.string.man)
-                        Gender.WOMAN -> stringResource(R.string.woman)
+                        Gender.MALE -> stringResource(R.string.male)
+                        Gender.FEMALE -> stringResource(R.string.female)
                     },
                     style = OnmoimTheme.typography.body2Regular.copy(
                         color = if (value == it) {

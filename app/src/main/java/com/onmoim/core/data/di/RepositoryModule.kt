@@ -6,6 +6,8 @@ import com.onmoim.core.data.repository.LocationRepository
 import com.onmoim.core.data.repository.LocationRepositoryImpl
 import com.onmoim.core.data.repository.TokenRepository
 import com.onmoim.core.data.repository.TokenRepositoryImpl
+import com.onmoim.core.data.repository.UserRepository
+import com.onmoim.core.data.repository.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -22,6 +24,11 @@ abstract class RepositoryModule {
     abstract fun bindLocationRepository(
         locationRepositoryImpl: LocationRepositoryImpl
     ): LocationRepository
+
+    @Binds
+    abstract fun bindUserRepository(
+        userRepositoryImpl: UserRepositoryImpl
+    ): UserRepository
 
     @Binds
     abstract fun bindTokenRepository(
