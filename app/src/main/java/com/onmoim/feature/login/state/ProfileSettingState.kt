@@ -3,44 +3,16 @@ package com.onmoim.feature.login.state
 import com.onmoim.core.constant.Gender
 import timber.log.Timber
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import java.time.format.ResolverStyle
 
 data class ProfileSettingState(
     val name: String = "",
     val gender: Gender? = null,
-    val birth: String = "",
+    val birth: LocalDate? = null,
     val address: String = "",
     val addressId: Int = 0,
 ) {
     val isValidInputValue: Boolean
-        get() = isValidName() && gender != null && isValidBirthDate() && address.isNotBlank()
-
-    private fun isValidBirthDate(): Boolean {
-        if (birth.length != 8 || !birth.all { it.isDigit() }) {
-            Timber.d("생년월일은 8자리 숫자(YYYYMMDD) 형식이어야 함.")
-            return false
-        }
-
-        try {
-            val formatter = DateTimeFormatter.ofPattern("uuuuMMdd")
-                .withResolverStyle(ResolverStyle.STRICT)
-            val birthDate = LocalDate.parse(birth, formatter)
-
-            val today = LocalDate.now()
-            if (birthDate.isAfter(today)) {
-                Timber.d("생년월일이 미래 날짜일 수 없음.")
-                return false
-            }
-
-            return true
-
-        } catch (e: DateTimeParseException) {
-            Timber.d(e, "유효하지 않은 날짜 (예: 19901301, 20230229). 상세: ${e.message}")
-            return false
-        }
-    }
+        get() = isValidName() && gender != null && birth != null && address.isNotBlank()
 
     private fun isValidName(minLength: Int = 2, maxLength: Int = 12): Boolean {
         if (name.isBlank()) {

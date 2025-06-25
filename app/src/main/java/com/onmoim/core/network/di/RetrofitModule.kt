@@ -1,6 +1,8 @@
 package com.onmoim.core.network.di
 
 import com.onmoim.BuildConfig
+import com.onmoim.core.network.HttpClientType
+import com.onmoim.core.network.OnmoimHttpClientType
 import com.onmoim.core.network.di.ConverterFactoryModule.KotlinxSerializationConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -19,7 +21,7 @@ object RetrofitModule {
     @Singleton
     fun provideRetrofit(
         @KotlinxSerializationConverterFactory serializationConverterFactory: Converter.Factory,
-        okHttpClient: OkHttpClient
+        @HttpClientType(OnmoimHttpClientType.AUTH) okHttpClient: OkHttpClient
     ) = Retrofit.Builder().apply {
         baseUrl(BuildConfig.BASE_URL)
         addConverterFactory(serializationConverterFactory)

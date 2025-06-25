@@ -75,7 +75,7 @@ fun LoginRoute(
     )
 
     LaunchedEffect(Unit) {
-        loginViewModel.receiveEvent.collect { event ->
+        loginViewModel.event.collect { event ->
             when (event) {
                 is LoginEvent.ShowErrorDialog -> {
                     val error = event.t
