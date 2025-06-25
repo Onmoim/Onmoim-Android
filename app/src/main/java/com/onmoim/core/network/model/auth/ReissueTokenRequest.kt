@@ -1,15 +1,10 @@
 package com.onmoim.core.network.model.auth
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TokenDto(
-    @SerialName("accessToken")
-    val accessToken: String,
+data class ReissueTokenRequest(
     @SerialName("refreshToken")
-    val refreshToken: String?,
-    @SerialName("status")
-    val status: String?
+    val refreshToken: String
 )
