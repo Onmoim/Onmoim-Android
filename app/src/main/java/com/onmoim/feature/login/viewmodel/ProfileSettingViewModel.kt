@@ -3,6 +3,7 @@ package com.onmoim.feature.login.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onmoim.core.constant.Gender
+import com.onmoim.domain.usecase.SignUpUseCase
 import com.onmoim.feature.login.state.ProfileSettingEvent
 import com.onmoim.feature.login.state.ProfileSettingState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,13 +13,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileSettingViewModel @Inject constructor(
-
+    private val signUpUseCase: SignUpUseCase
 ) : ViewModel() {
     private val _profileSettingState = MutableStateFlow(ProfileSettingState())
     val profileSettingState = _profileSettingState.asStateFlow()
@@ -50,10 +52,26 @@ class ProfileSettingViewModel @Inject constructor(
         }
     }
 
-    fun onClickComplete() {
+    fun onClickConfirm() {
         viewModelScope.launch {
             _event.send(ProfileSettingEvent.Loading)
-            // TODO: API 호출
+            val state = profileSettingState.value
+            val birth = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(state.birth)
+
+            signUpUseCase(
+                addressId = state.addressId,
+                birth = birth,
+                gender = when(state.gender!!) {
+                    Gender.MALE -> "M"
+                    Gender.FEMALE -> "F"
+                },
+                name = state.name
+            ).onFailure {
+                Timber.e(it, "회원가입 실패")
+                _event.send(ProfileSettingEvent.ProfileSettingFailed(it))
+            }.onSuccess {
+                _event.send(ProfileSettingEvent.ProfileSettingSuccess)
+            }
         }
     }
 }

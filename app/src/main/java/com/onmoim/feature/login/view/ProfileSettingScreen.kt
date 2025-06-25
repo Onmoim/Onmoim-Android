@@ -82,7 +82,7 @@ fun ProfileSettingRoute(
             showDatePicker = true
         },
         onClickLocation = onNavigateToLocationSetting,
-        onClickComplete = profileSettingViewModel::onClickComplete
+        onClickComplete = profileSettingViewModel::onClickConfirm
     )
 
     LaunchedEffect(Unit) {
