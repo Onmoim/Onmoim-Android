@@ -56,6 +56,7 @@ class InterestSelectViewModel @Inject constructor(
                 userRepository.setInterest(userId, interestIds).onFailure {
                     _event.send(InterestSelectEvent.ShowErrorDialog(it))
                 }.onSuccess {
+                    userRepository.setHasNotInterest(false)
                     _event.send(InterestSelectEvent.NavigateToHome)
                 }
             } catch (e: Exception) {
