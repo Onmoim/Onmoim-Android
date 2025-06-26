@@ -1,8 +1,10 @@
 package com.onmoim.core.network.di
 
+import com.onmoim.core.data.repository.AppSettingRepository
 import com.onmoim.core.data.repository.TokenRepository
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
+import com.onmoim.core.event.AuthEventBus
 import com.onmoim.core.network.HttpClientType
 import com.onmoim.core.network.OnmoimAuthInterceptor
 import com.onmoim.core.network.OnmoimAuthenticator
@@ -54,9 +56,17 @@ object OkHttpClientModule {
     @Singleton
     fun provideOnmoimAuthenticator(
         tokenRepository: TokenRepository,
+        appSettingRepository: AppSettingRepository,
+        authEventBus: AuthEventBus,
         @HttpClientType(OnmoimHttpClientType.DEFAULT) okHttpClient: OkHttpClient,
         @Dispatcher(OnmoimDispatcher.IO) ioDispatcher: CoroutineDispatcher
-    ): Authenticator = OnmoimAuthenticator(tokenRepository, okHttpClient, ioDispatcher)
+    ): Authenticator = OnmoimAuthenticator(
+        tokenRepository = tokenRepository,
+        appSettingRepository = appSettingRepository,
+        authEventBus = authEventBus,
+        client = okHttpClient,
+        ioDispatcher = ioDispatcher
+    )
 
     @Provides
     @Singleton
