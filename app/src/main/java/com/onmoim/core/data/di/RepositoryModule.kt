@@ -2,6 +2,8 @@ package com.onmoim.core.data.di
 
 import com.onmoim.core.data.repository.AuthRepository
 import com.onmoim.core.data.repository.AuthRepositoryImpl
+import com.onmoim.core.data.repository.InterestRepository
+import com.onmoim.core.data.repository.InterestRepositoryImpl
 import com.onmoim.core.data.repository.LocationRepository
 import com.onmoim.core.data.repository.LocationRepositoryImpl
 import com.onmoim.core.data.repository.TokenRepository
@@ -34,4 +36,9 @@ abstract class RepositoryModule {
     abstract fun bindTokenRepository(
         tokenRepositoryImpl: TokenRepositoryImpl
     ): TokenRepository
+
+    @Binds
+    abstract fun bindInterestRepository(
+        interestRepositoryImpl: InterestRepositoryImpl
+    ): InterestRepository
 }
