@@ -56,7 +56,14 @@ fun NavGraphBuilder.loginGraph(
         composable<LoginRoute> {
             LoginRoute(
                 onNavigateToHome = {
-
+                    navController.navigateToHome(
+                        navOptions {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    )
                 },
                 onNavigateToProfileSetting = {
                     navController.navigateToProfileSetting()

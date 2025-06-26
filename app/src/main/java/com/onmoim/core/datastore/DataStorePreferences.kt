@@ -2,6 +2,7 @@ package com.onmoim.core.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -42,6 +43,22 @@ class DataStorePreferences @Inject constructor(
     suspend fun removeInt(key: String) {
         dataStore.edit {
             it.remove(intPreferencesKey(key))
+        }
+    }
+
+    suspend fun putBoolean(key: String, value: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[booleanPreferencesKey(key)] = value
+        }
+    }
+
+     fun getBoolean(key: String): Flow<Boolean?> = dataStore.data.map { preferences ->
+        preferences[booleanPreferencesKey(key)]
+    }
+
+    suspend fun removeBoolean(key: String) {
+        dataStore.edit {
+            it.remove(booleanPreferencesKey(key))
         }
     }
 }

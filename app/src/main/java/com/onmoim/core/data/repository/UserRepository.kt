@@ -15,8 +15,4 @@ interface UserRepository {
     suspend fun setInterest(userId: Int, interestIds: List<Int>): Result<Unit>
 
     fun getMyProfile(): Flow<Profile>
-
-    suspend fun setUserId(id: Int)
-    suspend fun getUserId(): Int?
-    suspend fun clearUserId()
 }
