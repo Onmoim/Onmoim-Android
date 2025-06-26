@@ -121,6 +121,7 @@ dependencies {
     implementation(libs.retrofit.converter.kotlinx.serialization)
 
     implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.kakao)
 
     implementation(libs.kotlinx.serialization.json)
