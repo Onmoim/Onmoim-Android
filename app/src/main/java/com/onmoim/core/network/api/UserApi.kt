@@ -1,11 +1,13 @@
 package com.onmoim.core.network.api
 
 import com.onmoim.core.network.model.BaseResponse
+import com.onmoim.core.network.model.user.ProfileDto
 import com.onmoim.core.network.model.user.SetCategoryRequest
 import com.onmoim.core.network.model.user.SignUpDto
 import com.onmoim.core.network.model.user.SignUpRequest
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface UserApi {
@@ -18,4 +20,7 @@ interface UserApi {
     suspend fun setCategory(
         @Body setCategoryRequest: SetCategoryRequest
     ): Response<BaseResponse<String>>
+
+    @GET("api/v1/user/profile")
+    suspend fun getMyProfile(): Response<BaseResponse<ProfileDto>>
 }
