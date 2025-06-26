@@ -1,6 +1,5 @@
 package com.onmoim.core.data.repository
 
-import com.onmoim.core.data.PreferencesKey
 import com.onmoim.core.datastore.DataStorePreferences
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
@@ -15,29 +14,34 @@ class TokenRepositoryImpl @Inject constructor(
 ) : TokenRepository {
     override suspend fun getAccessToken(): String? {
         return withContext(ioDispatcher) {
-            dataStorePreferences.getString(PreferencesKey.ACCESS_TOKEN).first()
+            dataStorePreferences.getString(ACCESS_TOKEN_KEY).first()
         }
     }
 
     override suspend fun getRefreshToken(): String? {
         return withContext(ioDispatcher) {
-            dataStorePreferences.getString(PreferencesKey.REFRESH_TOKEN).first()
+            dataStorePreferences.getString(REFRESH_TOKEN_KEY).first()
         }
     }
 
     override suspend fun setJwt(accessToken: String, refreshToken: String?) {
         withContext(ioDispatcher) {
-            dataStorePreferences.putString(PreferencesKey.ACCESS_TOKEN, accessToken)
+            dataStorePreferences.putString(ACCESS_TOKEN_KEY, accessToken)
             refreshToken?.let {
-                dataStorePreferences.putString(PreferencesKey.REFRESH_TOKEN, it)
+                dataStorePreferences.putString(REFRESH_TOKEN_KEY, it)
             }
         }
     }
 
     override suspend fun clearJwt() {
         withContext(ioDispatcher) {
-            dataStorePreferences.removeString(PreferencesKey.ACCESS_TOKEN)
-            dataStorePreferences.removeString(PreferencesKey.REFRESH_TOKEN)
+            dataStorePreferences.removeString(ACCESS_TOKEN_KEY)
+            dataStorePreferences.removeString(REFRESH_TOKEN_KEY)
         }
+    }
+
+    companion object {
+        private const val ACCESS_TOKEN_KEY = "accessToken"
+        private const val REFRESH_TOKEN_KEY = "refreshToken"
     }
 }
