@@ -1,5 +1,7 @@
 package com.onmoim.core.data.di
 
+import com.onmoim.core.data.repository.AppSettingRepository
+import com.onmoim.core.data.repository.AppSettingRepositoryImpl
 import com.onmoim.core.data.repository.AuthRepository
 import com.onmoim.core.data.repository.AuthRepositoryImpl
 import com.onmoim.core.data.repository.InterestRepository
@@ -41,4 +43,9 @@ abstract class RepositoryModule {
     abstract fun bindInterestRepository(
         interestRepositoryImpl: InterestRepositoryImpl
     ): InterestRepository
+
+    @Binds
+    abstract fun bindAppSettingRepository(
+        appSettingRepositoryImpl: AppSettingRepositoryImpl
+    ): AppSettingRepository
 }

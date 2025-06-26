@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.rememberNavController
+import com.onmoim.core.data.repository.AppSettingRepository
 import com.onmoim.core.data.repository.TokenRepository
 import com.onmoim.core.data.repository.UserRepository
 import com.onmoim.core.event.AuthEventBus
@@ -23,7 +24,7 @@ class MainActivity : ComponentActivity() {
     lateinit var tokenRepository: TokenRepository
 
     @Inject
-    lateinit var userRepository: UserRepository
+    lateinit var appSettingRepository: AppSettingRepository
 
     @Inject
     lateinit var authEventBus: AuthEventBus
@@ -36,7 +37,7 @@ class MainActivity : ComponentActivity() {
                 navController = rememberNavController(),
                 coroutineScope = rememberCoroutineScope(),
                 tokenRepository = tokenRepository,
-                userRepository = userRepository,
+                appSettingRepository = appSettingRepository,
                 authEventBus = authEventBus
             )
 

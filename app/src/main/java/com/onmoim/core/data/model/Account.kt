@@ -4,13 +4,15 @@ import com.onmoim.core.constant.AccountStatus
 
 data class Account(
     val jwt: Jwt,
-    val status: AccountStatus
+    val status: AccountStatus,
+    val userId: Int?,
 ) {
     companion object {
         fun create(
             accessToken: String,
             refreshToken: String?,
-            accountStatus: String?
+            accountStatus: String?,
+            userId: Int? = null
         ): Account {
             val jwt = Jwt(accessToken, refreshToken)
             val status = when (accountStatus) {
@@ -18,7 +20,7 @@ data class Account(
                 "NO_CATEGORY" -> AccountStatus.NO_CATEGORY
                 else -> AccountStatus.NOT_EXISTS
             }
-            return Account(jwt, status)
+            return Account(jwt, status, userId)
         }
     }
 }

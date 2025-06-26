@@ -1,8 +1,8 @@
 package com.onmoim.core.network
 
 import com.onmoim.BuildConfig
+import com.onmoim.core.data.repository.AppSettingRepository
 import com.onmoim.core.data.repository.TokenRepository
-import com.onmoim.core.data.repository.UserRepository
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.event.AuthEventBus
@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 class OnmoimAuthenticator @Inject constructor(
     private val tokenRepository: TokenRepository,
-    private val userRepository: UserRepository,
+    private val appSettingRepository: AppSettingRepository,
     private val authEventBus: AuthEventBus,
     @HttpClientType(OnmoimHttpClientType.DEFAULT) private val client: OkHttpClient,
     @Dispatcher(OnmoimDispatcher.IO) private val ioDispatcher: CoroutineDispatcher
@@ -123,7 +123,7 @@ class OnmoimAuthenticator @Inject constructor(
 
     private suspend fun clearTokenAndUserInfo() {
         tokenRepository.clearJwt()
-        userRepository.clearUserId()
-        userRepository.clearHasNotInterest()
+        appSettingRepository.clearUserId()
+        appSettingRepository.clearHasNotInterest()
     }
 }

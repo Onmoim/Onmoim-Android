@@ -8,8 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
+import com.onmoim.core.data.repository.AppSettingRepository
 import com.onmoim.core.data.repository.TokenRepository
-import com.onmoim.core.data.repository.UserRepository
 import com.onmoim.core.event.AuthEvent
 import com.onmoim.core.event.AuthEventBus
 import com.onmoim.core.ui.navigation.navigateToHome
@@ -23,7 +23,7 @@ fun rememberOnmoimAppState(
     navController: NavHostController,
     coroutineScope: CoroutineScope,
     tokenRepository: TokenRepository,
-    userRepository: UserRepository,
+    appSettingRepository: AppSettingRepository,
     authEventBus: AuthEventBus
 ): OnmoimAppState {
     return remember(
@@ -34,7 +34,7 @@ fun rememberOnmoimAppState(
             navController = navController,
             coroutineScope = coroutineScope,
             tokenRepository = tokenRepository,
-            userRepository = userRepository,
+            appSettingRepository = appSettingRepository,
             authEventBus = authEventBus
         )
     }
@@ -45,7 +45,7 @@ class OnmoimAppState(
     internal val navController: NavHostController,
     internal val coroutineScope: CoroutineScope,
     internal val tokenRepository: TokenRepository,
-    internal val userRepository: UserRepository,
+    internal val appSettingRepository: AppSettingRepository,
     internal val authEventBus: AuthEventBus
 ) {
     private val previousDestination = mutableStateOf<NavDestination?>(null)
@@ -107,7 +107,7 @@ class OnmoimAppState(
         coroutineScope.launch {
             val accessToken = tokenRepository.getAccessToken()
             val refreshToken = tokenRepository.getRefreshToken()
-            val hasNotInterest = userRepository.hasNotInterest()
+            val hasNotInterest = appSettingRepository.hasNotInterest()
 
             if (accessToken == null || refreshToken == null || hasNotInterest) {
                 authEventBus.notifyNotAuthenticated()

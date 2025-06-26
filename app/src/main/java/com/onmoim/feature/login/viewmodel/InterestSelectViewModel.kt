@@ -2,8 +2,10 @@ package com.onmoim.feature.login.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.onmoim.core.data.repository.AppSettingRepository
 import com.onmoim.core.data.repository.InterestRepository
 import com.onmoim.core.data.repository.UserRepository
+import com.onmoim.domain.usecase.GetUserIdUseCase
 import com.onmoim.feature.login.state.InterestSelectEvent
 import com.onmoim.feature.login.state.InterestSelectUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +21,9 @@ import javax.inject.Inject
 @HiltViewModel
 class InterestSelectViewModel @Inject constructor(
     private val interestRepository: InterestRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val appSettingRepository: AppSettingRepository
 ) : ViewModel() {
     private val _event = Channel<InterestSelectEvent>(Channel.BUFFERED)
     val event = _event.receiveAsFlow()
@@ -51,12 +54,12 @@ class InterestSelectViewModel @Inject constructor(
 
             try {
                 val interestIds = selectedInterestIds.value.toList()
-                val userId = userRepository.getUserId() ?: userRepository.getMyProfile().first().id
+                val userId = getUserIdUseCase()
 
                 userRepository.setInterest(userId, interestIds).onFailure {
                     _event.send(InterestSelectEvent.ShowErrorDialog(it))
                 }.onSuccess {
-                    userRepository.setHasNotInterest(false)
+                    appSettingRepository.setHasNotInterest(false)
                     _event.send(InterestSelectEvent.NavigateToHome)
                 }
             } catch (e: Exception) {
