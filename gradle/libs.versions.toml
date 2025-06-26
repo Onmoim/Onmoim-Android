@@ -1,7 +1,7 @@
 [versions]
-agp = "8.10.1"
+agp = "8.11.0"
 firebaseBom = "33.15.0"
-kotlin = "2.1.21"
+kotlin = "2.2.0"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -9,14 +9,14 @@ espressoCore = "3.6.1"
 androidx-lifecycle = "2.9.1"
 activityCompose = "1.10.1"
 composeBom = "2025.06.01"
-coil = "2.7.0"
+coil = "3.2.0"
 datastore = "1.1.7"
 androidx-hilt = "1.2.0"
 hilt-android = "2.56.2"
 androidx-navigation = "2.9.0"
 androidx-core-splashScreen = "1.0.1"
 kotlinx-serialization = "1.8.1"
-ksp = "2.1.21-2.0.1"
+ksp = "2.2.0-2.0.2"
 okHttp = "4.12.0"
 retrofit = "3.0.0"
 androidx-paging = "3.3.6"
@@ -51,7 +51,8 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-core-splashScreen = { module = "androidx.core:core-splashscreen", version.ref = "androidx-core-splashScreen" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt-android" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt-android" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidx-hilt" }
