@@ -10,6 +10,8 @@ interface UserRepository {
         name: String
     ): Account
 
+    suspend fun setInterest(userId: Int, interestIds: List<Int>): Result<Unit>
+
     suspend fun setUserId(id: Int)
     suspend fun getUserId(): Int?
     suspend fun clearUserId()

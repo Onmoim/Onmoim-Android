@@ -5,6 +5,7 @@ import com.onmoim.core.datastore.DataStorePreferences
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.UserApi
+import com.onmoim.core.network.model.user.SetCategoryRequest
 import com.onmoim.core.network.model.user.SignUpRequest
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
@@ -39,6 +40,26 @@ class UserRepositoryImpl @Inject constructor(
             return Account.create(data.accessToken, data.refreshToken, data.status)
         } else {
             throw HttpException(resp)
+        }
+    }
+
+    override suspend fun setInterest(
+        userId: Int,
+        interestIds: List<Int>
+    ): Result<Unit> {
+        return try {
+            val setCategoryRequest = SetCategoryRequest(userId, interestIds)
+            val resp = withContext(ioDispatcher) {
+                userApi.setCategory(setCategoryRequest)
+            }
+
+            if (resp.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(HttpException(resp))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 
