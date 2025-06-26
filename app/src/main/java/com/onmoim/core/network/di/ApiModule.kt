@@ -1,6 +1,7 @@
 package com.onmoim.core.network.di
 
 import com.onmoim.core.network.api.AuthApi
+import com.onmoim.core.network.api.CategoryApi
 import com.onmoim.core.network.api.LocationApi
 import com.onmoim.core.network.api.UserApi
 import dagger.Module
@@ -21,4 +22,7 @@ object ApiModule {
 
     @Provides
     fun provideUserApi(retrofit: Retrofit): UserApi = retrofit.create(UserApi::class.java)
+
+    @Provides
+    fun provideCategoryApi(retrofit: Retrofit): CategoryApi = retrofit.create(CategoryApi::class.java)
 }
