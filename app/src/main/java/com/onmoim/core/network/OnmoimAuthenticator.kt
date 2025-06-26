@@ -4,6 +4,7 @@ import com.onmoim.BuildConfig
 import com.onmoim.core.data.repository.TokenRepository
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
+import com.onmoim.core.event.AuthEventBus
 import com.onmoim.core.network.model.auth.ReissueTokenRequest
 import com.onmoim.core.network.model.auth.TokenDto
 import kotlinx.coroutines.CoroutineDispatcher
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class OnmoimAuthenticator @Inject constructor(
     private val tokenRepository: TokenRepository,
     @HttpClientType(OnmoimHttpClientType.DEFAULT) private val client: OkHttpClient,
-    @Dispatcher(OnmoimDispatcher.IO) private val ioDispatcher: CoroutineDispatcher
+    @Dispatcher(OnmoimDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val authEventBus: AuthEventBus
 ) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
         val authorizationHeader = response.request.header("Authorization")
@@ -44,7 +46,14 @@ class OnmoimAuthenticator @Inject constructor(
 
                 val refreshToken = runBlocking(ioDispatcher) {
                     tokenRepository.getRefreshToken()
-                } ?: return null
+                }
+                if (refreshToken == null) {
+                    runBlocking(ioDispatcher) {
+                        authEventBus.notifyAuthExpired()
+                    }
+                    return null
+                }
+
                 val refreshResp = try {
                     val refreshReq = Request.Builder().apply {
                         val reissueTokenRequest = ReissueTokenRequest(refreshToken)
@@ -56,11 +65,21 @@ class OnmoimAuthenticator @Inject constructor(
                     client.newCall(refreshReq).execute()
                 } catch (e: Exception) {
                     Timber.e(e)
+                    runBlocking(ioDispatcher) {
+                        authEventBus.notifyAuthExpired()
+                    }
                     return null
                 }
 
                 if (refreshResp.isSuccessful) {
-                    val respJson = refreshResp.body?.string() ?: return null
+                    val respJson = refreshResp.body?.string()
+                    if (respJson == null) {
+                        runBlocking(ioDispatcher) {
+                            authEventBus.notifyAuthExpired()
+                        }
+                        return null
+                    }
+
                     val respData = Json.decodeFromString<TokenDto>(respJson)
 
                     runBlocking(ioDispatcher) {
@@ -73,11 +92,15 @@ class OnmoimAuthenticator @Inject constructor(
                 } else {
                     runBlocking(ioDispatcher) {
                         tokenRepository.clearJwt()
+                        authEventBus.notifyAuthExpired()
                     }
                     return null
                 }
             }
         } else {
+            runBlocking(ioDispatcher) {
+                authEventBus.notifyAuthExpired()
+            }
             null
         }
     }
