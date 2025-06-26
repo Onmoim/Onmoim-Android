@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -38,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.onmoim.R
 import com.onmoim.core.ui.component.CommonAppBar
 import com.onmoim.core.ui.component.CommonTextField
+import com.onmoim.core.ui.component.ErrorAndRetryBox
 import com.onmoim.core.ui.component.NavigationIconButton
 import com.onmoim.core.ui.theme.OnmoimTheme
 import com.onmoim.feature.login.state.LocationSettingUiState
@@ -138,40 +140,18 @@ private fun LocationSettingScreen(
             )
         )
         Box(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
         ) {
             when (uiState) {
                 is LocationSettingUiState.Error -> {
-                    Column(
+                    ErrorAndRetryBox(
+                        onClickRefresh = onClickRefresh,
                         modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = stringResource(R.string.temporary_error),
-                            style = OnmoimTheme.typography.body1SemiBold.copy(
-                                color = OnmoimTheme.colors.textColor
-                            )
-                        )
-                        Spacer(Modifier.height(20.dp))
-                        Text(
-                            text = stringResource(R.string.try_again_later),
-                            style = OnmoimTheme.typography.body2Regular.copy(
-                                color = OnmoimTheme.colors.gray04
-                            )
-                        )
-                        Spacer(Modifier.height(44.dp))
-                        Text(
-                            text = stringResource(R.string.refresh),
-                            modifier = Modifier.clickable(
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() },
-                                onClick = onClickRefresh
-                            ),
-                            style = OnmoimTheme.typography.caption1Regular.copy(
-                                color = OnmoimTheme.colors.textColor
-                            )
-                        )
-                    }
+                        title = stringResource(R.string.temporary_error),
+                        content = stringResource(R.string.try_again_later)
+                    )
                 }
 
                 is LocationSettingUiState.Result -> {
@@ -243,15 +223,15 @@ private fun LocationItem(
 @Preview
 @Composable
 private fun LocationSettingScreenPreview() {
-    var searchKeyword = remember { mutableStateOf("") }
+    var searchKeyword by remember { mutableStateOf("") }
 
     OnmoimTheme {
         LocationSettingScreen(
             onBack = { _, _ -> },
             uiState = LocationSettingUiState.Result(emptyList()),
-            searchKeyword = searchKeyword.value,
+            searchKeyword = searchKeyword,
             onSearchKeywordChange = {
-                searchKeyword.value = it
+                searchKeyword = it
             },
             onSearch = {},
             onClickRefresh = {}
