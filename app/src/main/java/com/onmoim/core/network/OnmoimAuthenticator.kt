@@ -2,6 +2,7 @@ package com.onmoim.core.network
 
 import com.onmoim.BuildConfig
 import com.onmoim.core.data.repository.TokenRepository
+import com.onmoim.core.data.repository.UserRepository
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.event.AuthEventBus
@@ -22,9 +23,10 @@ import javax.inject.Inject
 
 class OnmoimAuthenticator @Inject constructor(
     private val tokenRepository: TokenRepository,
+    private val userRepository: UserRepository,
+    private val authEventBus: AuthEventBus,
     @HttpClientType(OnmoimHttpClientType.DEFAULT) private val client: OkHttpClient,
-    @Dispatcher(OnmoimDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
-    private val authEventBus: AuthEventBus
+    @Dispatcher(OnmoimDispatcher.IO) private val ioDispatcher: CoroutineDispatcher
 ) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
         val authorizationHeader = response.request.header("Authorization")
@@ -49,6 +51,7 @@ class OnmoimAuthenticator @Inject constructor(
                 }
                 if (refreshToken == null) {
                     runBlocking(ioDispatcher) {
+                        clearTokenAndUserInfo()
                         authEventBus.notifyAuthExpired()
                     }
                     return null
@@ -66,6 +69,7 @@ class OnmoimAuthenticator @Inject constructor(
                 } catch (e: Exception) {
                     Timber.e(e)
                     runBlocking(ioDispatcher) {
+                        clearTokenAndUserInfo()
                         authEventBus.notifyAuthExpired()
                     }
                     return null
@@ -75,6 +79,7 @@ class OnmoimAuthenticator @Inject constructor(
                     val respJson = refreshResp.body?.string()
                     if (respJson == null) {
                         runBlocking(ioDispatcher) {
+                            clearTokenAndUserInfo()
                             authEventBus.notifyAuthExpired()
                         }
                         return null
@@ -91,7 +96,7 @@ class OnmoimAuthenticator @Inject constructor(
                     }.build()
                 } else {
                     runBlocking(ioDispatcher) {
-                        tokenRepository.clearJwt()
+                        clearTokenAndUserInfo()
                         authEventBus.notifyAuthExpired()
                     }
                     return null
@@ -99,6 +104,7 @@ class OnmoimAuthenticator @Inject constructor(
             }
         } else {
             runBlocking(ioDispatcher) {
+                clearTokenAndUserInfo()
                 authEventBus.notifyAuthExpired()
             }
             null
@@ -113,5 +119,11 @@ class OnmoimAuthenticator @Inject constructor(
             currentResponse = currentResponse.priorResponse
         }
         return result
+    }
+
+    private suspend fun clearTokenAndUserInfo() {
+        tokenRepository.clearJwt()
+        userRepository.clearUserId()
+        userRepository.clearHasNotInterest()
     }
 }
