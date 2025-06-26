@@ -16,8 +16,9 @@ object UseCaseModule {
     @Provides
     fun provideSignInUseCase(
         authRepository: AuthRepository,
-        tokenRepository: TokenRepository
-    ) = SignInUseCase(authRepository, tokenRepository)
+        tokenRepository: TokenRepository,
+        userRepository: UserRepository
+    ) = SignInUseCase(authRepository, tokenRepository, userRepository)
 
     @Provides
     fun provideSignUpUseCase(

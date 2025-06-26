@@ -1,5 +1,6 @@
 package com.onmoim.core.data.repository
 
+import com.onmoim.core.constant.AccountStatus
 import com.onmoim.core.data.model.Account
 import com.onmoim.core.data.model.Profile
 import com.onmoim.core.datastore.DataStorePreferences
@@ -42,7 +43,13 @@ class UserRepositoryImpl @Inject constructor(
 
         if (resp.isSuccessful && data != null) {
             setUserId(data.userId)
-            return Account.create(data.accessToken, data.refreshToken, data.status)
+            return Account.create(
+                accessToken = data.accessToken,
+                refreshToken = data.refreshToken,
+                accountStatus = data.status
+            ).also {
+                setHasNotInterest(it.status == AccountStatus.NO_CATEGORY)
+            }
         } else {
             throw HttpException(resp)
         }
@@ -109,7 +116,26 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun setHasNotInterest(value: Boolean) {
+        withContext(ioDispatcher) {
+            dataStorePreferences.putBoolean(HAS_NOT_INTEREST_KEY, value)
+        }
+    }
+
+    override suspend fun hasNotInterest(): Boolean {
+        return withContext(ioDispatcher) {
+            dataStorePreferences.getBoolean(HAS_NOT_INTEREST_KEY).first() ?: true
+        }
+    }
+
+    override suspend fun clearHasNotInterest() {
+        withContext(ioDispatcher) {
+            dataStorePreferences.removeBoolean(HAS_NOT_INTEREST_KEY)
+        }
+    }
+
     companion object {
         private const val USER_ID_KEY = "userId"
+        private const val HAS_NOT_INTEREST_KEY = "hasNotInterest"
     }
 }
