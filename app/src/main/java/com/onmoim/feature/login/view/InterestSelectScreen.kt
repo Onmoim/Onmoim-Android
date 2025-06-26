@@ -31,21 +31,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
 import com.onmoim.R
-import com.onmoim.core.constant.InterestCategory
+import com.onmoim.core.data.model.Interest
 import com.onmoim.core.ui.component.CommonAppBar
+import com.onmoim.core.ui.component.ErrorAndRetryBox
 import com.onmoim.core.ui.component.NavigationIconButton
 import com.onmoim.core.ui.theme.OnmoimTheme
 import com.onmoim.core.ui.theme.shadow1
 import com.onmoim.feature.login.state.InterestSelectEvent
+import com.onmoim.feature.login.state.InterestSelectUiState
 import com.onmoim.feature.login.viewmodel.InterestSelectViewModel
 
 @Composable
@@ -54,7 +59,8 @@ fun InterestSelectRoute(
     onBack: () -> Unit,
     onNavigateToHome: () -> Unit
 ) {
-    val selectedInterestCategories by interestSelectViewModel.selectedInterestCategories.collectAsStateWithLifecycle()
+    val uiState by interestSelectViewModel.uiState.collectAsStateWithLifecycle()
+    val selectedInterestIds by interestSelectViewModel.selectedInterestIds.collectAsStateWithLifecycle()
     var showLoading by remember { mutableStateOf(false) }
 
     BackHandler {
@@ -63,14 +69,16 @@ fun InterestSelectRoute(
 
     InterestSelectScreen(
         onBack = onBack,
+        onClickRefresh = interestSelectViewModel::fetchInterests,
         showLoading = showLoading,
-        selectedInterestCategories = selectedInterestCategories,
+        uiState = uiState,
+        selectedInterestIds = selectedInterestIds,
         onClickCategory = interestSelectViewModel::onClickCategory,
-        onClickOk = interestSelectViewModel::onClickOk
+        onClickConfirm = interestSelectViewModel::onClickConfirm
     )
 
     LaunchedEffect(Unit) {
-        interestSelectViewModel.receiveEvent.collect { event ->
+        interestSelectViewModel.event.collect { event ->
             when (event) {
                 is InterestSelectEvent.ShowErrorDialog -> {
                     showLoading = false
@@ -90,10 +98,12 @@ fun InterestSelectRoute(
 @Composable
 private fun InterestSelectScreen(
     onBack: () -> Unit,
+    onClickRefresh: () -> Unit,
     showLoading: Boolean,
-    selectedInterestCategories: Set<InterestCategory>,
-    onClickCategory: (InterestCategory) -> Unit,
-    onClickOk: () -> Unit
+    uiState: InterestSelectUiState,
+    selectedInterestIds: Set<Int>,
+    onClickCategory: (id: Int) -> Unit,
+    onClickConfirm: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -121,16 +131,19 @@ private fun InterestSelectScreen(
                     }
                 },
                 actions = {
-                    if (selectedInterestCategories.isNotEmpty()) {
+                    if (selectedInterestIds.isNotEmpty()) {
                         Text(
                             text = stringResource(R.string.confirm),
                             modifier = Modifier
                                 .clickable(
-                                    onClick = onClickOk,
+                                    onClick = onClickConfirm,
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null
                                 )
-                                .padding(16.dp),
+                                .padding(
+                                    horizontal = 16.dp,
+                                    vertical = 14.dp
+                                ),
                             style = OnmoimTheme.typography.body2Regular.copy(
                                 color = OnmoimTheme.colors.textColor
                             ),
@@ -139,26 +152,51 @@ private fun InterestSelectScreen(
                 }
             )
             Spacer(Modifier.height(20.dp))
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(
-                    start = 43.dp,
-                    end = 43.dp,
-                    bottom = 20.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(32.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             ) {
-                items(InterestCategory.entries) {
-                    InterestItem(
-                        onClick = {
-                            onClickCategory(it)
-                        },
-                        selected = selectedInterestCategories.contains(it),
-                        painter = painterResource(it.iconId),
-                        label = stringResource(it.labelId)
-                    )
+                when (uiState) {
+                    is InterestSelectUiState.Error -> {
+                        ErrorAndRetryBox(
+                            onClickRefresh = onClickRefresh,
+                            modifier = Modifier.align(Alignment.Center),
+                            title = stringResource(R.string.temporary_error),
+                            content = stringResource(R.string.try_again_later)
+                        )
+                    }
+
+                    InterestSelectUiState.Loading -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+
+                    is InterestSelectUiState.Success -> {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(3),
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(
+                                start = 43.dp,
+                                end = 43.dp,
+                                bottom = 20.dp
+                            ),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(uiState.categories) {
+                                InterestItem(
+                                    onClick = {
+                                        onClickCategory(it.id)
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    selected = selectedInterestIds.contains(it.id),
+                                    imageUrl = it.imageUrl,
+                                    label = it.name
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -182,9 +220,16 @@ private fun InterestItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     selected: Boolean,
-    painter: Painter,
+    imageUrl: String?,
     label: String
 ) {
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(LocalContext.current).apply {
+            data(imageUrl)
+        }.build()
+    )
+    val state by painter.state.collectAsStateWithLifecycle()
+
     Column(
         modifier = Modifier
             .clickable(
@@ -205,11 +250,25 @@ private fun InterestItem(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painter,
-                contentDescription = label,
+            Box(
                 modifier = Modifier.size(50.dp)
-            )
+            ) {
+                when (state) {
+                    is AsyncImagePainter.State.Error -> {
+                        // TODO: 추후 구현
+                    }
+
+                    is AsyncImagePainter.State.Success -> {
+                        Image(
+                            painter = painter,
+                            contentDescription = label,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+
+                    else -> {}
+                }
+            }
             if (selected) {
                 Box(
                     modifier = Modifier
@@ -241,25 +300,35 @@ private fun InterestItem(
 @Preview
 @Composable
 private fun InterestSelectScreenPreview() {
-    var selectedInterestCategories by remember {
-        mutableStateOf(setOf(InterestCategory.EXERCISE))
+    var selectedInterestIds by remember {
+        mutableStateOf(setOf(0))
     }
 
     OnmoimTheme {
         InterestSelectScreen(
             onBack = {},
+            onClickRefresh = {},
             showLoading = false,
-            selectedInterestCategories = selectedInterestCategories,
+            uiState = InterestSelectUiState.Success(
+                List(20) {
+                    Interest(
+                        id = it,
+                        imageUrl = null,
+                        name = "카테고리 $it"
+                    )
+                }
+            ),
+            selectedInterestIds = selectedInterestIds,
             onClickCategory = {
-                val copySet = selectedInterestCategories.toMutableSet()
+                val copySet = selectedInterestIds.toMutableSet()
                 if (copySet.contains(it)) {
                     copySet.remove(it)
                 } else {
                     copySet.add(it)
                 }
-                selectedInterestCategories = copySet
+                selectedInterestIds = copySet
             },
-            onClickOk = {}
+            onClickConfirm = {}
         )
     }
 }

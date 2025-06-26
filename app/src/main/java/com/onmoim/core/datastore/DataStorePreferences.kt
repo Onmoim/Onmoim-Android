@@ -3,6 +3,7 @@ package com.onmoim.core.datastore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -22,9 +23,25 @@ class DataStorePreferences @Inject constructor(
         preferences[stringPreferencesKey(key)]
     }
 
-    suspend fun remove(key: String) {
+    suspend fun putInt(key: String, value: Int) {
+        dataStore.edit { preferences ->
+            preferences[intPreferencesKey(key)] = value
+        }
+    }
+
+    fun getInt(key: String): Flow<Int?> = dataStore.data.map { preferences ->
+        preferences[intPreferencesKey(key)]
+    }
+
+    suspend fun removeString(key: String) {
         dataStore.edit {
             it.remove(stringPreferencesKey(key))
+        }
+    }
+
+    suspend fun removeInt(key: String) {
+        dataStore.edit {
+            it.remove(intPreferencesKey(key))
         }
     }
 }

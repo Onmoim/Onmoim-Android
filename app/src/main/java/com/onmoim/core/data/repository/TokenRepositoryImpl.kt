@@ -36,8 +36,8 @@ class TokenRepositoryImpl @Inject constructor(
 
     override suspend fun clearJwt() {
         withContext(ioDispatcher) {
-            dataStorePreferences.remove(PreferencesKey.ACCESS_TOKEN)
-            dataStorePreferences.remove(PreferencesKey.REFRESH_TOKEN)
+            dataStorePreferences.removeString(PreferencesKey.ACCESS_TOKEN)
+            dataStorePreferences.removeString(PreferencesKey.REFRESH_TOKEN)
         }
     }
 }
