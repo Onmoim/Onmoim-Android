@@ -29,7 +29,7 @@ class UserRepositoryImpl @Inject constructor(
         val resp = withContext(ioDispatcher) {
             userApi.signUp(req)
         }
-        val data = resp.body()
+        val data = resp.body()?.data
 
         if (resp.isSuccessful && data != null) {
             return Account.create(data.accessToken, data.refreshToken, data.status)
