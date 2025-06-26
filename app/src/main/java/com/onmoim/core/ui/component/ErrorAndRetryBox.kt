@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.onmoim.R
 import com.onmoim.core.ui.theme.OnmoimTheme
@@ -48,7 +49,8 @@ fun ErrorAndRetryBox(
                 onClick = onClickRefresh
             ),
             style = OnmoimTheme.typography.caption1Regular.copy(
-                color = OnmoimTheme.colors.textColor
+                color = OnmoimTheme.colors.gray06,
+                textDecoration = TextDecoration.Underline
             )
         )
     }
