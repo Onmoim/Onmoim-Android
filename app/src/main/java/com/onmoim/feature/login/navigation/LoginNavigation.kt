@@ -97,7 +97,7 @@ fun NavGraphBuilder.loginGraph(
             )
 
             LaunchedEffect(Unit) {
-                profileSettingViewModel.onAddressChange(address, addressId)
+                profileSettingViewModel.onLocationChange(address, addressId)
             }
         }
         composable<LocationSettingRoute> {

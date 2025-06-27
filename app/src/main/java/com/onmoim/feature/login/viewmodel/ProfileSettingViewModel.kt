@@ -46,9 +46,9 @@ class ProfileSettingViewModel @Inject constructor(
         }
     }
 
-    fun onAddressChange(address: String, addressId: Int) {
+    fun onLocationChange(location: String, locationId: Int) {
         _profileSettingState.update {
-            it.copy(address = address, addressId = addressId)
+            it.copy(location = location, locationId = locationId)
         }
     }
 
@@ -59,7 +59,7 @@ class ProfileSettingViewModel @Inject constructor(
             val birth = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(state.birth)
 
             signUpUseCase(
-                addressId = state.addressId,
+                locationId = state.locationId,
                 birth = birth,
                 gender = when(state.gender!!) {
                     Gender.MALE -> "M"

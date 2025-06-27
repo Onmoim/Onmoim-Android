@@ -1,12 +1,10 @@
 package com.onmoim.core.constant
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import com.onmoim.R
 
 enum class InterestCategory(
-    @DrawableRes val iconId: Int,
-    @StringRes val labelId: Int
+    val iconId: Int,
+    val labelId: Int
 ) {
     EXERCISE(
         iconId = R.drawable.ic_exercise,

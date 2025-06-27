@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SignUpRequest(
-    @SerialName("addressId")
-    val addressId: Int,
+    @SerialName("locationId")
+    val locationId: Int,
     @SerialName("birth")
     val birth: String,
     @SerialName("gender")
