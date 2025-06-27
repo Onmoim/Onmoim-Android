@@ -219,7 +219,7 @@ private fun ProfileSettingScreen(
                     )
                 )
                 CommonTextField(
-                    value = profileSettingState.address,
+                    value = profileSettingState.location,
                     onValueChange = {},
                     modifier = Modifier
                         .fillMaxWidth()
@@ -360,7 +360,7 @@ private fun ProfileSettingCompleteButton(
 @Composable
 private fun ProfileSettingScreenPreview() {
     var profileSettingState by remember {
-        mutableStateOf(ProfileSettingState(address = "연남동"))
+        mutableStateOf(ProfileSettingState(location = "연남동"))
     }
 
     OnmoimTheme {

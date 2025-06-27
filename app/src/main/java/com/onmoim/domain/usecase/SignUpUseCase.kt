@@ -12,13 +12,13 @@ class SignUpUseCase @Inject constructor(
     private val appSettingRepository: AppSettingRepository
 ) {
     suspend operator fun invoke(
-        addressId: Int,
+        locationId: Int,
         birth: String,
         gender: String,
         name: String
     ): Result<AccountStatus> {
         return try {
-            val account = userRepository.signUp(addressId, birth, gender, name)
+            val account = userRepository.signUp(locationId, birth, gender, name)
             val jwt = account.jwt
             tokenRepository.setJwt(jwt.accessToken, jwt.refreshToken)
             account.userId?.let {

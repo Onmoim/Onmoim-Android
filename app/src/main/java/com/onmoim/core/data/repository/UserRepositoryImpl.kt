@@ -21,13 +21,13 @@ class UserRepositoryImpl @Inject constructor(
     @Dispatcher(OnmoimDispatcher.IO) private val ioDispatcher: CoroutineDispatcher
 ) : UserRepository {
     override suspend fun signUp(
-        addressId: Int,
+        locationId: Int,
         birth: String,
         gender: String,
         name: String
     ): Account {
         val req = SignUpRequest(
-            addressId = addressId,
+            locationId = locationId,
             birth = birth,
             gender = gender,
             name = name
