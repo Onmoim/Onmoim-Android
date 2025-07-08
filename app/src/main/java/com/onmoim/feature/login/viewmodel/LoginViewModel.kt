@@ -2,7 +2,7 @@ package com.onmoim.feature.login.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.onmoim.core.constant.SocialType
+import com.onmoim.core.helper.constant.SocialType
 import com.onmoim.core.data.constant.AccountStatus
 import com.onmoim.core.domain.usecase.SignInUseCase
 import com.onmoim.core.helper.SocialSignInHelper

@@ -1,6 +1,7 @@
 package com.onmoim.core.helper
 
 import android.content.Context
+import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -11,8 +12,7 @@ import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
-import com.onmoim.BuildConfig
-import com.onmoim.core.constant.SocialType
+import com.onmoim.core.helper.constant.SocialType
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
@@ -20,12 +20,13 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
-import timber.log.Timber
 import kotlin.coroutines.cancellation.CancellationException
 
 class SocialSignInHelper(
     private val context: Context
 ) {
+    private val tag = "SocialSignInHelper"
+
     fun signIn(type: SocialType): Flow<String?> {
         return when (type) {
             SocialType.GOOGLE -> googleSignIn()
@@ -37,7 +38,7 @@ class SocialSignInHelper(
         val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             when {
                 error is ClientError && error.reason == ClientErrorCause.Cancelled -> {
-                    Timber.i("카카오 로그인 취소됨.")
+                    Log.i(tag, "카카오 로그인 취소됨.")
                 }
 
                 error != null -> {
@@ -46,7 +47,7 @@ class SocialSignInHelper(
 
                 else -> {
                     trySendBlocking(token?.accessToken).onFailure {
-                        Timber.e(it, it?.message.toString())
+                        Log.e(tag, it?.message.toString(), it)
                     }
                 }
             }
@@ -61,7 +62,7 @@ class SocialSignInHelper(
                     }
 
                     error != null -> {
-                        Timber.v(error, "카카오톡으로 로그인 실패")
+                        Log.v(tag, "카카오톡으로 로그인 실패", error)
                         UserApiClient.instance.loginWithKakaoAccount(context, callback = callback)
                     }
 
@@ -81,7 +82,8 @@ class SocialSignInHelper(
         try {
             val credentialManager = CredentialManager.create(context)
             val signInWithGoogleOption =
-                GetSignInWithGoogleOption.Builder(BuildConfig.GOOGLE_SIGN_IN_SERVER_CLIENT_ID).build()
+                GetSignInWithGoogleOption.Builder(BuildConfig.GOOGLE_SIGN_IN_SERVER_CLIENT_ID)
+                    .build()
             val getCredRequest = GetCredentialRequest.Builder()
                 .addCredentialOption(signInWithGoogleOption)
                 .build()
@@ -97,7 +99,7 @@ class SocialSignInHelper(
                 throw Throwable("Unexpected type of credential")
             }
         } catch (e: GetCredentialCancellationException) {
-            Timber.i(e, "구글 로그인 취소됨")
+            Log.i(tag, "구글 로그인 취소됨", e)
         }
     }
 }

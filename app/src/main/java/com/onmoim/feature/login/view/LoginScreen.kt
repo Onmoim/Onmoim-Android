@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.onmoim.R
-import com.onmoim.core.constant.SocialType
+import com.onmoim.core.helper.constant.SocialType
 import com.onmoim.core.ui.component.CommonDialog
 import com.onmoim.core.ui.theme.OnmoimTheme
 import com.onmoim.core.ui.theme.advancedShadow
@@ -135,11 +135,20 @@ private fun LoginScreen(
                     color = OnmoimTheme.colors.gray06
                 )
                 SocialType.entries.forEach { type ->
+                    val btnColor = when (type) {
+                        SocialType.GOOGLE -> Color.White
+                        SocialType.KAKAO -> Color(0xFFFFE400)
+                    }
+                    val btnLabelId = when (type) {
+                        SocialType.GOOGLE -> R.string.btn_google_login
+                        SocialType.KAKAO -> R.string.btn_kakao_login
+                    }
+
                     Box(
                         modifier = Modifier
                             .widthIn(min = 240.dp)
                             .shadow1(999.dp)
-                            .background(color = type.color, shape = CircleShape)
+                            .background(color = btnColor, shape = CircleShape)
                             .clip(CircleShape)
                             .clickable {
                                 onClickLogin(type)
@@ -147,7 +156,7 @@ private fun LoginScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = stringResource(type.labelId),
+                            text = stringResource(btnLabelId),
                             modifier = Modifier.padding(vertical = 8.dp),
                             fontFamily = pretendard,
                             fontWeight = FontWeight.W600,
