@@ -36,12 +36,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.onmoim.R
-import com.onmoim.core.ui.component.CommonAppBar
-import com.onmoim.core.ui.component.CommonTextField
-import com.onmoim.core.ui.component.ErrorAndRetryBox
-import com.onmoim.core.ui.component.NavigationIconButton
-import com.onmoim.core.ui.theme.OnmoimTheme
+import com.onmoim.core.designsystem.component.CommonAppBar
+import com.onmoim.core.designsystem.component.CommonTextField
+import com.onmoim.core.designsystem.component.ErrorAndRetryBox
+import com.onmoim.core.designsystem.component.NavigationIconButton
+import com.onmoim.core.designsystem.theme.OnmoimTheme
+import com.onmoim.core.ui.R
 import com.onmoim.feature.login.state.LocationSettingUiState
 import com.onmoim.feature.login.viewmodel.LocationSettingViewModel
 

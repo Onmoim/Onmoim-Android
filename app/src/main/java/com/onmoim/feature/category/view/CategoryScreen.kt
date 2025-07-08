@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.onmoim.core.ui.theme.OnmoimTheme
+import com.onmoim.core.designsystem.theme.OnmoimTheme
 
 @Composable
 fun CategoryRoute(

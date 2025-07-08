@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import com.onmoim.core.ui.component.TopLevelAppBar
-import com.onmoim.core.ui.theme.OnmoimTheme
+import com.onmoim.core.designsystem.component.TopLevelAppBar
+import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.navigation.OnmoimNavHost
 
 @Composable

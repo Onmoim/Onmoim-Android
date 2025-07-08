@@ -126,4 +126,6 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
     implementation(project(":core:helper"))
+    implementation(project(":core:ui"))
+    implementation(project(":core:designsystem"))
 }

@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.onmoim.R
+import com.onmoim.core.ui.R
 import com.onmoim.feature.category.CategoryRoute
 import com.onmoim.feature.category.view.CategoryRoute
 import com.onmoim.feature.home.HomeRoute

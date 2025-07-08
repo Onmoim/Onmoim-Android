@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
-import com.onmoim.core.ui.theme.OnmoimTheme
+import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.category.CategoryRoute
 import com.onmoim.feature.home.HomeRoute
 import com.onmoim.feature.mymeet.MyMeetRoute
