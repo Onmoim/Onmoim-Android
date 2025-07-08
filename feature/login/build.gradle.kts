@@ -1,64 +1,32 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.gms.googleServices)
 }
 
 android {
-    namespace = "com.onmoim"
+    namespace = "com.onmoim.feature.login"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.onmoim"
         minSdk = 28
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = getLocalPropertyValue("kakao.native.app.key")
-
-        buildConfigField(
-            "String",
-            "KAKAO_NATIVE_APP_KEY",
-            "\"${getLocalPropertyValue("kakao.native.app.key")}\""
-        )
-    }
-
-    signingConfigs {
-        create("debugKey") {
-            storeFile = file("../keystore/onmoim_debug_key.jks")
-            storePassword = getLocalPropertyValue("store.password")
-            keyAlias = getLocalPropertyValue("debug.key.alias")
-            keyPassword = getLocalPropertyValue("key.password")
-        }
-        create("releaseKey") {
-            storeFile = file("../keystore/onmoim_release_key.jks")
-            storePassword = getLocalPropertyValue("store.password")
-            keyAlias = getLocalPropertyValue("release.key.alias")
-            keyPassword = getLocalPropertyValue("key.password")
-        }
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
-        debug {
-            signingConfig = signingConfigs.getByName("debugKey")
-        }
         release {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("releaseKey")
         }
     }
     compileOptions {
@@ -72,12 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
-        buildConfig = true
     }
-}
-
-fun getLocalPropertyValue(key: String): String {
-    return gradleLocalProperties(rootDir, providers).getProperty(key)
 }
 
 dependencies {
@@ -102,30 +65,18 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.core.splashScreen)
-    implementation(libs.androidx.paging.runtimeKtx)
-    implementation(libs.androidx.paging.compose)
-
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
-
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
-    implementation(libs.kakao)
 
-    implementation(libs.kotlinx.serialization.json)
-
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
-
-    implementation(project(":core:event"))
-    implementation(project(":core:data"))
+    implementation(project(":core:helper"))
+    implementation(project(":core:ui"))
     implementation(project(":core:designsystem"))
+    implementation(project(":core:domain"))
+    implementation(project(":core:data"))
 
-    implementation(project(":feature:login"))
     implementation(project(":feature:home"))
-    implementation(project(":feature:category"))
-    implementation(project(":feature:mymeet"))
-    implementation(project(":feature:profile"))
 }
