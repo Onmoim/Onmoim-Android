@@ -75,6 +75,9 @@ class OnmoimAppState(
             authEventBus.event.collect { event ->
                 when (event) {
                     AuthEvent.AuthExpired -> {
+                        launch { tokenRepository.clearJwt() }
+                        launch { appSettingRepository.clearUserId() }
+                        launch { appSettingRepository.clearHasNotInterest() }
                         navController.navigateToLogin()
                     }
 

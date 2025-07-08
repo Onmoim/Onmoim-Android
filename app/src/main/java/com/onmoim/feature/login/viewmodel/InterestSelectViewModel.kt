@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.onmoim.core.data.repository.AppSettingRepository
 import com.onmoim.core.data.repository.InterestRepository
 import com.onmoim.core.data.repository.UserRepository
-import com.onmoim.domain.usecase.GetUserIdUseCase
+import com.onmoim.core.domain.usecase.GetUserIdUseCase
 import com.onmoim.feature.login.state.InterestSelectEvent
 import com.onmoim.feature.login.state.InterestSelectUiState
 import dagger.hilt.android.lifecycle.HiltViewModel

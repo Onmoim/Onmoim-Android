@@ -2,10 +2,10 @@ package com.onmoim.feature.login.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.onmoim.core.constant.AccountStatus
 import com.onmoim.core.constant.SocialType
+import com.onmoim.core.data.constant.AccountStatus
+import com.onmoim.core.domain.usecase.SignInUseCase
 import com.onmoim.core.helper.SocialSignInHelper
-import com.onmoim.domain.usecase.SignInUseCase
 import com.onmoim.feature.login.state.LoginEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi

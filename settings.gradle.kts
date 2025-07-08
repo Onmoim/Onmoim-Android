@@ -22,3 +22,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "Onmoim"
 include(":app")
+include(":core:network")
+include(":core:event")
+include(":core:dispatcher")
+include(":core:data")
+include(":core:datastore")
+include(":core:domain")
