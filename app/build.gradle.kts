@@ -31,11 +31,6 @@ android {
             "KAKAO_NATIVE_APP_KEY",
             "\"${getLocalPropertyValue("kakao.native.app.key")}\""
         )
-        buildConfigField(
-            "String",
-            "GOOGLE_SIGN_IN_SERVER_CLIENT_ID",
-            "\"${getLocalPropertyValue("google.sign.in.server.client.id")}\""
-        )
     }
 
     signingConfigs {
@@ -97,7 +92,6 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -125,13 +119,13 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
 
-    implementation(libs.androidx.credentials)
-    implementation(libs.androidx.credentials.playServicesAuth)
-    implementation(libs.googleId)
-
-    implementation(libs.timber)
-
     implementation(project(":core:event"))
     implementation(project(":core:data"))
-    implementation(project(":core:domain"))
+    implementation(project(":core:designsystem"))
+
+    implementation(project(":feature:login"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:category"))
+    implementation(project(":feature:mymeet"))
+    implementation(project(":feature:profile"))
 }
