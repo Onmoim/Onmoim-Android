@@ -26,11 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
-import com.onmoim.core.ui.navigation.CategoryRoute
-import com.onmoim.core.ui.navigation.HomeRoute
-import com.onmoim.core.ui.navigation.MyMeetRoute
-import com.onmoim.core.ui.navigation.ProfileRoute
-import com.onmoim.core.ui.navigation.topLevelRoutes
+import com.onmoim.navigation.CategoryRoute
+import com.onmoim.navigation.HomeRoute
+import com.onmoim.navigation.MyMeetRoute
+import com.onmoim.navigation.ProfileRoute
+import com.onmoim.navigation.topLevelRoutes
 import com.onmoim.core.ui.theme.OnmoimTheme
 
 @Composable

@@ -1,4 +1,4 @@
-package com.onmoim.core.ui.navigation
+package com.onmoim.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween

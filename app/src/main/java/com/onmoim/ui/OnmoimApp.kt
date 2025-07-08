@@ -1,4 +1,4 @@
-package com.onmoim
+package com.onmoim.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.onmoim.core.ui.component.BottomNavigationBar
 import com.onmoim.core.ui.component.TopLevelAppBar
-import com.onmoim.core.ui.navigation.OnmoimNavHost
+import com.onmoim.navigation.OnmoimNavHost
 import com.onmoim.core.ui.theme.OnmoimTheme
 
 @Composable

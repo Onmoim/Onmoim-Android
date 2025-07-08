@@ -8,7 +8,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import androidx.navigation.navigation
-import com.onmoim.core.ui.navigation.navigateToHome
+import com.onmoim.navigation.navigateToHome
 import com.onmoim.feature.login.view.InterestSelectRoute
 import com.onmoim.feature.login.view.LocationSettingRoute
 import com.onmoim.feature.login.view.LoginRoute

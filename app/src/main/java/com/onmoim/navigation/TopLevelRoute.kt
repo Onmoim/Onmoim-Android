@@ -1,4 +1,4 @@
-package com.onmoim.core.ui.navigation
+package com.onmoim.navigation
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition

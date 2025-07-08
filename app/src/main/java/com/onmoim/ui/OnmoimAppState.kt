@@ -1,4 +1,4 @@
-package com.onmoim
+package com.onmoim.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -12,8 +12,8 @@ import com.onmoim.core.data.repository.AppSettingRepository
 import com.onmoim.core.data.repository.TokenRepository
 import com.onmoim.core.event.AuthEvent
 import com.onmoim.core.event.AuthEventBus
-import com.onmoim.core.ui.navigation.navigateToHome
 import com.onmoim.feature.login.navigation.navigateToLogin
+import com.onmoim.navigation.navigateToHome
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
