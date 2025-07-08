@@ -5,14 +5,16 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.onmoim.R
+import com.onmoim.feature.category.CategoryRoute
 import com.onmoim.feature.category.view.CategoryRoute
+import com.onmoim.feature.home.HomeRoute
 import com.onmoim.feature.home.view.HomeRoute
+import com.onmoim.feature.mymeet.MyMeetRoute
 import com.onmoim.feature.mymeet.view.MyMeetRoute
+import com.onmoim.feature.profile.ProfileRoute
 import com.onmoim.feature.profile.view.ProfileRoute
-import kotlinx.serialization.Serializable
 
 data class TopLevelRoute<T : Any>(
     val labelId: Int,
@@ -20,18 +22,6 @@ data class TopLevelRoute<T : Any>(
     val unselectedIconId: Int,
     val route: T
 )
-
-@Serializable
-object HomeRoute
-
-@Serializable
-object CategoryRoute
-
-@Serializable
-object MyMeetRoute
-
-@Serializable
-object ProfileRoute
 
 val topLevelRoutes = listOf(
     TopLevelRoute(
@@ -59,10 +49,6 @@ val topLevelRoutes = listOf(
         route = ProfileRoute
     )
 )
-
-fun NavController.navigateToHome(navOptions: NavOptions? = null) {
-    navigate(HomeRoute, navOptions)
-}
 
 fun NavGraphBuilder.topLevelGraph(
     navController: NavController,
