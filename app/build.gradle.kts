@@ -26,7 +26,6 @@ android {
 
         manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = getLocalPropertyValue("kakao.native.app.key")
 
-        buildConfigField("String", "BASE_URL", "\"https://onmoim.store\"")
         buildConfigField(
             "String",
             "KAKAO_NATIVE_APP_KEY",
@@ -110,18 +109,12 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.splashScreen)
-    implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.paging.runtimeKtx)
     implementation(libs.androidx.paging.compose)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
-
-    implementation(libs.okHttp)
-    implementation(libs.okHttp.logging)
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.kotlinx.serialization)
 
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
@@ -137,4 +130,8 @@ dependencies {
     implementation(libs.googleId)
 
     implementation(libs.timber)
+
+    implementation(project(":core:event"))
+    implementation(project(":core:data"))
+    implementation(project(":core:domain"))
 }

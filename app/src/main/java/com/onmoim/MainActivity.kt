@@ -11,7 +11,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.rememberNavController
 import com.onmoim.core.data.repository.AppSettingRepository
 import com.onmoim.core.data.repository.TokenRepository
-import com.onmoim.core.data.repository.UserRepository
 import com.onmoim.core.event.AuthEventBus
 import com.onmoim.core.ui.theme.OnmoimTheme
 import dagger.hilt.android.AndroidEntryPoint
