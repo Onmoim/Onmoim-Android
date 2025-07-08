@@ -1,4 +1,4 @@
-package com.onmoim.core.ui.component
+package com.onmoim.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,12 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
-import com.onmoim.navigation.CategoryRoute
-import com.onmoim.navigation.HomeRoute
-import com.onmoim.navigation.MyMeetRoute
-import com.onmoim.navigation.ProfileRoute
-import com.onmoim.navigation.topLevelRoutes
 import com.onmoim.core.ui.theme.OnmoimTheme
+import com.onmoim.feature.category.CategoryRoute
+import com.onmoim.feature.home.HomeRoute
+import com.onmoim.feature.mymeet.MyMeetRoute
+import com.onmoim.feature.profile.ProfileRoute
+import com.onmoim.navigation.topLevelRoutes
 
 @Composable
 fun BottomNavigationBar(
