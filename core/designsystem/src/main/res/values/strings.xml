@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- MeetItem -->
+    <string name="meet_item_recommend">추천</string>
+    <string name="meet_item_signing_up">가입중</string>
+    <string name="meet_item_operating">운영중</string>
+    <string name="meet_item_member_count">멤버 %d명</string>
+    <string name="meet_item_schedule_count">다가오는 일정 %d</string>
+    <string name="more_show">더보기</string>
+</resources>
