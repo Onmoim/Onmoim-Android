@@ -1,28 +1,20 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.onmoim.filterProject
 
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt.android)
-    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.onmoim.android.application)
+    alias(libs.plugins.onmoim.android.compose)
     alias(libs.plugins.gms.googleServices)
 }
 
 android {
     namespace = "com.onmoim"
-    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.onmoim"
-        minSdk = 28
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = getLocalPropertyValue("kakao.native.app.key")
 
@@ -61,19 +53,6 @@ android {
             signingConfig = signingConfigs.getByName("releaseKey")
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
-    }
-    buildFeatures {
-        compose = true
-        buildConfig = true
-    }
 }
 
 fun getLocalPropertyValue(key: String): String {
@@ -81,44 +60,17 @@ fun getLocalPropertyValue(key: String): String {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewmodel)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.splashScreen)
-
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-
-    implementation(libs.kakao)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
 
-    implementation(project(":core:event"))
-    implementation(project(":core:data"))
-    implementation(project(":core:designsystem"))
+    implementation(libs.kakao)
 
-    implementation(project(":feature:login"))
-    implementation(project(":feature:home"))
-    implementation(project(":feature:category"))
-    implementation(project(":feature:mymeet"))
-    implementation(project(":feature:profile"))
+    rootProject.subprojects.filterProject {
+        implementation(it)
+    }
 }
