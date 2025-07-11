@@ -1,60 +1,24 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt.android)
-    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.onmoim.android.library)
+    alias(libs.plugins.onmoim.android.hilt)
+    alias(libs.plugins.onmoim.kotlin.library.serialization)
 }
 
 android {
     namespace = "com.onmoim.core.network"
-    compileSdk = 36
 
     defaultConfig {
-        minSdk = 28
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
         buildConfigField("String", "BASE_URL", "\"https://onmoim.store\"")
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
-    }
-    buildFeatures {
-        buildConfig = true
     }
 }
 
 dependencies {
+    implementation(projects.core.event)
+    implementation(projects.core.dispatcher)
+    implementation(projects.core.datastore)
 
-    implementation(libs.androidx.core.ktx)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
     implementation(libs.okHttp)
     implementation(libs.okHttp.logging)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.kotlinx.serialization)
-    implementation(libs.kotlinx.serialization.json)
-
-    implementation(project(":core:event"))
-    implementation(project(":core:dispatcher"))
-    implementation(project(":core:datastore"))
 }
