@@ -1,3 +1,4 @@
+import com.onmoim.configureAndroidJUnit
 import com.onmoim.configureHiltAndroid
 import com.onmoim.configureKotlinAndroid
 
@@ -7,3 +8,4 @@ plugins {
 
 configureKotlinAndroid()
 configureHiltAndroid()
+configureAndroidJUnit()
