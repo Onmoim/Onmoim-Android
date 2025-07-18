@@ -10,6 +10,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import com.onmoim.feature.groups.navigateToGroupDetail
 import com.onmoim.feature.home.constant.HomeGroupType
 import com.onmoim.feature.home.view.GroupMoreRoute
 import com.onmoim.feature.home.view.HomeRoute
@@ -59,7 +60,7 @@ fun NavGraphBuilder.homeGraph(
                 topBar = topBar,
                 bottomBar = bottomBar,
                 onNavigateToGroupDetail = {
-
+                    navController.navigateToGroupDetail(it)
                 },
                 onNavigateToMoreGroup = {
                     navController.navigateToGroupMore(it)
@@ -75,7 +76,7 @@ fun NavGraphBuilder.homeGraph(
             GroupMoreRoute(
                 groupMoreViewModel = groupMoreViewModel,
                 onNavigateToGroupDetail = {
-
+                    navController.navigateToGroupDetail(it)
                 }
             )
         }

@@ -8,6 +8,8 @@ android {
 }
 
 dependencies {
+    implementation(projects.feature.groups)
+
     implementation(libs.androidx.paging.runtimeKtx)
     implementation(libs.androidx.paging.compose)
 }
