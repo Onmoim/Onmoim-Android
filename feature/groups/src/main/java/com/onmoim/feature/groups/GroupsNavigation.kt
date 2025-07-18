@@ -38,7 +38,8 @@ fun NavGraphBuilder.groupsGraph(
 
             GroupDetailRoute(
                 groupDetailViewModel = groupDetailViewModel,
-                onNavigateToComingSchedule = {}
+                onNavigateToComingSchedule = {},
+                onNavigateToPostDetail = {}
             )
         }
     }

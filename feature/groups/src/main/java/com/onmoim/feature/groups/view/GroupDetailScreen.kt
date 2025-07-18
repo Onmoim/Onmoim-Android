@@ -16,6 +16,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -34,7 +38,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
@@ -44,9 +47,12 @@ import com.onmoim.core.designsystem.component.CommonTab
 import com.onmoim.core.designsystem.component.CommonTabRow
 import com.onmoim.core.designsystem.component.groups.ComingScheduleCard
 import com.onmoim.core.designsystem.component.groups.GroupDetailAppBar
+import com.onmoim.core.designsystem.component.groups.PostCard
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.groups.R
+import com.onmoim.feature.groups.constant.GroupDetailPostFilter
+import com.onmoim.feature.groups.constant.GroupDetailPostViewMode
 import com.onmoim.feature.groups.constant.GroupDetailTab
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
 import java.time.LocalDateTime
@@ -54,7 +60,8 @@ import java.time.LocalDateTime
 @Composable
 fun GroupDetailRoute(
     groupDetailViewModel: GroupDetailViewModel,
-    onNavigateToComingSchedule: () -> Unit
+    onNavigateToComingSchedule: () -> Unit,
+    onNavigateToPostDetail: (id: Int) -> Unit
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var selectedTab by remember { mutableStateOf(GroupDetailTab.HOME) }
@@ -67,7 +74,8 @@ fun GroupDetailRoute(
         onTabChange = {
             selectedTab = it
         },
-        onClickComingSchedule = onNavigateToComingSchedule
+        onClickComingSchedule = onNavigateToComingSchedule,
+        onClickPost = onNavigateToPostDetail
     )
 }
 
@@ -76,7 +84,8 @@ private fun GroupDetailScreen(
     onBack: () -> Unit,
     selectedTab: GroupDetailTab,
     onTabChange: (GroupDetailTab) -> Unit,
-    onClickComingSchedule: () -> Unit
+    onClickComingSchedule: () -> Unit,
+    onClickPost: (id: Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -134,7 +143,15 @@ private fun GroupDetailScreen(
                     )
                 }
 
-                GroupDetailTab.POST -> {}
+                GroupDetailTab.POST -> {
+                    GroupDetailPostContainer(
+                        onClickPost = onClickPost,
+                        modifier = Modifier.fillMaxSize(),
+                        selectedFilter = GroupDetailPostFilter.ALL,
+                        onFilterChange = {}
+                    )
+                }
+
                 GroupDetailTab.CHAT -> {}
             }
         }
@@ -287,15 +304,208 @@ private fun GroupDetailHomeContainer(
     }
 }
 
+@Composable
+private fun GroupDetailPostContainer(
+    onClickPost: (id: Int) -> Unit,
+    modifier: Modifier = Modifier,
+    selectedFilter: GroupDetailPostFilter,
+    onFilterChange: (GroupDetailPostFilter) -> Unit,
+    initialViewMode: GroupDetailPostViewMode = GroupDetailPostViewMode.POST
+) {
+    var selectedViewMode by remember { mutableStateOf(initialViewMode) }
+
+    Column(
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = OnmoimTheme.colors.gray01
+                ),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            GroupDetailPostFilter.entries.forEach { filter ->
+                Text(
+                    text = stringResource(
+                        id = when (filter) {
+                            GroupDetailPostFilter.ALL -> R.string.group_detail_post_all
+                            GroupDetailPostFilter.NOTICE -> R.string.group_detail_post_notice
+                            GroupDetailPostFilter.REG_GREETING -> R.string.group_detail_post_reg_greeting
+                            GroupDetailPostFilter.MEET_REVIEW -> R.string.group_detail_post_meet_review
+                            GroupDetailPostFilter.FREE_BOARD -> R.string.group_detail_post_free_board
+                        }
+                    ),
+                    modifier = Modifier
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() },
+                            onClick = {
+                                onFilterChange(filter)
+                            }
+                        )
+                        .padding(horizontal = 15.5.dp, vertical = 15.dp),
+                    style = OnmoimTheme.typography.caption1Regular.copy(
+                        color = if (selectedFilter == filter) {
+                            OnmoimTheme.colors.textColor
+                        } else {
+                            OnmoimTheme.colors.gray04
+                        }
+                    )
+                )
+            }
+        }
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            Row(
+                modifier = Modifier
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            selectedViewMode = when (selectedViewMode) {
+                                GroupDetailPostViewMode.POST -> GroupDetailPostViewMode.ALBUM
+                                GroupDetailPostViewMode.ALBUM -> GroupDetailPostViewMode.POST
+                            }
+                        }
+                    )
+                    .padding(horizontal = 15.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_sort),
+                    contentDescription = null
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    text = stringResource(
+                        id = when (selectedViewMode) {
+                            GroupDetailPostViewMode.POST -> R.string.group_detail_post_view_mode_post
+                            GroupDetailPostViewMode.ALBUM -> R.string.group_detail_post_view_mode_album
+                        }
+                    ),
+                    style = OnmoimTheme.typography.caption2Regular.copy(
+                        color = OnmoimTheme.colors.gray06
+                    )
+                )
+            }
+        }
+        when (selectedViewMode) {
+            GroupDetailPostViewMode.POST -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ) {
+                    items(10) {
+                        PostCard(
+                            onClick = {
+                                // TODO: api 연동시 수정
+                                onClickPost(it)
+                            },
+                            userName = "userName",
+                            profileImgUrl = "https://picsum.photos/200",
+                            writeDateTime = LocalDateTime.now(),
+                            title = "title",
+                            content = "content",
+                            likeCount = 10,
+                            commentCount = 20,
+                            representImageUrl = "https://picsum.photos/200"
+                        )
+                    }
+                }
+            }
+
+            GroupDetailPostViewMode.ALBUM -> {
+                LazyVerticalGrid(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    columns = GridCells.Fixed(3),
+                    verticalArrangement = Arrangement.spacedBy(3.dp),
+                    horizontalArrangement = Arrangement.spacedBy(3.dp)
+                ) {
+                    items(10) {
+                        val painter = rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(LocalContext.current).apply {
+                                data("https://picsum.photos/200")
+                            }.build()
+                        )
+                        val painterState by painter.state.collectAsStateWithLifecycle()
+
+                        Crossfade(
+                            targetState = painterState,
+                            modifier = Modifier
+                                .clickable(
+                                    indication = null,
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    onClick = {
+                                        // TODO: api 연동시 수정
+                                        onClickPost(it)
+                                    }
+                                )
+                                .aspectRatio(1f)
+                        ) { state ->
+                            when (state) {
+                                is AsyncImagePainter.State.Loading -> {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .shimmerBackground()
+                                    )
+                                }
+
+                                is AsyncImagePainter.State.Success -> {
+                                    Image(
+                                        painter = state.painter,
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+
+                                else -> {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(Color(0xFFA4A4A4))
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
-private fun GroupDetailScreenPreview() {
+private fun GroupDetailScreenForHomePreview() {
     OnmoimTheme {
         GroupDetailScreen(
             onBack = {},
             selectedTab = GroupDetailTab.HOME,
             onTabChange = {},
-            onClickComingSchedule = {}
+            onClickComingSchedule = {},
+            onClickPost = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun GroupDetailScreenForPostPreview() {
+    OnmoimTheme {
+        GroupDetailScreen(
+            onBack = {},
+            selectedTab = GroupDetailTab.POST,
+            onTabChange = {},
+            onClickComingSchedule = {},
+            onClickPost = {}
         )
     }
 }

@@ -6,4 +6,11 @@
     <string name="group_detail_tab_chat">그룹 채팅</string>
     <string name="group_detail_chip_member_count">멤버 %d</string>
     <string name="group_detail_coming_schedule">다가오는 일정</string>
+    <string name="group_detail_post_all">전체</string>
+    <string name="group_detail_post_notice">공지</string>
+    <string name="group_detail_post_reg_greeting">가입인사</string>
+    <string name="group_detail_post_meet_review">모임후기</string>
+    <string name="group_detail_post_free_board">자유게시판</string>
+    <string name="group_detail_post_view_mode_post">게시글</string>
+    <string name="group_detail_post_view_mode_album">사진첩</string>
 </resources>
