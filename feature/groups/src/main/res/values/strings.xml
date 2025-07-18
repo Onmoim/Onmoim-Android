@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 모임 상세 -->
+    <string name="group_detail_tab_home">홈</string>
+    <string name="group_detail_tab_post">게시판</string>
+    <string name="group_detail_tab_chat">그룹 채팅</string>
+    <string name="group_detail_chip_member_count">멤버 %d</string>
+    <string name="group_detail_coming_schedule">다가오는 일정</string>
+</resources>
