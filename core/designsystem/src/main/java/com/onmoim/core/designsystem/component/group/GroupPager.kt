@@ -1,4 +1,4 @@
-package com.onmoim.core.designsystem.component.meet
+package com.onmoim.core.designsystem.component.group
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -24,20 +24,26 @@ import com.onmoim.core.designsystem.R
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 
 @Composable
-fun MeetPager(
+fun GroupPager(
     title: String,
-    pageSize: Int,
+    itemCount: Int,
     itemsPerPage: Int,
     modifier: Modifier = Modifier,
     itemSpacing: Dp = 16.dp,
     onClickMore: () -> Unit,
     meetContent: @Composable (page: Int, index: Int) -> Unit
 ) {
-    val pagerState = rememberPagerState { pageSize }
+    val pagerState = rememberPagerState {
+        if (itemCount % itemsPerPage == 0) {
+            itemCount / itemsPerPage
+        } else {
+            itemCount / itemsPerPage + 1
+        }
+    }
     val moreButtonBottomBorderColor = OnmoimTheme.colors.gray01
 
     Column(modifier = modifier) {
-        MeetHeader(
+        GroupHeader(
             title = title,
             modifier = Modifier.padding(horizontal = 15.dp)
         )
@@ -52,7 +58,13 @@ fun MeetPager(
             Column(
                 verticalArrangement = Arrangement.spacedBy(itemSpacing)
             ) {
-                List(itemsPerPage) { index ->
+                List(
+                    size = if (itemCount % itemsPerPage == 0) {
+                        itemsPerPage
+                    } else {
+                        itemCount % itemsPerPage
+                    }
+                ) { index ->
                     meetContent(page, index)
                 }
             }
@@ -87,13 +99,13 @@ fun MeetPager(
 @Composable
 private fun MeetPagerPreview() {
     OnmoimTheme {
-        MeetPager(
+        GroupPager(
             title = "title",
-            pageSize = 3,
+            itemCount = 3,
             itemsPerPage = 4,
             onClickMore = {}
         ) { page, index ->
-            MeetItem(
+            GroupItem(
                 onClick = {},
                 imageUrl = "",
                 title = "title",

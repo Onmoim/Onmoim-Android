@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 공통 -->
+    <string name="more_show">더보기</string>
+
     <!-- 홈화면 -->
     <string name="home_recommend_meet">추천</string>
     <string name="home_popularity_meet">인기</string>
     <string name="home_favorite_meet">찜한 모임</string>
-    <string name="home_similar_interest">나와 비슷한 관심사</string>
-    <string name="home_near_meet">나와 가까운 모임</string>
-    <string name="home_near_popular_meet">내 주변 인기 모임</string>
-    <string name="home_lively_meet">활동이 활발한 모임</string>
+    <string name="home_similar_interest_group">나와 비슷한 관심사</string>
+    <string name="home_nearby_group">나와 가까운 모임</string>
+    <string name="home_popular_nearby_group">내 주변 인기 모임</string>
+    <string name="home_popular_active_group">활동이 활발한 모임</string>
     <string name="home_my_favorite_meet">내가 찜한 모임</string>
 </resources>

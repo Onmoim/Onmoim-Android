@@ -10,6 +10,7 @@ import com.onmoim.core.ui.R
 import com.onmoim.feature.category.CategoryRoute
 import com.onmoim.feature.category.view.CategoryRoute
 import com.onmoim.feature.home.HomeRoute
+import com.onmoim.feature.home.homeGraph
 import com.onmoim.feature.home.view.HomeRoute
 import com.onmoim.feature.mymeet.MyMeetRoute
 import com.onmoim.feature.mymeet.view.MyMeetRoute
@@ -55,17 +56,11 @@ fun NavGraphBuilder.topLevelGraph(
     topBar: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit
 ) {
-    composable<HomeRoute>(
-        enterTransition = { EnterTransition.None },
-        exitTransition = { ExitTransition.None },
-        popEnterTransition = { EnterTransition.None },
-        popExitTransition = { ExitTransition.None }
-    ) {
-        HomeRoute(
-            topBar = topBar,
-            bottomBar = bottomBar
-        )
-    }
+    homeGraph(
+        navController = navController,
+        topBar = topBar,
+        bottomBar = bottomBar
+    )
     composable<CategoryRoute>(
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None },

@@ -1,4 +1,4 @@
-package com.onmoim.core.designsystem.component.meet
+package com.onmoim.core.designsystem.component.group
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 
 @Composable
-fun MeetHeader(
+fun GroupHeader(
     title: String,
     modifier: Modifier = Modifier
 ) {

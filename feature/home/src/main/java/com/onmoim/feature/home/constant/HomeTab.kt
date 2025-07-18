@@ -1,4 +1,6 @@
-package com.onmoim.feature.home
+package com.onmoim.feature.home.constant
+
+import com.onmoim.feature.home.R
 
 enum class HomeTab(
     val labelId: Int
