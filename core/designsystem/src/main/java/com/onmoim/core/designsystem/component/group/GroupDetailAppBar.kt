@@ -1,4 +1,4 @@
-package com.onmoim.core.designsystem.component.groups
+package com.onmoim.core.designsystem.component.group
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row

@@ -45,9 +45,9 @@ import coil3.request.ImageRequest
 import com.onmoim.core.designsystem.component.CommonChip
 import com.onmoim.core.designsystem.component.CommonTab
 import com.onmoim.core.designsystem.component.CommonTabRow
-import com.onmoim.core.designsystem.component.groups.ComingScheduleCard
-import com.onmoim.core.designsystem.component.groups.GroupDetailAppBar
-import com.onmoim.core.designsystem.component.groups.PostCard
+import com.onmoim.core.designsystem.component.group.ComingScheduleCard
+import com.onmoim.core.designsystem.component.group.GroupDetailAppBar
+import com.onmoim.core.designsystem.component.group.PostCard
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.groups.R
