@@ -7,4 +7,11 @@
     <string name="meet_item_member_count">멤버 %d명</string>
     <string name="meet_item_schedule_count">다가오는 일정 %d</string>
     <string name="more_show">더보기</string>
+
+    <!-- ComingScheduleCard -->
+    <string name="coming_schedule_attend">참석</string>
+    <string name="coming_schedule_date">일시</string>
+    <string name="coming_schedule_location">위치</string>
+    <string name="coming_schedule_cost">비용</string>
+    <string name="coming_schedule_formatted_price">%s원</string>
 </resources>

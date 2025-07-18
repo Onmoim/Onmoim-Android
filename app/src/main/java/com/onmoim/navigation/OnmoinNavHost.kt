@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.onmoim.feature.groups.groupsGraph
 import com.onmoim.feature.login.navigation.LoginNavigation
 import com.onmoim.feature.login.navigation.loginGraph
 
@@ -59,6 +60,9 @@ fun OnmoimNavHost(
             bottomBar = bottomBar
         )
         loginGraph(
+            navController = navController
+        )
+        groupsGraph(
             navController = navController
         )
     }
