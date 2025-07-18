@@ -44,7 +44,8 @@ fun GroupMoreRoute(
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     // TODO: api 연동하면 수정
-    val groupPagingItems = MutableStateFlow(PagingData.empty<HomeGroup>()).collectAsLazyPagingItems()
+    val groupPagingItems =
+        MutableStateFlow(PagingData.empty<HomeGroup>()).collectAsLazyPagingItems()
 
     GroupMoreScreen(
         homeGroupType = groupMoreViewModel.homeGroupType,
@@ -94,10 +95,10 @@ private fun GroupMoreScreen(
         GroupHeader(
             title = stringResource(
                 id = when (homeGroupType) {
-                    HomeGroupType.Popular.Active -> R.string.home_popular_active_group
-                    HomeGroupType.Popular.Nearby -> R.string.home_popular_nearby_group
-                    HomeGroupType.Recommend.Nearby -> R.string.home_nearby_group
-                    HomeGroupType.Recommend.Similar -> R.string.home_similar_interest_group
+                    HomeGroupType.POPULAR_ACTIVE -> R.string.home_popular_active_group
+                    HomeGroupType.POPULAR_NEARBY -> R.string.home_popular_nearby_group
+                    HomeGroupType.RECOMMEND_NEARBY -> R.string.home_nearby_group
+                    HomeGroupType.RECOMMEND_SIMILAR -> R.string.home_similar_interest_group
                 }
             ),
             modifier = Modifier.padding(horizontal = 15.dp)
@@ -172,7 +173,7 @@ private fun GroupMoreScreenPreview() {
 
     OnmoimTheme {
         GroupMoreScreen(
-            homeGroupType = HomeGroupType.Popular.Active,
+            homeGroupType = HomeGroupType.POPULAR_ACTIVE,
             onBack = {},
             onClickGroup = {},
             groupPagingItems = lazyPagingItems

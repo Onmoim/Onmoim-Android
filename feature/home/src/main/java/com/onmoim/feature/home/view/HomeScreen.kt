@@ -31,9 +31,9 @@ import com.onmoim.core.designsystem.component.group.GroupHeader
 import com.onmoim.core.designsystem.component.group.GroupItem
 import com.onmoim.core.designsystem.component.group.GroupPager
 import com.onmoim.core.designsystem.theme.OnmoimTheme
-import com.onmoim.feature.home.constant.HomeTab
 import com.onmoim.feature.home.R
 import com.onmoim.feature.home.constant.HomeGroupType
+import com.onmoim.feature.home.constant.HomeTab
 import com.onmoim.feature.home.state.HomePopularGroupUiState
 import com.onmoim.feature.home.state.HomeRecommendGroupUiState
 import com.onmoim.feature.home.viewmodel.HomeViewModel
@@ -229,7 +229,7 @@ private fun RecommendContent(
             itemCount = similarGroups.size,
             itemsPerPage = itemsPerPage,
             onClickMore = {
-                onClickMore(HomeGroupType.Popular.Nearby)
+                onClickMore(HomeGroupType.RECOMMEND_SIMILAR)
             }
         ) { page, index ->
             val item = similarGroupsForPage[page][index]
@@ -255,7 +255,7 @@ private fun RecommendContent(
             itemCount = nearbyGroups.size,
             itemsPerPage = itemsPerPage,
             onClickMore = {
-                onClickMore(HomeGroupType.Popular.Active)
+                onClickMore(HomeGroupType.RECOMMEND_NEARBY)
             }
         ) { page, index ->
             val item = nearbyGroupsForPage[page][index]
@@ -299,7 +299,7 @@ private fun PopularContent(
             itemCount = nearbyGroups.size,
             itemsPerPage = itemsPerPage,
             onClickMore = {
-                onClickMore(HomeGroupType.Popular.Nearby)
+                onClickMore(HomeGroupType.POPULAR_NEARBY)
             }
         ) { page, index ->
             val item = nearbyGroupsForPage[page][index]
@@ -325,7 +325,7 @@ private fun PopularContent(
             itemCount = activeGroups.size,
             itemsPerPage = itemsPerPage,
             onClickMore = {
-                onClickMore(HomeGroupType.Popular.Active)
+                onClickMore(HomeGroupType.POPULAR_ACTIVE)
             }
         ) { page, index ->
             val item = activeGroupsForPage[page][index]
