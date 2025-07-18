@@ -1,6 +1,5 @@
 package com.onmoim.feature.home.view
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -226,7 +225,7 @@ private fun RecommendContent(
         modifier = modifier
     ) {
         GroupPager(
-            title = stringResource(R.string.home_similar_interest),
+            title = stringResource(R.string.home_similar_interest_group),
             itemCount = similarGroups.size,
             itemsPerPage = itemsPerPage,
             onClickMore = {
@@ -252,7 +251,7 @@ private fun RecommendContent(
             )
         }
         GroupPager(
-            title = stringResource(R.string.home_near_meet),
+            title = stringResource(R.string.home_nearby_group),
             itemCount = nearbyGroups.size,
             itemsPerPage = itemsPerPage,
             onClickMore = {

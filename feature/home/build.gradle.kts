@@ -6,3 +6,8 @@ plugins {
 android {
     namespace = "com.onmoim.feature.home"
 }
+
+dependencies {
+    implementation(libs.androidx.paging.runtimeKtx)
+    implementation(libs.androidx.paging.compose)
+}
