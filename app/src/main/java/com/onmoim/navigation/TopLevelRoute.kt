@@ -63,7 +63,13 @@ fun NavGraphBuilder.topLevelGraph(
     ) {
         HomeRoute(
             topBar = topBar,
-            bottomBar = bottomBar
+            bottomBar = bottomBar,
+            onNavigateToGroupDetail = {
+
+            },
+            onNavigateToMoreGroup = {
+
+            }
         )
     }
     composable<CategoryRoute>(

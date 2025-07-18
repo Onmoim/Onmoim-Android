@@ -1,4 +1,4 @@
-package com.onmoim.core.designsystem.component.meet
+package com.onmoim.core.designsystem.component.group
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
@@ -45,7 +45,7 @@ import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
 
 @Composable
-fun MeetItem(
+fun GroupItem(
     onClick: () -> Unit,
     imageUrl: String,
     title: String,
@@ -250,7 +250,7 @@ private fun MeetChip(
 @Composable
 private fun MeetItemPreview() {
     OnmoimTheme {
-        MeetItem(
+        GroupItem(
             onClick = {},
             imageUrl = "",
             title = "title",

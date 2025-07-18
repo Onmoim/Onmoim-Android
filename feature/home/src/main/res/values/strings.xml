@@ -6,7 +6,7 @@
     <string name="home_favorite_meet">찜한 모임</string>
     <string name="home_similar_interest">나와 비슷한 관심사</string>
     <string name="home_near_meet">나와 가까운 모임</string>
-    <string name="home_near_popular_meet">내 주변 인기 모임</string>
-    <string name="home_lively_meet">활동이 활발한 모임</string>
+    <string name="home_popular_nearby_group">내 주변 인기 모임</string>
+    <string name="home_popular_active_group">활동이 활발한 모임</string>
     <string name="home_my_favorite_meet">내가 찜한 모임</string>
 </resources>
