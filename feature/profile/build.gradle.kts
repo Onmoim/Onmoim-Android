@@ -6,3 +6,10 @@ plugins {
 android {
     namespace = "com.onmoim.feature.profile"
 }
+
+dependencies {
+    implementation(projects.feature.groups)
+
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+}

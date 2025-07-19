@@ -1,6 +1,6 @@
 package com.onmoim.feature.login.state
 
-import com.onmoim.feature.login.constant.Gender
+import com.onmoim.core.designsystem.constant.Gender
 import java.time.LocalDate
 
 data class ProfileSettingState(

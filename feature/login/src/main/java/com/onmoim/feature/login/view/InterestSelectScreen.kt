@@ -1,7 +1,6 @@
 package com.onmoim.feature.login.view
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,11 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -30,24 +27,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImagePainter
-import coil3.compose.rememberAsyncImagePainter
-import coil3.request.ImageRequest
-import com.onmoim.core.data.model.Interest
+import com.onmoim.core.data.model.Category
+import com.onmoim.core.designsystem.component.CategoryItem
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.ErrorAndRetryBox
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.theme.OnmoimTheme
-import com.onmoim.core.designsystem.theme.shadow1
 import com.onmoim.core.ui.R
 import com.onmoim.feature.login.state.InterestSelectEvent
 import com.onmoim.feature.login.state.InterestSelectUiState
@@ -185,7 +177,7 @@ private fun InterestSelectScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             items(uiState.categories) {
-                                InterestItem(
+                                CategoryItem(
                                     onClick = {
                                         onClickCategory(it.id)
                                     },
@@ -215,88 +207,6 @@ private fun InterestSelectScreen(
     }
 }
 
-@Composable
-private fun InterestItem(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    selected: Boolean,
-    imageUrl: String?,
-    label: String
-) {
-    val painter = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(LocalContext.current).apply {
-            data(imageUrl)
-        }.build()
-    )
-    val state by painter.state.collectAsStateWithLifecycle()
-
-    Column(
-        modifier = Modifier
-            .clickable(
-                onClick = onClick,
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            )
-            .then(modifier),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .size(70.dp)
-                .shadow1(999.dp)
-                .background(
-                    color = Color.White,
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier.size(50.dp)
-            ) {
-                when (state) {
-                    is AsyncImagePainter.State.Error -> {
-                        // TODO: 추후 구현
-                    }
-
-                    is AsyncImagePainter.State.Success -> {
-                        Image(
-                            painter = painter,
-                            contentDescription = label,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-
-                    else -> {}
-                }
-            }
-            if (selected) {
-                Box(
-                    modifier = Modifier
-                        .size(70.dp)
-                        .background(
-                            color = Color(0xFF565656).copy(alpha = 0.8f),
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_check),
-                        contentDescription = null,
-                        tint = Color.White
-                    )
-                }
-            }
-        }
-        Spacer(Modifier.height(8.dp))
-        Text(
-            text = label,
-            style = OnmoimTheme.typography.caption2Regular.copy(
-                color = OnmoimTheme.colors.textColor
-            )
-        )
-    }
-}
-
 @Preview
 @Composable
 private fun InterestSelectScreenPreview() {
@@ -311,7 +221,7 @@ private fun InterestSelectScreenPreview() {
             showLoading = false,
             uiState = InterestSelectUiState.Success(
                 List(20) {
-                    Interest(
+                    Category(
                         id = it,
                         imageUrl = null,
                         name = "카테고리 $it"
