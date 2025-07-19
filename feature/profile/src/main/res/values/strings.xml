@@ -22,4 +22,12 @@
     <string name="profile_edit_intro">소개</string>
     <string name="profile_edit_interest">관심사</string>
     <string name="profile_edit_error_name_format">이름에는 특수문자를 사용할 수 없어요</string>
+
+    <!-- 알림 설정 -->
+    <string name="profile_notification_setting_schedule">일정</string>
+    <string name="profile_notification_setting_schedule_a_days_notice">참석한 일정 하루 전 알림</string>
+    <string name="profile_notification_setting_board">게시판</string>
+    <string name="profile_notification_setting_comments_on_my_post">내 글에 댓글 알림</string>
+    <string name="profile_notification_setting_empathy_in_my_post">내 글에 공감 알림</string>
+    <string name="profile_notification_setting_group_chat">모임 채팅</string>
 </resources>

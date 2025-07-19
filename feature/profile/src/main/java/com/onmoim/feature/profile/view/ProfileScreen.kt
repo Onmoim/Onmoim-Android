@@ -52,7 +52,8 @@ import java.time.format.DateTimeFormatter
 fun ProfileRoute(
     bottomBar: @Composable () -> Unit,
     onNavigateToProfileEdit: () -> Unit,
-    onNavigateToGroupList: (GroupType) -> Unit
+    onNavigateToGroupList: (GroupType) -> Unit,
+    onNavigateToNotificationSetting: () -> Unit
 ) {
 
     Column(
@@ -64,7 +65,7 @@ fun ProfileRoute(
                 .fillMaxWidth(),
             onClickProfileEdit = onNavigateToProfileEdit,
             onClickGroup = onNavigateToGroupList,
-            onClickNotificationSetting = {},
+            onClickNotificationSetting = onNavigateToNotificationSetting,
             onClickWithdrawal = {}
         )
         bottomBar()
