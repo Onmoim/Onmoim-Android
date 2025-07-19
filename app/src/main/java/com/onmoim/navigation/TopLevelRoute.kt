@@ -9,9 +9,9 @@ import androidx.navigation.compose.composable
 import com.onmoim.core.ui.R
 import com.onmoim.feature.category.CategoryRoute
 import com.onmoim.feature.category.view.CategoryRoute
+import com.onmoim.feature.groups.navigateToGroupDetail
 import com.onmoim.feature.home.HomeRoute
 import com.onmoim.feature.home.homeGraph
-import com.onmoim.feature.home.view.HomeRoute
 import com.onmoim.feature.mymeet.MyMeetRoute
 import com.onmoim.feature.mymeet.view.MyMeetRoute
 import com.onmoim.feature.profile.ProfileRoute
@@ -69,7 +69,10 @@ fun NavGraphBuilder.topLevelGraph(
     ) {
         CategoryRoute(
             topBar = topBar,
-            bottomBar = bottomBar
+            bottomBar = bottomBar,
+            onNavigateToGroupDetail = {
+                navController.navigateToGroupDetail(it)
+            }
         )
     }
     composable<MyMeetRoute>(
