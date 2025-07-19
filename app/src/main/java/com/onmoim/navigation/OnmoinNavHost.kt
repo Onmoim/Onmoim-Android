@@ -20,8 +20,6 @@ import com.onmoim.feature.groups.navigateToGroupDetail
 import com.onmoim.feature.home.homeGraph
 import com.onmoim.feature.login.navigation.LoginNavigation
 import com.onmoim.feature.login.navigation.loginGraph
-import com.onmoim.feature.mymeet.MyMeetRoute
-import com.onmoim.feature.mymeet.view.MyMeetRoute
 import com.onmoim.feature.profile.profileGraph
 
 private const val PAGE_TURN_DURATION_MS = 450
@@ -83,25 +81,16 @@ fun OnmoimNavHost(
                 }
             )
         }
-        composable<MyMeetRoute>(
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
-            popEnterTransition = { EnterTransition.None },
-            popExitTransition = { ExitTransition.None }
-        ) {
-            MyMeetRoute(
-                topBar = topBar,
-                bottomBar = bottomBar
-            )
-        }
+        groupsGraph(
+            navController = navController,
+            topBar = topBar,
+            bottomBar = bottomBar
+        )
         profileGraph(
             navController = navController,
             bottomBar = bottomBar
         )
         loginGraph(
-            navController = navController
-        )
-        groupsGraph(
             navController = navController
         )
     }

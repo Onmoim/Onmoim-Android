@@ -2,8 +2,8 @@ package com.onmoim.navigation
 
 import com.onmoim.core.ui.R
 import com.onmoim.feature.category.CategoryRoute
+import com.onmoim.feature.groups.MyGroupRoute
 import com.onmoim.feature.home.HomeRoute
-import com.onmoim.feature.mymeet.MyMeetRoute
 import com.onmoim.feature.profile.ProfileRoute
 
 data class TopLevelRoute<T : Any>(
@@ -30,7 +30,7 @@ val topLevelRoutes = listOf(
         labelId = R.string.my_meet,
         selectedIconId = R.drawable.ic_meet_selected,
         unselectedIconId = R.drawable.ic_meet_unselected,
-        route = MyMeetRoute
+        route = MyGroupRoute
     ),
     TopLevelRoute(
         labelId = R.string.profile,

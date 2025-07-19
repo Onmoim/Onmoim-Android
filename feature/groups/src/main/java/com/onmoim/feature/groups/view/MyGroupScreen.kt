@@ -1,4 +1,4 @@
-package com.onmoim.feature.mymeet.view
+package com.onmoim.feature.groups.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -9,7 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 
 @Composable
-fun MyMeetRoute(
+fun MyGroupRoute(
     topBar: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit
 ) {
@@ -18,7 +18,7 @@ fun MyMeetRoute(
         modifier = Modifier.fillMaxSize()
     ) {
         topBar()
-        MyMeetScreen(
+        MyGroupScreen(
             modifier = Modifier.weight(1f)
         )
         bottomBar()
@@ -26,7 +26,7 @@ fun MyMeetRoute(
 }
 
 @Composable
-private fun MyMeetScreen(
+private fun MyGroupScreen(
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -38,9 +38,9 @@ private fun MyMeetScreen(
 
 @Preview
 @Composable
-private fun MyMeetScreenPreview() {
+private fun MyGroupScreenPreview() {
     OnmoimTheme {
-        MyMeetScreen(
+        MyGroupScreen(
             modifier = Modifier
                 .background(OnmoimTheme.colors.backgroundColor)
                 .fillMaxSize()
