@@ -14,4 +14,8 @@
     <string name="coming_schedule_location">위치</string>
     <string name="coming_schedule_cost">비용</string>
     <string name="coming_schedule_formatted_price">%s원</string>
+
+    <!-- GenderToggle -->
+    <string name="male">남</string>
+    <string name="female">여</string>
 </resources>

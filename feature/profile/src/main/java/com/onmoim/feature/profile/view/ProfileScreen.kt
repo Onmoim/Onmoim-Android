@@ -49,7 +49,8 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun ProfileRoute(
-    bottomBar: @Composable () -> Unit
+    bottomBar: @Composable () -> Unit,
+    onNavigateToProfileEdit: () -> Unit,
 ) {
 
     Column(
@@ -59,7 +60,7 @@ fun ProfileRoute(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth(),
-            onClickSetting = {},
+            onClickProfileEdit = onNavigateToProfileEdit,
             onClickNotificationSetting = {},
             onClickWithdrawal = {}
         )
@@ -70,7 +71,7 @@ fun ProfileRoute(
 @Composable
 private fun ProfileScreen(
     modifier: Modifier = Modifier,
-    onClickSetting: () -> Unit,
+    onClickProfileEdit: () -> Unit,
     onClickNotificationSetting: () -> Unit,
     onClickWithdrawal: () -> Unit
 ) {
@@ -78,7 +79,7 @@ private fun ProfileScreen(
         modifier = modifier
     ) {
         ProfileAppBar(
-            onClickSetting = onClickSetting
+            onClickProfileEdit = onClickProfileEdit
         )
         Spacer(Modifier.height(16.dp))
         ProfileCard(
@@ -148,7 +149,7 @@ private fun ProfileScreen(
 
 @Composable
 private fun ProfileAppBar(
-    onClickSetting: () -> Unit
+    onClickProfileEdit: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -169,7 +170,7 @@ private fun ProfileAppBar(
             )
         )
         NavigationIconButton(
-            onClick = onClickSetting
+            onClick = onClickProfileEdit
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_setting),
@@ -359,7 +360,7 @@ private fun ProfileScreenPreview() {
             modifier = Modifier
                 .background(OnmoimTheme.colors.backgroundColor)
                 .fillMaxSize(),
-            onClickSetting = {},
+            onClickProfileEdit = {},
             onClickNotificationSetting = {},
             onClickWithdrawal = {}
         )

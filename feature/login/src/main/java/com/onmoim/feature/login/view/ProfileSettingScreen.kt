@@ -2,7 +2,6 @@ package com.onmoim.feature.login.view
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -43,10 +42,11 @@ import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.CommonDatePickerDialog
 import com.onmoim.core.designsystem.component.CommonDialog
 import com.onmoim.core.designsystem.component.CommonTextField
+import com.onmoim.core.designsystem.component.GenderToggle
+import com.onmoim.core.designsystem.constant.Gender
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.designsystem.theme.pretendard
 import com.onmoim.core.ui.R
-import com.onmoim.feature.login.constant.Gender
 import com.onmoim.feature.login.state.ProfileSettingEvent
 import com.onmoim.feature.login.state.ProfileSettingState
 import com.onmoim.feature.login.viewmodel.ProfileSettingViewModel
@@ -259,63 +259,6 @@ private fun ProfileSettingScreen(
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
-            }
-        }
-    }
-}
-
-@Composable
-private fun GenderToggle(
-    value: Gender?,
-    onValueChange: (Gender) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .border(
-                width = 0.5.dp,
-                color = OnmoimTheme.colors.gray04,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .clip(RoundedCornerShape(10.dp)),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Gender.entries.forEach {
-            Box(
-                modifier = Modifier
-                    .clickable {
-                        onValueChange(it)
-                    }
-                    .weight(1f)
-                    .heightIn(min = 38.dp)
-                    .padding(
-                        start = when (it) {
-                            Gender.MALE -> 0.dp
-                            Gender.FEMALE -> 15.dp
-                        },
-                        end = when (it) {
-                            Gender.MALE -> 15.dp
-                            Gender.FEMALE -> 0.dp
-                        }
-                    ),
-                contentAlignment = when (it) {
-                    Gender.MALE -> Alignment.CenterEnd
-                    Gender.FEMALE -> Alignment.CenterStart
-                }
-            ) {
-                Text(
-                    text = when (it) {
-                        Gender.MALE -> stringResource(R.string.male)
-                        Gender.FEMALE -> stringResource(R.string.female)
-                    },
-                    style = OnmoimTheme.typography.body2Regular.copy(
-                        color = if (value == it) {
-                            OnmoimTheme.colors.textColor
-                        } else {
-                            OnmoimTheme.colors.gray04
-                        }
-                    )
-                )
             }
         }
     }

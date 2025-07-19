@@ -41,6 +41,7 @@ fun CommonTextField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     visualTransformation: VisualTransformation = VisualTransformation.None,
+    innerFieldAlignment: Alignment = Alignment.CenterStart
 ) {
     BasicTextField(
         value = value,
@@ -59,7 +60,7 @@ fun CommonTextField(
         minLines = minLines,
         visualTransformation = visualTransformation
     ) { innerTextField ->
-        Row(
+        Box(
             modifier = Modifier
                 .background(
                     color = OnmoimTheme.colors.gray01,
@@ -68,21 +69,25 @@ fun CommonTextField(
                 .padding(
                     horizontal = 16.dp,
                     vertical = 8.5.dp
-                ),
-            verticalAlignment = Alignment.CenterVertically
+                )
         ) {
-            if (leadingIcon != null) {
-                leadingIcon()
-                Spacer(Modifier.width(8.dp))
-            }
-            Box(
-                modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.CenterStart
+            Row(
+                modifier = Modifier.align(innerFieldAlignment),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                if (value.isEmpty() && placeholder != null) {
-                    placeholder()
+                if (leadingIcon != null) {
+                    leadingIcon()
+                    Spacer(Modifier.width(8.dp))
                 }
-                innerTextField()
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    if (value.isEmpty() && placeholder != null) {
+                        placeholder()
+                    }
+                    innerTextField()
+                }
             }
         }
     }

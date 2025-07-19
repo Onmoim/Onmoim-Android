@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onmoim.core.domain.usecase.SignUpUseCase
-import com.onmoim.feature.login.constant.Gender
+import com.onmoim.core.designsystem.constant.Gender
 import com.onmoim.feature.login.state.ProfileSettingEvent
 import com.onmoim.feature.login.state.ProfileSettingState
 import dagger.hilt.android.lifecycle.HiltViewModel
