@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 공통 -->
+    <string name="profile">프로필</string>
+
+    <!-- 프로필 화면 -->
+    <string name="profile_favorit_group">찜 모임</string>
+    <string name="profile_recent_group">최근 본 모임</string>
+    <string name="profile_join_group">가입한 모임</string>
+    <string name="profile_notification_setting">알림 설정</string>
+    <string name="profile_withdrawal">회원 탈퇴하기</string>
+</resources>

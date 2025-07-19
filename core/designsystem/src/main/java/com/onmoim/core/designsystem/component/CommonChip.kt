@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 
@@ -17,11 +18,12 @@ fun CommonChip(
     label: String,
     backgroundColor: Color = OnmoimTheme.colors.gray02,
     textColor: Color = Color(0xFF675F60),
+    shape: Shape = RoundedCornerShape(16.dp)
 ) {
     Box(
         modifier = Modifier.background(
             color = backgroundColor,
-            shape = RoundedCornerShape(16.dp)
+            shape = shape
         ),
         contentAlignment = Alignment.Center
     ) {

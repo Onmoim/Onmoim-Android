@@ -93,7 +93,6 @@ fun NavGraphBuilder.topLevelGraph(
         popExitTransition = { ExitTransition.None }
     ) {
         ProfileRoute(
-            topBar = topBar,
             bottomBar = bottomBar
         )
     }
