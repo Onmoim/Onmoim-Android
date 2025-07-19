@@ -1,10 +1,8 @@
 package com.onmoim.feature.home.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onmoim.core.data.constant.HomePopular
-import com.onmoim.core.data.model.HomeGroup
 import com.onmoim.core.data.repository.GroupRepository
 import com.onmoim.feature.home.state.HomePopularGroupUiState
 import com.onmoim.feature.home.state.HomeRecommendGroupUiState

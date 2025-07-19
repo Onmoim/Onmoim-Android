@@ -16,11 +16,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -49,6 +51,7 @@ import com.onmoim.core.designsystem.component.group.ComingScheduleCard
 import com.onmoim.core.designsystem.component.group.GroupDetailAppBar
 import com.onmoim.core.designsystem.component.group.PostCard
 import com.onmoim.core.designsystem.theme.OnmoimTheme
+import com.onmoim.core.designsystem.theme.shadow1
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.GroupDetailPostFilter
@@ -141,6 +144,13 @@ private fun GroupDetailScreen(
                         onClickComingSchedule = onClickComingSchedule,
                         onClickAttend = {}
                     )
+                    // TODO: api 연동시 수정
+                    GroupJoinButton(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 60.dp),
+                        onClick = {},
+                    )
                 }
 
                 GroupDetailTab.POST -> {
@@ -155,6 +165,35 @@ private fun GroupDetailScreen(
                 GroupDetailTab.CHAT -> {}
             }
         }
+    }
+}
+
+@Composable
+private fun GroupJoinButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = onClick
+            )
+            .shadow1(999.dp)
+            .background(
+                color = OnmoimTheme.colors.primaryMint,
+                shape = CircleShape
+            )
+            .size(240.dp, 38.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = stringResource(R.string.group_detail_group_join),
+            style = OnmoimTheme.typography.body2SemiBold.copy(
+                color = Color.White
+            )
+        )
     }
 }
 
@@ -277,9 +316,8 @@ private fun GroupDetailHomeContainer(
                     color = OnmoimTheme.colors.gray01
                 )
                 .padding(
-                    top = 20.dp,
-                    start = 15.dp,
-                    end = 15.dp
+                    vertical = 20.dp,
+                    horizontal = 15.dp
                 ),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {

@@ -13,4 +13,5 @@
     <string name="group_detail_post_free_board">자유게시판</string>
     <string name="group_detail_post_view_mode_post">게시글</string>
     <string name="group_detail_post_view_mode_album">사진첩</string>
+    <string name="group_detail_group_join">가입하기</string>
 </resources>
