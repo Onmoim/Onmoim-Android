@@ -44,6 +44,7 @@ import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.profile.R
+import com.onmoim.feature.profile.constant.GroupType
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -51,6 +52,7 @@ import java.time.format.DateTimeFormatter
 fun ProfileRoute(
     bottomBar: @Composable () -> Unit,
     onNavigateToProfileEdit: () -> Unit,
+    onNavigateToGroupList: (GroupType) -> Unit
 ) {
 
     Column(
@@ -61,6 +63,7 @@ fun ProfileRoute(
                 .weight(1f)
                 .fillMaxWidth(),
             onClickProfileEdit = onNavigateToProfileEdit,
+            onClickGroup = onNavigateToGroupList,
             onClickNotificationSetting = {},
             onClickWithdrawal = {}
         )
@@ -72,6 +75,7 @@ fun ProfileRoute(
 private fun ProfileScreen(
     modifier: Modifier = Modifier,
     onClickProfileEdit: () -> Unit,
+    onClickGroup: (GroupType) -> Unit,
     onClickNotificationSetting: () -> Unit,
     onClickWithdrawal: () -> Unit
 ) {
@@ -92,6 +96,7 @@ private fun ProfileScreen(
         )
         Spacer(Modifier.height(8.dp))
         MyGroupStatus(
+            onClickGroup = onClickGroup,
             modifier = Modifier.fillMaxWidth(),
             favoriteGroupCount = 1,
             recentGroupCount = 2,
@@ -273,6 +278,7 @@ private fun ProfileCard(
 
 @Composable
 private fun MyGroupStatus(
+    onClickGroup: (GroupType) -> Unit,
     modifier: Modifier = Modifier,
     favoriteGroupCount: Int,
     recentGroupCount: Int,
@@ -303,7 +309,13 @@ private fun MyGroupStatus(
             )
 
             Column(
-                modifier = groupStatusItemModifier,
+                modifier = Modifier.clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                    onClick = {
+                        onClickGroup(GroupType.FAVORITE)
+                    }
+                ).then(groupStatusItemModifier),
                 verticalArrangement = groupStatusItemVerticalArrangement,
                 horizontalAlignment = groupStatusItemHorizontalArrangement
             ) {
@@ -317,7 +329,13 @@ private fun MyGroupStatus(
                 )
             }
             Column(
-                modifier = groupStatusItemModifier,
+                modifier = Modifier.clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                    onClick = {
+                        onClickGroup(GroupType.RECENT)
+                    }
+                ).then(groupStatusItemModifier),
                 verticalArrangement = groupStatusItemVerticalArrangement,
                 horizontalAlignment = groupStatusItemHorizontalArrangement
             ) {
@@ -331,7 +349,13 @@ private fun MyGroupStatus(
                 )
             }
             Column(
-                modifier = groupStatusItemModifier,
+                modifier = Modifier.clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() },
+                    onClick = {
+                        onClickGroup(GroupType.JOIN)
+                    }
+                ).then(groupStatusItemModifier),
                 verticalArrangement = groupStatusItemVerticalArrangement,
                 horizontalAlignment = groupStatusItemHorizontalArrangement
             ) {
@@ -361,6 +385,7 @@ private fun ProfileScreenPreview() {
                 .background(OnmoimTheme.colors.backgroundColor)
                 .fillMaxSize(),
             onClickProfileEdit = {},
+            onClickGroup = {},
             onClickNotificationSetting = {},
             onClickWithdrawal = {}
         )
