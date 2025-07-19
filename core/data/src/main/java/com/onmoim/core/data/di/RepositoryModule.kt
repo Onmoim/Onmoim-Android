@@ -4,10 +4,10 @@ import com.onmoim.core.data.repository.AppSettingRepository
 import com.onmoim.core.data.repository.AppSettingRepositoryImpl
 import com.onmoim.core.data.repository.AuthRepository
 import com.onmoim.core.data.repository.AuthRepositoryImpl
+import com.onmoim.core.data.repository.CategoryRepository
+import com.onmoim.core.data.repository.CategoryRepositoryImpl
 import com.onmoim.core.data.repository.GroupRepository
 import com.onmoim.core.data.repository.GroupRepositoryImpl
-import com.onmoim.core.data.repository.InterestRepository
-import com.onmoim.core.data.repository.InterestRepositoryImpl
 import com.onmoim.core.data.repository.LocationRepository
 import com.onmoim.core.data.repository.LocationRepositoryImpl
 import com.onmoim.core.data.repository.TokenRepository
@@ -42,9 +42,9 @@ abstract class RepositoryModule {
     ): TokenRepository
 
     @Binds
-    abstract fun bindInterestRepository(
-        interestRepositoryImpl: InterestRepositoryImpl
-    ): InterestRepository
+    abstract fun bindCategoryRepository(
+        categoryRepositoryImpl: CategoryRepositoryImpl
+    ): CategoryRepository
 
     @Binds
     abstract fun bindAppSettingRepository(

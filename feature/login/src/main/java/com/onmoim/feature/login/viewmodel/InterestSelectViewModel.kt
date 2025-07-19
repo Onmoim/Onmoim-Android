@@ -3,7 +3,7 @@ package com.onmoim.feature.login.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onmoim.core.data.repository.AppSettingRepository
-import com.onmoim.core.data.repository.InterestRepository
+import com.onmoim.core.data.repository.CategoryRepository
 import com.onmoim.core.data.repository.UserRepository
 import com.onmoim.core.domain.usecase.GetUserIdUseCase
 import com.onmoim.feature.login.state.InterestSelectEvent
@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InterestSelectViewModel @Inject constructor(
-    private val interestRepository: InterestRepository,
+    private val categoryRepository: CategoryRepository,
     private val userRepository: UserRepository,
     private val getUserIdUseCase: GetUserIdUseCase,
     private val appSettingRepository: AppSettingRepository
@@ -72,7 +72,7 @@ class InterestSelectViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = InterestSelectUiState.Loading
 
-            interestRepository.getInterests().catch {
+            categoryRepository.getCategories().catch {
                 _uiState.value = InterestSelectUiState.Error(it)
             }.collectLatest {
                 _uiState.value = InterestSelectUiState.Success(it)
