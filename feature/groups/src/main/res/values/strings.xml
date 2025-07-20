@@ -44,4 +44,10 @@
     <string name="group_open_group_description_hint">모임 설명 입력</string>
     <string name="group_open_group_capacity">정원 (%1$d~%2$d)명</string>
     <string name="group_open_group_capacity_hint">정원 입력</string>
+
+    <!-- 모임 개설 완료 -->
+    <string name="group_open_complete">개설 완료</string>
+    <string name="group_open_complete_title">모임 개설이 완료되었습니다!</string>
+    <string name="group_open_complete_sub_title">첫 만남을 위한 일정을 만들어보세요.</string>
+    <string name="group_open_complete_go_to_group">모임 홈으로</string>
 </resources>

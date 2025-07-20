@@ -9,11 +9,13 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.onmoim.feature.groups.view.ComingScheduleRoute
 import com.onmoim.feature.groups.view.GroupCategorySelectRoute
 import com.onmoim.feature.groups.view.GroupDetailRoute
+import com.onmoim.feature.groups.view.GroupOpenCompleteRoute
 import com.onmoim.feature.groups.view.GroupOpenRoute
 import com.onmoim.feature.groups.view.MyGroupRoute
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
@@ -48,6 +50,11 @@ data class GroupOpenRoute(
     val categoryImageUrl: String?
 )
 
+@Serializable
+data class GroupOpenCompleteRoute(
+    val groupId: Int
+)
+
 fun NavController.navigateToComingSchedule(groupId: Int? = null, navOptions: NavOptions? = null) {
     navigate(ComingScheduleRoute(groupId), navOptions)
 }
@@ -67,6 +74,10 @@ fun NavController.navigateToGroupOpen(
     navOptions: NavOptions? = null
 ) {
     navigate(GroupOpenRoute(categoryId, categoryName, categoryImageUrl), navOptions)
+}
+
+fun NavController.navigateToGroupOpenComplete(groupId: Int, navOptions: NavOptions? = null) {
+    navigate(GroupOpenCompleteRoute(groupId), navOptions)
 }
 
 fun NavGraphBuilder.groupsGraph(
@@ -128,8 +139,10 @@ fun NavGraphBuilder.groupsGraph(
             }
 
             val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
-            val locationId = savedStateHandle?.get<Int>(LocationNavigationBundleKey.LOCATION_ID) ?: 0
-            val locationName = savedStateHandle?.get<String>(LocationNavigationBundleKey.LOCATION_NAME) ?: ""
+            val locationId =
+                savedStateHandle?.get<Int>(LocationNavigationBundleKey.LOCATION_ID) ?: 0
+            val locationName =
+                savedStateHandle?.get<String>(LocationNavigationBundleKey.LOCATION_NAME) ?: ""
             savedStateHandle?.remove<String>(LocationNavigationBundleKey.LOCATION_NAME)
             savedStateHandle?.remove<Int>(LocationNavigationBundleKey.LOCATION_ID)
 
@@ -139,12 +152,32 @@ fun NavGraphBuilder.groupsGraph(
                 categoryImageUrl = groupOpenRoute.categoryImageUrl,
                 onNavigateToLocationSearch = {
                     navController.navigateToLocationSearch()
+                },
+                onNavigateToGroupOpenComplete = {
+                    navController.navigateToGroupOpenComplete(it, navOptions {
+                        popUpTo(MyGroupRoute) {
+                            inclusive = true
+                        }
+                    })
                 }
             )
 
             LaunchedEffect(Unit) {
                 groupOpenViewModel.onLocationChange(locationId, locationName)
             }
+        }
+        composable<GroupOpenCompleteRoute> { backStackEntry ->
+            val groupId = backStackEntry.toRoute<GroupOpenCompleteRoute>().groupId
+
+            GroupOpenCompleteRoute(
+                onNavigateToGroupDetail = {
+                    navController.navigateToGroupDetail(groupId, navOptions {
+                        popUpTo(MyGroupRoute) {
+                            inclusive = true
+                        }
+                    })
+                }
+            )
         }
     }
 }

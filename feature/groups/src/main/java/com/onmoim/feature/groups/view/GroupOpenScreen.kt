@@ -54,7 +54,8 @@ fun GroupOpenRoute(
     groupOpenViewModel: GroupOpenViewModel,
     categoryName: String,
     categoryImageUrl: String?,
-    onNavigateToLocationSearch: () -> Unit
+    onNavigateToLocationSearch: () -> Unit,
+    onNavigateToGroupOpenComplete: (groupId: Int) -> Unit
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val uiState by groupOpenViewModel.uiState.collectAsStateWithLifecycle()
