@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.onmoim.core.designsystem.component.CommonAppBar
-import com.onmoim.core.designsystem.component.CommonConfirmButton
+import com.onmoim.core.designsystem.component.CommonButton
 import com.onmoim.core.designsystem.component.CommonDatePickerDialog
 import com.onmoim.core.designsystem.component.CommonDialog
 import com.onmoim.core.designsystem.component.CommonTextField
@@ -235,7 +235,7 @@ private fun ProfileSettingScreen(
                 )
             }
             Spacer(Modifier.height(40.dp))
-            CommonConfirmButton(
+            CommonButton(
                 onClick = onClickComplete,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 enabled = profileSettingState.isValidInputValue

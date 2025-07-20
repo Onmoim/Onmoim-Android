@@ -39,7 +39,7 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import com.onmoim.core.designsystem.component.CommonAppBar
-import com.onmoim.core.designsystem.component.CommonConfirmButton
+import com.onmoim.core.designsystem.component.CommonButton
 import com.onmoim.core.designsystem.component.CommonTextField
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.theme.OnmoimTheme
@@ -238,7 +238,7 @@ private fun GroupOpenScreen(
                     keyboardType = KeyboardType.Number
                 )
             )
-            CommonConfirmButton(
+            CommonButton(
                 onClick = onClickConfirm,
                 modifier = Modifier
                     .padding(vertical = 40.dp)

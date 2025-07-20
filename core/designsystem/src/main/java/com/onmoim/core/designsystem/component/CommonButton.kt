@@ -19,9 +19,10 @@ import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.designsystem.theme.pretendard
 
 @Composable
-fun CommonConfirmButton(
+fun CommonButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    label: String = stringResource(R.string.confirm),
     enabled: Boolean = true,
 ) {
     Box(
@@ -44,7 +45,7 @@ fun CommonConfirmButton(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = stringResource(R.string.confirm),
+            text = label,
             fontFamily = pretendard,
             fontWeight = FontWeight.W600,
             fontSize = 15.sp,
