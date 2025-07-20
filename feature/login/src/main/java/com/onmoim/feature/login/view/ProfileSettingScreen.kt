@@ -12,10 +12,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -27,25 +25,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.onmoim.core.designsystem.component.CommonAppBar
+import com.onmoim.core.designsystem.component.CommonConfirmButton
 import com.onmoim.core.designsystem.component.CommonDatePickerDialog
 import com.onmoim.core.designsystem.component.CommonDialog
 import com.onmoim.core.designsystem.component.CommonTextField
 import com.onmoim.core.designsystem.component.GenderToggle
 import com.onmoim.core.designsystem.constant.Gender
 import com.onmoim.core.designsystem.theme.OnmoimTheme
-import com.onmoim.core.designsystem.theme.pretendard
 import com.onmoim.core.ui.R
 import com.onmoim.feature.login.state.ProfileSettingEvent
 import com.onmoim.feature.login.state.ProfileSettingState
@@ -240,12 +235,9 @@ private fun ProfileSettingScreen(
                 )
             }
             Spacer(Modifier.height(40.dp))
-            ProfileSettingCompleteButton(
+            CommonConfirmButton(
                 onClick = onClickComplete,
-                modifier = Modifier
-                    .padding(horizontal = 60.dp)
-                    .fillMaxWidth()
-                    .heightIn(min = 38.dp),
+                modifier = Modifier.align(Alignment.CenterHorizontally),
                 enabled = profileSettingState.isValidInputValue
             )
         }
@@ -261,41 +253,6 @@ private fun ProfileSettingScreen(
                 CircularProgressIndicator()
             }
         }
-    }
-}
-
-@Composable
-private fun ProfileSettingCompleteButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    Box(
-        modifier = modifier
-            .background(
-                color = if (enabled) {
-                    OnmoimTheme.colors.primaryBlue
-                } else {
-                    OnmoimTheme.colors.gray05
-                },
-                shape = RoundedCornerShape(20.dp)
-            )
-            .clip(RoundedCornerShape(20.dp))
-            .clickable(
-                enabled = enabled
-            ) {
-                onClick()
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = stringResource(R.string.confirm),
-            fontFamily = pretendard,
-            fontWeight = FontWeight.W600,
-            fontSize = 15.sp,
-            lineHeight = 22.sp,
-            color = OnmoimTheme.colors.backgroundColor
-        )
     }
 }
 

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 공통 -->
+    <string name="confirm">확인</string>
+
     <!-- MeetItem -->
     <string name="meet_item_recommend">추천</string>
     <string name="meet_item_signing_up">가입중</string>
