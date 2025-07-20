@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.onmoim.feature.groups.view.ComingScheduleRoute
+import com.onmoim.feature.groups.view.GroupCategorySelectRoute
 import com.onmoim.feature.groups.view.GroupDetailRoute
 import com.onmoim.feature.groups.view.MyGroupRoute
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
@@ -32,12 +33,19 @@ data class ComingScheduleRoute(
     val id: Int? = null
 )
 
+@Serializable
+object GroupCategorySelectRoute
+
 fun NavController.navigateToComingSchedule(groupId: Int? = null, navOptions: NavOptions? = null) {
     navigate(ComingScheduleRoute(groupId), navOptions)
 }
 
 fun NavController.navigateToGroupDetail(id: Int, navOptions: NavOptions? = null) {
     navigate(GroupDetailRoute(id), navOptions)
+}
+
+fun NavController.navigateToGroupCategorySelect(navOptions: NavOptions? = null) {
+    navigate(GroupCategorySelectRoute, navOptions)
 }
 
 fun NavGraphBuilder.groupsGraph(
@@ -57,6 +65,9 @@ fun NavGraphBuilder.groupsGraph(
             MyGroupRoute(
                 topBar = topBar,
                 bottomBar = bottomBar,
+                onNavigateToGroupCategorySelect = {
+                    navController.navigateToGroupCategorySelect()
+                },
                 onNavigateToComingSchedule = {
                     navController.navigateToComingSchedule()
                 }
@@ -80,6 +91,13 @@ fun NavGraphBuilder.groupsGraph(
                     navController.navigateToComingSchedule(groupId)
                 },
                 onNavigateToPostDetail = {}
+            )
+        }
+        composable<GroupCategorySelectRoute> {
+            GroupCategorySelectRoute(
+                onNavigateToGroupOpen = {
+
+                }
             )
         }
     }

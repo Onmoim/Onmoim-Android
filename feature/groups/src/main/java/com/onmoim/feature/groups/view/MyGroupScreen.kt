@@ -46,6 +46,7 @@ import java.time.LocalDateTime
 fun MyGroupRoute(
     topBar: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit,
+    onNavigateToGroupCategorySelect: () -> Unit,
     onNavigateToComingSchedule: () -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(MyGroupTab.MY_GROUP) }
@@ -64,7 +65,7 @@ fun MyGroupRoute(
             onTabChange = {
                 selectedTab = it
             },
-            onClickCreateGroup = {},
+            onClickCreateGroup = onNavigateToGroupCategorySelect,
             onClickComingSchedule = onNavigateToComingSchedule
         )
         bottomBar()

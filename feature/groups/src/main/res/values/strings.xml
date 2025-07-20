@@ -4,6 +4,7 @@
     <string name="my_group">내모임</string>
     <string name="group_chat">그룹 채팅</string>
     <string name="coming_schedule">다가오는 일정</string>
+    <string name="next">다음</string>
 
     <!-- 내 모임 -->
     <string name="my_group_create_group">+ 새로운 모임 개설하기</string>
@@ -29,4 +30,7 @@
     <string name="group_detail_post_view_mode_post">게시글</string>
     <string name="group_detail_post_view_mode_album">사진첩</string>
     <string name="group_detail_group_join">가입하기</string>
+
+    <!-- 모임 카테고리 선택 -->
+    <string name="group_category_select">모임 카테고리 선택</string>
 </resources>
