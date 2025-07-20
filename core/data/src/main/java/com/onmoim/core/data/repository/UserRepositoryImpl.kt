@@ -80,8 +80,8 @@ class UserRepositoryImpl @Inject constructor(
                 name = data.name,
                 birth = birthDateTime.toLocalDate(),
                 introduction = data.introduction,
-                interests = data.categoryList,
-                location = data.location,
+                interestCategories = data.categoryList,
+                location = data.locationName,
                 profileImgUrl = data.profileImgUrl
             )
 
