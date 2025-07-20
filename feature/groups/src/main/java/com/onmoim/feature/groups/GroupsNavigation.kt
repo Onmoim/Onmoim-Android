@@ -10,6 +10,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import com.onmoim.feature.groups.view.ComingScheduleRoute
 import com.onmoim.feature.groups.view.GroupDetailRoute
 import com.onmoim.feature.groups.view.MyGroupRoute
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
@@ -25,6 +26,15 @@ object MyGroupRoute
 data class GroupDetailRoute(
     val id: Int
 )
+
+@Serializable
+data class ComingScheduleRoute(
+    val id: Int? = null
+)
+
+fun NavController.navigateToComingSchedule(groupId: Int? = null, navOptions: NavOptions? = null) {
+    navigate(ComingScheduleRoute(groupId), navOptions)
+}
 
 fun NavController.navigateToGroupDetail(id: Int, navOptions: NavOptions? = null) {
     navigate(GroupDetailRoute(id), navOptions)
@@ -46,19 +56,29 @@ fun NavGraphBuilder.groupsGraph(
         ) {
             MyGroupRoute(
                 topBar = topBar,
-                bottomBar = bottomBar
+                bottomBar = bottomBar,
+                onNavigateToComingSchedule = {
+                    navController.navigateToComingSchedule()
+                }
             )
         }
+        composable<ComingScheduleRoute> { backStackEntry ->
+            val id = backStackEntry.toRoute<ComingScheduleRoute>().id
+
+            ComingScheduleRoute()
+        }
         composable<GroupDetailRoute> { backStackEntry ->
-            val id = backStackEntry.toRoute<GroupDetailRoute>().id
+            val groupId = backStackEntry.toRoute<GroupDetailRoute>().id
             val groupDetailViewModel =
                 hiltViewModel<GroupDetailViewModel, GroupDetailViewModel.Factory> {
-                    it.create(id)
+                    it.create(groupId)
                 }
 
             GroupDetailRoute(
                 groupDetailViewModel = groupDetailViewModel,
-                onNavigateToComingSchedule = {},
+                onNavigateToComingSchedule = {
+                    navController.navigateToComingSchedule(groupId)
+                },
                 onNavigateToPostDetail = {}
             )
         }

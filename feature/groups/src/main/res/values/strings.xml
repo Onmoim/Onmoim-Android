@@ -9,6 +9,14 @@
     <string name="my_group_create_group">+ 새로운 모임 개설하기</string>
     <string name="my_group_joined_group">가입한 모임</string>
 
+    <!-- 다가오는 일정 -->
+    <string name="coming_schedule_reset">초기화</string>
+    <string name="coming_schedule_week">이번주</string>
+    <string name="coming_schedule_month">이번달</string>
+    <string name="coming_schedule_attended">내가 참석한</string>
+    <string name="coming_schedule_regular_meet">정기모임</string>
+    <string name="coming_schedule_lightning">번개</string>
+
     <!-- 모임 상세 -->
     <string name="group_detail_tab_home">홈</string>
     <string name="group_detail_tab_post">게시판</string>
