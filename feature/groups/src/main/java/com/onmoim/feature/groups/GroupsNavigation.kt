@@ -95,10 +95,11 @@ fun NavGraphBuilder.groupsGraph(
         }
         composable<GroupCategorySelectRoute> {
             GroupCategorySelectRoute(
-                onNavigateToGroupOpen = {
-
+                onNavigateToGroupOpen = { categoryId, categoryName, categoryImageUrl ->
+                    
                 }
             )
         }
+
     }
 }

@@ -22,6 +22,9 @@ class GroupCategorySelectViewModel @Inject constructor(
     private val _categoriesState = MutableStateFlow<List<Category>>(emptyList())
     val categoriesState =  _categoriesState.asStateFlow()
 
+    private val _selectedCategoryState = MutableStateFlow<Category?>(null)
+    val selectedCategoryState = _selectedCategoryState.asStateFlow()
+
     init {
         fetchCategories()
     }
@@ -37,5 +40,9 @@ class GroupCategorySelectViewModel @Inject constructor(
                 _categoriesState.value = it
             }
         }
+    }
+
+    fun onClickCategory(category: Category) {
+        _selectedCategoryState.value = category
     }
 }

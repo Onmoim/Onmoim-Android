@@ -19,9 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -41,23 +39,23 @@ import com.onmoim.feature.groups.viewmodel.GroupCategorySelectViewModel
 @Composable
 fun GroupCategorySelectRoute(
     groupCategorySelectViewModel: GroupCategorySelectViewModel = hiltViewModel(),
-    onNavigateToGroupOpen: (categoryId: Int) -> Unit
+    onNavigateToGroupOpen: (categoryId: Int, categoryName: String, categoryImageUrl: String?) -> Unit
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val categories by groupCategorySelectViewModel.categoriesState.collectAsStateWithLifecycle()
-    var selectedCategoryId by remember { mutableIntStateOf(0) }
+    val selectedCategory by groupCategorySelectViewModel.selectedCategoryState.collectAsStateWithLifecycle()
 
     GroupCategorySelectScreen(
         onBack = {
             onBackPressedDispatcher?.onBackPressed()
         },
         onClickNext = {
-            onNavigateToGroupOpen(selectedCategoryId)
+            selectedCategory?.let {
+                onNavigateToGroupOpen(it.id, it.name, it.imageUrl)
+            }
         },
-        selectedCategoryId = selectedCategoryId,
-        onClickCategory = {
-            selectedCategoryId = it
-        },
+        selectedCategoryId = selectedCategory?.id ?: 0,
+        onClickCategory = groupCategorySelectViewModel::onClickCategory,
         categories = categories
     )
 }
@@ -67,7 +65,7 @@ private fun GroupCategorySelectScreen(
     onBack: () -> Unit,
     onClickNext: () -> Unit,
     selectedCategoryId: Int,
-    onClickCategory: (id: Int) -> Unit,
+    onClickCategory: (Category) -> Unit,
     categories: List<Category>
 ) {
     Column(
@@ -128,7 +126,7 @@ private fun GroupCategorySelectScreen(
             items(categories) {
                 CategoryItem(
                     onClick = {
-                        onClickCategory(it.id)
+                        onClickCategory(it)
                     },
                     modifier = Modifier.fillMaxWidth(),
                     selected = selectedCategoryId == it.id,
