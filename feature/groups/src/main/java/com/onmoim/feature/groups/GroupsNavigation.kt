@@ -155,9 +155,7 @@ fun NavGraphBuilder.groupsGraph(
                 },
                 onNavigateToGroupOpenComplete = {
                     navController.navigateToGroupOpenComplete(it, navOptions {
-                        popUpTo(MyGroupRoute) {
-                            inclusive = true
-                        }
+                        popUpTo(MyGroupRoute)
                     })
                 }
             )
@@ -172,9 +170,7 @@ fun NavGraphBuilder.groupsGraph(
             GroupOpenCompleteRoute(
                 onNavigateToGroupDetail = {
                     navController.navigateToGroupDetail(groupId, navOptions {
-                        popUpTo(MyGroupRoute) {
-                            inclusive = true
-                        }
+                        popUpTo(MyGroupRoute)
                     })
                 }
             )
