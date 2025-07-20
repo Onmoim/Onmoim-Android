@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 공통 -->
+    <string name="my_group">내모임</string>
+    <string name="group_chat">그룹 채팅</string>
+    <string name="coming_schedule">다가오는 일정</string>
+
+    <!-- 내 모임 -->
+    <string name="my_group_create_group">+ 새로운 모임 개설하기</string>
+    <string name="my_group_joined_group">가입한 모임</string>
+
     <!-- 모임 상세 -->
     <string name="group_detail_tab_home">홈</string>
     <string name="group_detail_tab_post">게시판</string>
-    <string name="group_detail_tab_chat">그룹 채팅</string>
     <string name="group_detail_chip_member_count">멤버 %d</string>
-    <string name="group_detail_coming_schedule">다가오는 일정</string>
     <string name="group_detail_post_all">전체</string>
     <string name="group_detail_post_notice">공지</string>
     <string name="group_detail_post_reg_greeting">가입인사</string>
