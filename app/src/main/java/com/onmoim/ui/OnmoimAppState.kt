@@ -74,6 +74,8 @@ class OnmoimAppState(
         coroutineScope.launch {
             authEventBus.event.collect { event ->
                 when (event) {
+                    AuthEvent.SignOut,
+                    AuthEvent.Withdrawal,
                     AuthEvent.AuthExpired -> {
                         launch { tokenRepository.clearJwt() }
                         launch { appSettingRepository.clearUserId() }
@@ -96,10 +98,6 @@ class OnmoimAppState(
 
                     AuthEvent.NotAuthenticated -> {
                         shouldShowSplash = false
-                    }
-
-                    AuthEvent.SignOut -> {
-                        navController.navigateToLogin()
                     }
                 }
             }

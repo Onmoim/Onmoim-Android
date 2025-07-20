@@ -1,5 +1,6 @@
 package com.onmoim.feature.profile.view
 
+import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,15 +20,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -42,11 +48,13 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import com.onmoim.core.data.model.Profile
 import com.onmoim.core.designsystem.component.CommonChip
+import com.onmoim.core.designsystem.component.CommonDialog
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.profile.R
 import com.onmoim.feature.profile.constant.GroupType
+import com.onmoim.feature.profile.state.ProfileEvent
 import com.onmoim.feature.profile.viewmodel.ProfileViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -60,23 +68,74 @@ fun ProfileRoute(
     onNavigateToNotificationSetting: () -> Unit
 ) {
     val profile by profileViewModel.profileState.collectAsStateWithLifecycle()
+    val isLoading by profileViewModel.isLoading.collectAsStateWithLifecycle()
+    var showWithdrawalDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-    Column(
+    if (showWithdrawalDialog) {
+        CommonDialog(
+            onDismissRequest = {
+                showWithdrawalDialog = false
+            },
+            onClickConfirm = {
+                showWithdrawalDialog = false
+            },
+            onClickDismiss = {
+                profileViewModel.withdrawal()
+                showWithdrawalDialog = false
+            },
+            title = stringResource(R.string.profile_somoim),
+            content = stringResource(R.string.profile_withdrawal_guide_message),
+            confirmText = stringResource(R.string.cancel),
+            dismissText = stringResource(R.string.profile_do_withdrawal),
+        )
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(OnmoimTheme.colors.backgroundColor)
     ) {
-        ProfileScreen(
+        Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            onClickProfileEdit = onNavigateToProfileEdit,
-            onClickGroup = onNavigateToGroupList,
-            onClickNotificationSetting = onNavigateToNotificationSetting,
-            onClickWithdrawal = {},
-            profile = profile
-        )
-        bottomBar()
+                .pointerInteropFilter {
+                    isLoading
+                }
+                .fillMaxSize()
+        ) {
+            ProfileScreen(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                onClickProfileEdit = onNavigateToProfileEdit,
+                onClickGroup = onNavigateToGroupList,
+                onClickNotificationSetting = onNavigateToNotificationSetting,
+                onClickWithdrawal = {
+                    showWithdrawalDialog = true
+                },
+                profile = profile
+            )
+            bottomBar()
+        }
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        profileViewModel.event.collect { event ->
+            when (event) {
+                is ProfileEvent.WithdrawalError -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.wait_and_retry),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
     }
 }
 

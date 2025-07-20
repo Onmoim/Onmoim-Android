@@ -90,4 +90,16 @@ class UserRepositoryImpl @Inject constructor(
             throw HttpException(resp)
         }
     }.flowOn(ioDispatcher)
+
+    override suspend fun withdrawal(id: Int): Result<Unit> {
+        val resp = withContext(ioDispatcher) {
+            userApi.withdrawal(id)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
+    }
 }
