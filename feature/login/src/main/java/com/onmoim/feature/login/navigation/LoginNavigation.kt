@@ -9,8 +9,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import androidx.navigation.navigation
 import com.onmoim.feature.home.navigateToHome
+import com.onmoim.feature.location.navigation.LocationNavigationBundleKey
+import com.onmoim.feature.location.navigation.navigateToLocationSearch
 import com.onmoim.feature.login.view.InterestSelectRoute
-import com.onmoim.feature.login.view.LocationSettingRoute
 import com.onmoim.feature.login.view.LoginRoute
 import com.onmoim.feature.login.view.ProfileSettingRoute
 import com.onmoim.feature.login.viewmodel.ProfileSettingViewModel
@@ -26,9 +27,6 @@ object LoginRoute
 object ProfileSettingRoute
 
 @Serializable
-object LocationSettingRoute
-
-@Serializable
 object InterestSelectRoute
 
 fun NavController.navigateToLogin(navOptions: NavOptions? = null) {
@@ -37,10 +35,6 @@ fun NavController.navigateToLogin(navOptions: NavOptions? = null) {
 
 fun NavController.navigateToProfileSetting(navOptions: NavOptions? = null) {
     navigate(ProfileSettingRoute, navOptions)
-}
-
-fun NavController.navigateToLocationSetting(navOptions: NavOptions? = null) {
-    navigate(LocationSettingRoute, navOptions)
 }
 
 fun NavController.navigateToInterestSelect(navOptions: NavOptions? = null) {
@@ -75,17 +69,17 @@ fun NavGraphBuilder.loginGraph(
         }
         composable<ProfileSettingRoute> {
             val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
-            val address = savedStateHandle?.get<String>(LoginNavigationBundleKey.ADDRESS) ?: ""
-            val addressId = savedStateHandle?.get<Int>(LoginNavigationBundleKey.ADDRESS_ID) ?: 0
-            savedStateHandle?.remove<String>(LoginNavigationBundleKey.ADDRESS)
-            savedStateHandle?.remove<Int>(LoginNavigationBundleKey.ADDRESS_ID)
+            val locationName = savedStateHandle?.get<String>(LocationNavigationBundleKey.LOCATION_NAME) ?: ""
+            val locationId = savedStateHandle?.get<Int>(LocationNavigationBundleKey.LOCATION_ID) ?: 0
+            savedStateHandle?.remove<String>(LocationNavigationBundleKey.LOCATION_NAME)
+            savedStateHandle?.remove<Int>(LocationNavigationBundleKey.LOCATION_ID)
 
             val profileSettingViewModel = hiltViewModel<ProfileSettingViewModel>()
 
             ProfileSettingRoute(
                 profileSettingViewModel = profileSettingViewModel,
                 onNavigateToLocationSetting = {
-                    navController.navigateToLocationSetting()
+                    navController.navigateToLocationSearch()
                 },
                 onNavigateToInterestSelect = {
                     navController.navigateToInterestSelect(navOptions {
@@ -97,19 +91,8 @@ fun NavGraphBuilder.loginGraph(
             )
 
             LaunchedEffect(Unit) {
-                profileSettingViewModel.onLocationChange(address, addressId)
+                profileSettingViewModel.onLocationChange(locationName, locationId)
             }
-        }
-        composable<LocationSettingRoute> {
-            LocationSettingRoute(
-                onBack = { address, addressId ->
-                    navController.previousBackStackEntry?.savedStateHandle?.apply {
-                        set(LoginNavigationBundleKey.ADDRESS, address)
-                        set(LoginNavigationBundleKey.ADDRESS_ID, addressId)
-                    }
-                    navController.popBackStack()
-                }
-            )
         }
         composable<InterestSelectRoute> {
             InterestSelectRoute(

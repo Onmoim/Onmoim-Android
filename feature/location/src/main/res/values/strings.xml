@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 공통 -->
+    <string name="temporary_error">일시적인 오류입니다</string>
+    <string name="try_again_later">잠시 후에 다시 시도해 주세요</string>
+    <string name="back">뒤로 가기</string>
+
+    <!-- 지역 설정 화면 -->
+    <string name="location_setting_title">지역 설정</string>
+    <string name="find_location_placeholder">동・읍・면 찾기</string>
+</resources>
