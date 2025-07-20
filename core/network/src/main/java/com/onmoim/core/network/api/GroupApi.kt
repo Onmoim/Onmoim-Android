@@ -1,9 +1,13 @@
 package com.onmoim.core.network.api
 
 import com.onmoim.core.network.model.BaseResponse
+import com.onmoim.core.network.model.group.CreateGroupRequest
+import com.onmoim.core.network.model.group.CreatedGroupDto
 import com.onmoim.core.network.model.group.PopularGroupDto
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface GroupApi {
@@ -20,4 +24,9 @@ interface GroupApi {
         @Query("requestSize") requestSize: Int = 10,
         @Query("memberCount") memberCount: Int? = null
     ): Response<BaseResponse<PopularGroupDto>>
+
+    @POST("api/v1/groups")
+    suspend fun createGroup(
+        @Body createGroupRequest: CreateGroupRequest
+    ): Response<BaseResponse<CreatedGroupDto>>
 }

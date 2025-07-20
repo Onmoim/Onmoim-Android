@@ -1,5 +1,6 @@
 package com.onmoim.feature.groups.view
 
+import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
@@ -20,14 +21,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -46,6 +50,7 @@ import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.designsystem.theme.shadow1
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.groups.R
+import com.onmoim.feature.groups.state.GroupOpenEvent
 import com.onmoim.feature.groups.state.GroupOpenUiState
 import com.onmoim.feature.groups.viewmodel.GroupOpenViewModel
 
@@ -59,20 +64,48 @@ fun GroupOpenRoute(
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val uiState by groupOpenViewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    GroupOpenScreen(
-        onBack = {
-            onBackPressedDispatcher?.onBackPressed()
-        },
-        categoryName = categoryName,
-        categoryImageUrl = categoryImageUrl,
-        onClickLocation = onNavigateToLocationSearch,
-        onGroupNameChange = groupOpenViewModel::onGroupNameChange,
-        onGroupDescriptionChange = groupOpenViewModel::onGroupDescriptionChange,
-        onGroupCapacityChange = groupOpenViewModel::onGroupCapacityChange,
-        onClickConfirm = groupOpenViewModel::onClickConfirm,
-        uiState = uiState
-    )
+    Box(
+        modifier = Modifier
+            .pointerInteropFilter {
+                uiState.isLoading
+            }
+            .fillMaxSize()
+    ) {
+        GroupOpenScreen(
+            onBack = {
+                onBackPressedDispatcher?.onBackPressed()
+            },
+            categoryName = categoryName,
+            categoryImageUrl = categoryImageUrl,
+            onClickLocation = onNavigateToLocationSearch,
+            onGroupNameChange = groupOpenViewModel::onGroupNameChange,
+            onGroupDescriptionChange = groupOpenViewModel::onGroupDescriptionChange,
+            onGroupCapacityChange = groupOpenViewModel::onGroupCapacityChange,
+            onClickConfirm = groupOpenViewModel::onClickConfirm,
+            uiState = uiState
+        )
+        if (uiState.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        groupOpenViewModel.event.collect { event ->
+            when (event) {
+                is GroupOpenEvent.CreateGroupError -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is GroupOpenEvent.CreateGroupSuccess -> {
+                    onNavigateToGroupOpenComplete(event.groupId)
+                }
+            }
+        }
+    }
 }
 
 @Composable

@@ -6,4 +6,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface GroupRepository {
     fun getHomePopularGroups(homePopular: HomePopular): Flow<List<HomeGroup>>
+    fun createGroup(
+        name: String,
+        description: String,
+        locationId: Int,
+        categoryId: Int,
+        capacity: Int
+    ): Flow<Int>
 }
