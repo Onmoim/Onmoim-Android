@@ -5,6 +5,8 @@
     <string name="edit">편집</string>
     <string name="male">남</string>
     <string name="female">여</string>
+    <string name="cancel">취소</string>
+    <string name="wait_and_retry">잠시 후 다시 시도해주세요</string>
 
     <!-- 프로필 화면 -->
     <string name="profile">프로필</string>
@@ -13,6 +15,9 @@
     <string name="profile_join_group">가입한 모임</string>
     <string name="profile_notification_setting">알림 설정</string>
     <string name="profile_withdrawal">회원 탈퇴하기</string>
+    <string name="profile_somoim">소모임</string>
+    <string name="profile_withdrawal_guide_message">계정 정보가 삭제 되며, 한 번 삭제된 게정은 복원할 수 없습니다.</string>
+    <string name="profile_do_withdrawal">탈퇴하기</string>
 
     <!-- 프로필 편집 화면 -->
     <string name="profile_edit">프로필 편집</string>

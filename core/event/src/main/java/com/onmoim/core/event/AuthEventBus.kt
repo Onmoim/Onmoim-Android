@@ -23,6 +23,10 @@ class AuthEventBus @Inject constructor() {
     suspend fun notifyAuthenticated() {
         _event.send(AuthEvent.Authenticated)
     }
+
+    suspend fun notifyWithdrawal() {
+        _event.send(AuthEvent.Withdrawal)
+    }
 }
 
 sealed class AuthEvent {
@@ -30,4 +34,5 @@ sealed class AuthEvent {
     data object SignOut : AuthEvent()
     data object NotAuthenticated : AuthEvent()
     data object Authenticated : AuthEvent()
+    data object Withdrawal : AuthEvent()
 }

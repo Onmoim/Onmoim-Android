@@ -14,8 +14,10 @@ data class ProfileDto(
     val id: Int,
     @SerialName("introduction")
     val introduction: String?,
-    @SerialName("location")
-    val location: String,
+    @SerialName("locationId")
+    val locationId: Int,
+    @SerialName("locationName")
+    val locationName: String,
     @SerialName("name")
     val name: String,
     @SerialName("profileImgUrl")

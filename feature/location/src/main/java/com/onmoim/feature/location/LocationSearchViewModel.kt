@@ -1,9 +1,8 @@
-package com.onmoim.feature.login.viewmodel
+package com.onmoim.feature.location
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onmoim.core.data.repository.LocationRepository
-import com.onmoim.feature.login.state.LocationSettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,11 +17,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LocationSettingViewModel @Inject constructor(
+class LocationSearchViewModel @Inject constructor(
     private val locationRepository: LocationRepository
 ) : ViewModel() {
     private val _uiState =
-        MutableStateFlow<LocationSettingUiState>(LocationSettingUiState.Result(emptyList()))
+        MutableStateFlow<LocationSearchUiState>(LocationSearchUiState.Result(emptyList()))
     val uiState = _uiState.asStateFlow()
 
     private val _searchKeyword = MutableStateFlow("")
@@ -47,9 +46,9 @@ class LocationSettingViewModel @Inject constructor(
 
         viewModelScope.launch {
             locationRepository.searchLocation(keyword).catch {
-                _uiState.value = LocationSettingUiState.Error(it)
+                _uiState.value = LocationSearchUiState.Error(it)
             }.collectLatest {
-                _uiState.value = LocationSettingUiState.Result(it)
+                _uiState.value = LocationSearchUiState.Result(it)
             }
         }
     }

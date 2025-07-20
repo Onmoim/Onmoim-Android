@@ -18,6 +18,7 @@ import com.onmoim.feature.category.view.CategoryRoute
 import com.onmoim.feature.groups.groupsGraph
 import com.onmoim.feature.groups.navigateToGroupDetail
 import com.onmoim.feature.home.homeGraph
+import com.onmoim.feature.location.navigation.locationGraph
 import com.onmoim.feature.login.navigation.LoginNavigation
 import com.onmoim.feature.login.navigation.loginGraph
 import com.onmoim.feature.profile.profileGraph
@@ -91,6 +92,9 @@ fun OnmoimNavHost(
             bottomBar = bottomBar
         )
         loginGraph(
+            navController = navController
+        )
+        locationGraph(
             navController = navController
         )
     }

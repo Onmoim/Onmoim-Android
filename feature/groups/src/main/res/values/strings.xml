@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 공통 -->
+    <string name="my_group">내모임</string>
+    <string name="group_chat">그룹 채팅</string>
+    <string name="coming_schedule">다가오는 일정</string>
+    <string name="next">다음</string>
+
+    <!-- 내 모임 -->
+    <string name="my_group_create_group">+ 새로운 모임 개설하기</string>
+    <string name="my_group_joined_group">가입한 모임</string>
+
+    <!-- 다가오는 일정 -->
+    <string name="coming_schedule_reset">초기화</string>
+    <string name="coming_schedule_week">이번주</string>
+    <string name="coming_schedule_month">이번달</string>
+    <string name="coming_schedule_attended">내가 참석한</string>
+    <string name="coming_schedule_regular_meet">정기모임</string>
+    <string name="coming_schedule_lightning">번개</string>
+
     <!-- 모임 상세 -->
     <string name="group_detail_tab_home">홈</string>
     <string name="group_detail_tab_post">게시판</string>
-    <string name="group_detail_tab_chat">그룹 채팅</string>
     <string name="group_detail_chip_member_count">멤버 %d</string>
-    <string name="group_detail_coming_schedule">다가오는 일정</string>
     <string name="group_detail_post_all">전체</string>
     <string name="group_detail_post_notice">공지</string>
     <string name="group_detail_post_reg_greeting">가입인사</string>
@@ -14,4 +30,24 @@
     <string name="group_detail_post_view_mode_post">게시글</string>
     <string name="group_detail_post_view_mode_album">사진첩</string>
     <string name="group_detail_group_join">가입하기</string>
+
+    <!-- 모임 카테고리 선택 -->
+    <string name="group_category_select">모임 카테고리 선택</string>
+
+    <!-- 모임 개설 -->
+    <string name="group_open">모임 개설</string>
+    <string name="group_open_category">카테고리</string>
+    <string name="group_open_location_setting">지역 설정</string>
+    <string name="group_open_find_location_hint">동・읍・면 찾기</string>
+    <string name="group_open_group_description">모임 설명</string>
+    <string name="group_open_group_name">모임 이름</string>
+    <string name="group_open_group_description_hint">모임 설명 입력</string>
+    <string name="group_open_group_capacity">정원 (%1$d~%2$d)명</string>
+    <string name="group_open_group_capacity_hint">정원 입력</string>
+
+    <!-- 모임 개설 완료 -->
+    <string name="group_open_complete">개설 완료</string>
+    <string name="group_open_complete_title">모임 개설이 완료되었습니다!</string>
+    <string name="group_open_complete_sub_title">첫 만남을 위한 일정을 만들어보세요.</string>
+    <string name="group_open_complete_go_to_group">모임 홈으로</string>
 </resources>

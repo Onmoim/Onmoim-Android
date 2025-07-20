@@ -80,8 +80,8 @@ class UserRepositoryImpl @Inject constructor(
                 name = data.name,
                 birth = birthDateTime.toLocalDate(),
                 introduction = data.introduction,
-                interests = data.categoryList,
-                location = data.location,
+                interestCategories = data.categoryList,
+                location = data.locationName,
                 profileImgUrl = data.profileImgUrl
             )
 
@@ -90,4 +90,16 @@ class UserRepositoryImpl @Inject constructor(
             throw HttpException(resp)
         }
     }.flowOn(ioDispatcher)
+
+    override suspend fun withdrawal(id: Int): Result<Unit> {
+        val resp = withContext(ioDispatcher) {
+            userApi.withdrawal(id)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
+    }
 }

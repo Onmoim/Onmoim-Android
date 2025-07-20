@@ -70,7 +70,7 @@ fun ComingScheduleCard(
     val nowDateTime = LocalDateTime.now()
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .shadow2Block(16.dp)
             .background(
                 color = OnmoimTheme.colors.backgroundColor,
@@ -82,7 +82,6 @@ fun ComingScheduleCard(
                 top = 15.dp,
                 bottom = 16.dp
             )
-            .then(modifier)
     ) {
         Box(
             modifier = Modifier

@@ -1,4 +1,4 @@
-package com.onmoim.feature.login.view
+package com.onmoim.feature.location
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -41,40 +41,37 @@ import com.onmoim.core.designsystem.component.CommonTextField
 import com.onmoim.core.designsystem.component.ErrorAndRetryBox
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.theme.OnmoimTheme
-import com.onmoim.core.ui.R
-import com.onmoim.feature.login.state.LocationSettingUiState
-import com.onmoim.feature.login.viewmodel.LocationSettingViewModel
 
 @Composable
-fun LocationSettingRoute(
-    locationSettingViewModel: LocationSettingViewModel = hiltViewModel(),
+fun LocationSearchRoute(
+    locationSearchViewModel: LocationSearchViewModel = hiltViewModel(),
     onBack: (address: String?, addressId: Int?) -> Unit
 ) {
-    val uiState by locationSettingViewModel.uiState.collectAsStateWithLifecycle()
-    val searchKeyword by locationSettingViewModel.searchKeyword.collectAsStateWithLifecycle()
+    val uiState by locationSearchViewModel.uiState.collectAsStateWithLifecycle()
+    val searchKeyword by locationSearchViewModel.searchKeyword.collectAsStateWithLifecycle()
 
     BackHandler {
         onBack(null, null)
     }
 
-    LocationSettingScreen(
+    LocationSearchScreen(
         onBack = onBack,
         uiState = uiState,
         searchKeyword = searchKeyword,
-        onSearchKeywordChange = locationSettingViewModel::onSearchKeywordChange,
+        onSearchKeywordChange = locationSearchViewModel::onSearchKeywordChange,
         onSearch = {
-            locationSettingViewModel.fetchLocationSearch(searchKeyword)
+            locationSearchViewModel.fetchLocationSearch(searchKeyword)
         },
         onClickRefresh = {
-            locationSettingViewModel.fetchLocationSearch(searchKeyword)
+            locationSearchViewModel.fetchLocationSearch(searchKeyword)
         }
     )
 }
 
 @Composable
-private fun LocationSettingScreen(
+private fun LocationSearchScreen(
     onBack: (address: String?, addressId: Int?) -> Unit,
-    uiState: LocationSettingUiState,
+    uiState: LocationSearchUiState,
     searchKeyword: String,
     onSearchKeywordChange: (String) -> Unit,
     onSearch: () -> Unit,
@@ -145,7 +142,7 @@ private fun LocationSettingScreen(
                 .fillMaxWidth()
         ) {
             when (uiState) {
-                is LocationSettingUiState.Error -> {
+                is LocationSearchUiState.Error -> {
                     ErrorAndRetryBox(
                         onClickRefresh = onClickRefresh,
                         modifier = Modifier.align(Alignment.Center),
@@ -154,7 +151,7 @@ private fun LocationSettingScreen(
                     )
                 }
 
-                is LocationSettingUiState.Result -> {
+                is LocationSearchUiState.Result -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize()
                     ) {
@@ -226,9 +223,9 @@ private fun LocationSettingScreenPreview() {
     var searchKeyword by remember { mutableStateOf("") }
 
     OnmoimTheme {
-        LocationSettingScreen(
+        LocationSearchScreen(
             onBack = { _, _ -> },
-            uiState = LocationSettingUiState.Result(emptyList()),
+            uiState = LocationSearchUiState.Result(emptyList()),
             searchKeyword = searchKeyword,
             onSearchKeywordChange = {
                 searchKeyword = it

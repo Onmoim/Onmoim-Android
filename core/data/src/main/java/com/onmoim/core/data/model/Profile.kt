@@ -7,7 +7,7 @@ data class Profile(
     val name: String,
     val birth: LocalDate,
     val introduction: String?,
-    val interests: List<String>,
+    val interestCategories: List<String>,
     val location: String,
     val profileImgUrl: String?
 )

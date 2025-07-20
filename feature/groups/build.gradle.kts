@@ -8,6 +8,8 @@ android {
 }
 
 dependencies {
+    implementation(projects.feature.location)
+
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 }

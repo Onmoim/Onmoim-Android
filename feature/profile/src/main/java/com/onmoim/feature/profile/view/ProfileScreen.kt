@@ -1,5 +1,6 @@
 package com.onmoim.feature.profile.view
 
+import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,15 +20,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -35,40 +41,101 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
+import com.onmoim.core.data.model.Profile
 import com.onmoim.core.designsystem.component.CommonChip
+import com.onmoim.core.designsystem.component.CommonDialog
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.profile.R
 import com.onmoim.feature.profile.constant.GroupType
+import com.onmoim.feature.profile.state.ProfileEvent
+import com.onmoim.feature.profile.viewmodel.ProfileViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun ProfileRoute(
+    profileViewModel: ProfileViewModel = hiltViewModel(),
     bottomBar: @Composable () -> Unit,
     onNavigateToProfileEdit: () -> Unit,
     onNavigateToGroupList: (GroupType) -> Unit,
     onNavigateToNotificationSetting: () -> Unit
 ) {
+    val profile by profileViewModel.profileState.collectAsStateWithLifecycle()
+    val isLoading by profileViewModel.isLoading.collectAsStateWithLifecycle()
+    var showWithdrawalDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        ProfileScreen(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            onClickProfileEdit = onNavigateToProfileEdit,
-            onClickGroup = onNavigateToGroupList,
-            onClickNotificationSetting = onNavigateToNotificationSetting,
-            onClickWithdrawal = {}
+    if (showWithdrawalDialog) {
+        CommonDialog(
+            onDismissRequest = {
+                showWithdrawalDialog = false
+            },
+            onClickConfirm = {
+                showWithdrawalDialog = false
+            },
+            onClickDismiss = {
+                profileViewModel.withdrawal()
+                showWithdrawalDialog = false
+            },
+            title = stringResource(R.string.profile_somoim),
+            content = stringResource(R.string.profile_withdrawal_guide_message),
+            confirmText = stringResource(R.string.cancel),
+            dismissText = stringResource(R.string.profile_do_withdrawal),
         )
-        bottomBar()
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(OnmoimTheme.colors.backgroundColor)
+    ) {
+        Column(
+            modifier = Modifier
+                .pointerInteropFilter {
+                    isLoading
+                }
+                .fillMaxSize()
+        ) {
+            ProfileScreen(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                onClickProfileEdit = onNavigateToProfileEdit,
+                onClickGroup = onNavigateToGroupList,
+                onClickNotificationSetting = onNavigateToNotificationSetting,
+                onClickWithdrawal = {
+                    showWithdrawalDialog = true
+                },
+                profile = profile
+            )
+            bottomBar()
+        }
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        profileViewModel.event.collect { event ->
+            when (event) {
+                is ProfileEvent.WithdrawalError -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.wait_and_retry),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
     }
 }
 
@@ -78,7 +145,8 @@ private fun ProfileScreen(
     onClickProfileEdit: () -> Unit,
     onClickGroup: (GroupType) -> Unit,
     onClickNotificationSetting: () -> Unit,
-    onClickWithdrawal: () -> Unit
+    onClickWithdrawal: () -> Unit,
+    profile: Profile?
 ) {
     Column(
         modifier = modifier
@@ -89,11 +157,12 @@ private fun ProfileScreen(
         Spacer(Modifier.height(16.dp))
         ProfileCard(
             modifier = Modifier.padding(horizontal = 15.dp),
-            profileImgUrl = "https://picsum.photos/200",
-            userName = "홍길동",
-            location = "서울",
-            birthDate = LocalDate.of(2000, 1, 1),
-            interestCategories = List(5) { "카테고리${it + 1}" }
+            profileImgUrl = profile?.profileImgUrl,
+            userName = profile?.name ?: "",
+            location = profile?.location ?: "",
+            birthDate = profile?.birth,
+            introduction = profile?.introduction ?: "",
+            interestCategories = profile?.interestCategories ?: emptyList()
         )
         Spacer(Modifier.height(8.dp))
         MyGroupStatus(
@@ -192,7 +261,8 @@ private fun ProfileCard(
     profileImgUrl: String?,
     userName: String,
     location: String,
-    birthDate: LocalDate,
+    birthDate: LocalDate?,
+    introduction: String,
     interestCategories: List<String>,
 ) {
     val profilePainter = rememberAsyncImagePainter(
@@ -242,7 +312,8 @@ private fun ProfileCard(
             Column(
                 modifier = Modifier
                     .padding(vertical = 3.dp)
-                    .weight(1f)
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
                     text = userName,
@@ -250,13 +321,20 @@ private fun ProfileCard(
                         color = OnmoimTheme.colors.textColor
                     )
                 )
-                Spacer(Modifier.height(8.dp))
                 Text(
                     text = "$location・${
-                        DateTimeFormatter.ofPattern("yyyy. M. D").format(birthDate)
+                        birthDate?.let {
+                            DateTimeFormatter.ofPattern("yyyy. M. D").format(it)
+                        } ?: ""
                     }",
                     style = OnmoimTheme.typography.caption1Regular.copy(
                         color = OnmoimTheme.colors.gray05
+                    )
+                )
+                Text(
+                    text = introduction,
+                    style = OnmoimTheme.typography.caption1Regular.copy(
+                        color = OnmoimTheme.colors.textColor
                     )
                 )
             }
@@ -310,13 +388,15 @@ private fun MyGroupStatus(
             )
 
             Column(
-                modifier = Modifier.clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    onClick = {
-                        onClickGroup(GroupType.FAVORITE)
-                    }
-                ).then(groupStatusItemModifier),
+                modifier = Modifier
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            onClickGroup(GroupType.FAVORITE)
+                        }
+                    )
+                    .then(groupStatusItemModifier),
                 verticalArrangement = groupStatusItemVerticalArrangement,
                 horizontalAlignment = groupStatusItemHorizontalArrangement
             ) {
@@ -330,13 +410,15 @@ private fun MyGroupStatus(
                 )
             }
             Column(
-                modifier = Modifier.clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    onClick = {
-                        onClickGroup(GroupType.RECENT)
-                    }
-                ).then(groupStatusItemModifier),
+                modifier = Modifier
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            onClickGroup(GroupType.RECENT)
+                        }
+                    )
+                    .then(groupStatusItemModifier),
                 verticalArrangement = groupStatusItemVerticalArrangement,
                 horizontalAlignment = groupStatusItemHorizontalArrangement
             ) {
@@ -350,13 +432,15 @@ private fun MyGroupStatus(
                 )
             }
             Column(
-                modifier = Modifier.clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    onClick = {
-                        onClickGroup(GroupType.JOIN)
-                    }
-                ).then(groupStatusItemModifier),
+                modifier = Modifier
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = {
+                            onClickGroup(GroupType.JOIN)
+                        }
+                    )
+                    .then(groupStatusItemModifier),
                 verticalArrangement = groupStatusItemVerticalArrangement,
                 horizontalAlignment = groupStatusItemHorizontalArrangement
             ) {
@@ -388,7 +472,16 @@ private fun ProfileScreenPreview() {
             onClickProfileEdit = {},
             onClickGroup = {},
             onClickNotificationSetting = {},
-            onClickWithdrawal = {}
+            onClickWithdrawal = {},
+            profile = Profile(
+                id = 0,
+                name = "name",
+                birth = LocalDate.now(),
+                introduction = "introduction",
+                interestCategories = List(5) { "interest$it" },
+                location = "location",
+                profileImgUrl = null
+            )
         )
     }
 }

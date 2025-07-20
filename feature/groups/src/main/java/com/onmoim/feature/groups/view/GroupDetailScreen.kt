@@ -118,7 +118,7 @@ private fun GroupDetailScreen(
                         id = when (tab) {
                             GroupDetailTab.HOME -> R.string.group_detail_tab_home
                             GroupDetailTab.POST -> R.string.group_detail_tab_post
-                            GroupDetailTab.CHAT -> R.string.group_detail_tab_chat
+                            GroupDetailTab.CHAT -> R.string.group_chat
                         }
                     )
                 )
@@ -299,7 +299,7 @@ private fun GroupDetailHomeContainer(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(R.string.group_detail_coming_schedule),
+                text = stringResource(R.string.coming_schedule),
                 style = OnmoimTheme.typography.body1SemiBold.copy(
                     color = OnmoimTheme.colors.textColor
                 )
