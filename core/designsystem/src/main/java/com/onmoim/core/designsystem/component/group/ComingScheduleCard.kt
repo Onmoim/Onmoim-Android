@@ -53,13 +53,14 @@ fun ComingScheduleCard(
     modifier: Modifier = Modifier,
     onClickAttend: () -> Unit,
     isLightning: Boolean,
-    meetDateTime: LocalDateTime,
+    startDate: LocalDateTime,
     title: String,
-    location: String,
+    placeName: String,
     cost: Int,
-    currentNumberOfPeople: Int,
-    maxNumberOfPeople: Int,
-    imageUrl: String
+    joinCount: Int,
+    capacity: Int,
+    imageUrl: String?,
+    attendance: Boolean
 ) {
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current).apply {
@@ -93,13 +94,23 @@ fun ComingScheduleCard(
                     onClick = onClickAttend
                 )
                 .background(
-                    color = OnmoimTheme.colors.primaryBlue,
+                    color = if(attendance) {
+                        OnmoimTheme.colors.primaryPink
+                    } else {
+                        OnmoimTheme.colors.primaryBlue
+                    },
                     shape = RoundedCornerShape(10.dp)
                 ),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(R.string.coming_schedule_attend),
+                text = stringResource(
+                    id = if(attendance) {
+                        R.string.coming_schedule_attend_cancel
+                    } else {
+                        R.string.coming_schedule_attend
+                    }
+                ),
                 style = OnmoimTheme.typography.body2SemiBold.copy(
                     color = Color.White
                 )
@@ -111,7 +122,7 @@ fun ComingScheduleCard(
             Row {
                 Text(
                     text = DateTimeFormatter.ofPattern("M/d (E)", Locale.KOREAN)
-                        .format(meetDateTime),
+                        .format(startDate),
                     style = OnmoimTheme.typography.body1SemiBold.copy(
                         color = OnmoimTheme.colors.textColor
                     )
@@ -120,7 +131,7 @@ fun ComingScheduleCard(
                 Text(
                     text = "D${
                         ChronoUnit.DAYS.between(
-                            meetDateTime.toLocalDate(),
+                            startDate.toLocalDate(),
                             nowDateTime.toLocalDate()
                         )
                     }",
@@ -200,7 +211,7 @@ fun ComingScheduleCard(
                         )
                         Text(
                             text = DateTimeFormatter.ofPattern("M/d E a h:mm", Locale.KOREAN)
-                                .format(meetDateTime),
+                                .format(startDate),
                             style = OnmoimTheme.typography.caption2Regular.copy(
                                 color = OnmoimTheme.colors.textColor
                             )
@@ -216,7 +227,7 @@ fun ComingScheduleCard(
                             )
                         )
                         Text(
-                            text = location,
+                            text = placeName,
                             style = OnmoimTheme.typography.caption2Regular.copy(
                                 color = OnmoimTheme.colors.textColor
                             )
@@ -253,10 +264,10 @@ fun ComingScheduleCard(
                         Text(
                             text = buildAnnotatedString {
                                 withStyle(SpanStyle(color = OnmoimTheme.colors.alertRed)) {
-                                    append(currentNumberOfPeople.toString())
+                                    append(joinCount.toString())
                                 }
                                 append("/")
-                                append(maxNumberOfPeople.toString())
+                                append(capacity.toString())
                             },
                             style = OnmoimTheme.typography.caption2Regular.copy(
                                 color = OnmoimTheme.colors.textColor,
@@ -278,13 +289,14 @@ private fun ComingScheduleCardPreview() {
             modifier = Modifier.width(330.dp),
             onClickAttend = {},
             isLightning = false,
-            meetDateTime = LocalDateTime.now().plusDays(2),
+            startDate = LocalDateTime.now().plusDays(2),
             title = "퇴근 후 독서 정모: 각자 독서",
-            location = "카페 언노운",
+            placeName = "카페 언노운",
             cost = 1000,
-            currentNumberOfPeople = 6,
-            maxNumberOfPeople = 8,
+            joinCount = 6,
+            capacity = 8,
             imageUrl = "https://picsum.photos/200",
+            attendance = false
         )
     }
 }
@@ -297,13 +309,14 @@ private fun ComingScheduleCardForLightningPreview() {
             modifier = Modifier.width(330.dp),
             onClickAttend = {},
             isLightning = true,
-            meetDateTime = LocalDateTime.now().plusDays(2),
+            startDate = LocalDateTime.now().plusDays(2),
             title = "퇴근 후 독서 정모: 각자 독서",
-            location = "카페 언노운",
+            placeName = "카페 언노운",
             cost = 1000,
-            currentNumberOfPeople = 6,
-            maxNumberOfPeople = 8,
+            joinCount = 6,
+            capacity = 8,
             imageUrl = "https://picsum.photos/200",
+            attendance = false
         )
     }
 }

@@ -22,6 +22,7 @@
     <string name="group_detail_tab_home">홈</string>
     <string name="group_detail_tab_post">게시판</string>
     <string name="group_detail_chip_member_count">멤버 %d</string>
+    <string name="group_detail_chip_operating">운영중</string>
     <string name="group_detail_post_all">전체</string>
     <string name="group_detail_post_notice">공지</string>
     <string name="group_detail_post_reg_greeting">가입인사</string>
@@ -30,6 +31,7 @@
     <string name="group_detail_post_view_mode_post">게시글</string>
     <string name="group_detail_post_view_mode_album">사진첩</string>
     <string name="group_detail_group_join">가입하기</string>
+    <string name="group_detail_no_meeting">다가오는 일정이 없습니다.</string>
 
     <!-- 모임 카테고리 선택 -->
     <string name="group_category_select">모임 카테고리 선택</string>

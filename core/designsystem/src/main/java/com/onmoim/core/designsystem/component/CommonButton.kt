@@ -10,13 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.onmoim.core.designsystem.R
 import com.onmoim.core.designsystem.theme.OnmoimTheme
-import com.onmoim.core.designsystem.theme.pretendard
 
 @Composable
 fun CommonButton(
@@ -24,15 +22,17 @@ fun CommonButton(
     modifier: Modifier = Modifier,
     label: String = stringResource(R.string.confirm),
     enabled: Boolean = true,
+    enabledContainerColor: Color = OnmoimTheme.colors.primaryBlue,
+    disabledContainerColor: Color = OnmoimTheme.colors.gray05,
 ) {
     Box(
         modifier = modifier
             .size(240.dp, 38.dp)
             .background(
                 color = if (enabled) {
-                    OnmoimTheme.colors.primaryBlue
+                    enabledContainerColor
                 } else {
-                    OnmoimTheme.colors.gray05
+                    disabledContainerColor
                 },
                 shape = RoundedCornerShape(20.dp)
             )
@@ -46,11 +46,9 @@ fun CommonButton(
     ) {
         Text(
             text = label,
-            fontFamily = pretendard,
-            fontWeight = FontWeight.W600,
-            fontSize = 15.sp,
-            lineHeight = 22.sp,
-            color = OnmoimTheme.colors.backgroundColor
+            style = OnmoimTheme.typography.body2SemiBold.copy(
+                color = Color.White
+            )
         )
     }
 }
