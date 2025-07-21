@@ -24,6 +24,7 @@ internal val ColorPalette = OnmoimColors(
     gray05 = Gray05,
     gray06 = Gray06,
     accentSoftRed = AccentSoftRed,
+    accentSoftRed30 = AccentSoftRed30,
     alertRed = AlertRed,
     black40 = Black40,
 )
@@ -74,6 +75,7 @@ class OnmoimColors(
     gray05: Color,
     gray06: Color,
     accentSoftRed: Color,
+    accentSoftRed30: Color,
     alertRed: Color,
     black40: Color,
 ) {
@@ -101,6 +103,8 @@ class OnmoimColors(
         private set
     var accentSoftRed by mutableStateOf(accentSoftRed)
         private set
+    var accentSoftRed30 by mutableStateOf(accentSoftRed30)
+        private set
     var alertRed by mutableStateOf(alertRed)
         private set
     var black40 by mutableStateOf(black40)
@@ -119,6 +123,7 @@ class OnmoimColors(
         gray05 = other.gray05
         gray06 = other.gray06
         accentSoftRed = other.accentSoftRed
+        accentSoftRed30 = other.accentSoftRed30
         alertRed = other.alertRed
         black40 = other.black40
     }
@@ -136,6 +141,7 @@ class OnmoimColors(
         gray05 = gray05,
         gray06 = gray06,
         accentSoftRed = accentSoftRed,
+        accentSoftRed30 = accentSoftRed30,
         alertRed = alertRed,
         black40 = black40
     )
