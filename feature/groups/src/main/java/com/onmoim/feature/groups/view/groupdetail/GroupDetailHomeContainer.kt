@@ -54,7 +54,7 @@ fun GroupDetailHomeContainer(
     memberStatus: MemberStatus,
     onClickComingSchedule: () -> Unit,
     onClickAttend: (id: Int) -> Unit,
-    onClickGroupEdit: () -> Unit
+    onClickGroupSetting: () -> Unit
 ) {
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current).apply {
@@ -90,7 +90,7 @@ fun GroupDetailHomeContainer(
                 else -> {
                     if (imageUrl == null && memberStatus == MemberStatus.OWNER) {
                         GroupImageNotRegBox(
-                            onClick = onClickGroupEdit,
+                            onClick = onClickGroupSetting,
                             modifier = Modifier.fillMaxSize()
                         )
                     } else {
@@ -137,7 +137,7 @@ fun GroupDetailHomeContainer(
             )
             if (memberStatus == MemberStatus.OWNER) {
                 NavigationIconButton(
-                    onClick = onClickGroupEdit
+                    onClick = onClickGroupSetting
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_setting),

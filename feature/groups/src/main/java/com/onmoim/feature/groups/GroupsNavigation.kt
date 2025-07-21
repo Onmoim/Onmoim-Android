@@ -14,11 +14,13 @@ import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.onmoim.feature.groups.view.ComingScheduleRoute
 import com.onmoim.feature.groups.view.GroupCategorySelectRoute
-import com.onmoim.feature.groups.view.groupdetail.GroupDetailRoute
+import com.onmoim.feature.groups.view.GroupManagementRoute
 import com.onmoim.feature.groups.view.GroupOpenCompleteRoute
 import com.onmoim.feature.groups.view.GroupOpenRoute
 import com.onmoim.feature.groups.view.MyGroupRoute
+import com.onmoim.feature.groups.view.groupdetail.GroupDetailRoute
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
+import com.onmoim.feature.groups.viewmodel.GroupManagementViewModel
 import com.onmoim.feature.groups.viewmodel.GroupOpenViewModel
 import com.onmoim.feature.location.navigation.LocationNavigationBundleKey
 import com.onmoim.feature.location.navigation.navigateToLocationSearch
@@ -55,6 +57,11 @@ data class GroupOpenCompleteRoute(
     val groupId: Int
 )
 
+@Serializable
+data class GroupManagementRoute(
+    val groupId: Int
+)
+
 fun NavController.navigateToComingSchedule(groupId: Int? = null, navOptions: NavOptions? = null) {
     navigate(ComingScheduleRoute(groupId), navOptions)
 }
@@ -78,6 +85,10 @@ fun NavController.navigateToGroupOpen(
 
 fun NavController.navigateToGroupOpenComplete(groupId: Int, navOptions: NavOptions? = null) {
     navigate(GroupOpenCompleteRoute(groupId), navOptions)
+}
+
+fun NavController.navigateToGroupManagement(groupId: Int, navOptions: NavOptions? = null) {
+    navigate(GroupManagementRoute(groupId), navOptions)
 }
 
 fun NavGraphBuilder.groupsGraph(
@@ -122,7 +133,10 @@ fun NavGraphBuilder.groupsGraph(
                 onNavigateToComingSchedule = {
                     navController.navigateToComingSchedule(groupId)
                 },
-                onNavigateToPostDetail = {}
+                onNavigateToPostDetail = {},
+                onNavigateToGroupManagement = {
+                    navController.navigateToGroupManagement(it)
+                }
             )
         }
         composable<GroupCategorySelectRoute> {
@@ -173,6 +187,17 @@ fun NavGraphBuilder.groupsGraph(
                         popUpTo(MyGroupRoute)
                     })
                 }
+            )
+        }
+        composable<GroupManagementRoute> { backStackEntry ->
+            val groupId = backStackEntry.toRoute<GroupManagementRoute>().groupId
+            val groupManagementViewModel =
+                hiltViewModel<GroupManagementViewModel, GroupManagementViewModel.Factory> {
+                    it.create(groupId)
+                }
+
+            GroupManagementRoute(
+                groupManagementViewModel = groupManagementViewModel
             )
         }
     }

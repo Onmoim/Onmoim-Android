@@ -51,7 +51,8 @@ import java.time.LocalDateTime
 fun GroupDetailRoute(
     groupDetailViewModel: GroupDetailViewModel,
     onNavigateToComingSchedule: () -> Unit,
-    onNavigateToPostDetail: (id: Int) -> Unit
+    onNavigateToPostDetail: (id: Int) -> Unit,
+    onNavigateToGroupManagement: (id: Int) -> Unit
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var selectedTab by remember { mutableStateOf(GroupDetailTab.HOME) }
@@ -196,9 +197,7 @@ fun GroupDetailRoute(
             onClickJoin = {
 
             },
-            onClickGroupEdit = {
-
-            },
+            onClickGroupSetting = onNavigateToGroupManagement,
             onClickMenu = {
                 showMenuDialog = true
             },
@@ -257,7 +256,7 @@ private fun GroupDetailScreen(
     onClickPost: (id: Int) -> Unit,
     groupDetailUiState: GroupDetailUiState,
     onClickJoin: (id: Int) -> Unit,
-    onClickGroupEdit: (id: Int) -> Unit,
+    onClickGroupSetting: (id: Int) -> Unit,
     onClickMenu: () -> Unit,
     onClickFavorite: (Boolean) -> Unit
 ) {
@@ -336,8 +335,8 @@ private fun GroupDetailScreen(
                                 memberStatus = groupDetail.memberStatus,
                                 onClickComingSchedule = onClickComingSchedule,
                                 onClickAttend = {},
-                                onClickGroupEdit = {
-                                    onClickGroupEdit(groupDetail.id)
+                                onClickGroupSetting = {
+                                    onClickGroupSetting(groupDetail.id)
                                 }
                             )
                             if (groupDetail.memberStatus == MemberStatus.NONE) {
@@ -392,7 +391,7 @@ private fun GroupMenuDialog(
                 )
                 CommonMenuItem(
                     onClick = onClickDelete,
-                    label = stringResource(R.string.group_detail_group_delete),
+                    label = stringResource(R.string.group_delete),
                     includeDivider = false
                 )
             }
@@ -462,7 +461,7 @@ private fun GroupDetailScreenForHomePreview1() {
             onClickPost = {},
             groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.NONE)),
             onClickJoin = {},
-            onClickGroupEdit = {},
+            onClickGroupSetting = {},
             onClickMenu = {},
             onClickFavorite = {}
         )
@@ -481,7 +480,7 @@ private fun GroupDetailScreenForHomePreview2() {
             onClickPost = {},
             groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.OWNER)),
             onClickJoin = {},
-            onClickGroupEdit = {},
+            onClickGroupSetting = {},
             onClickMenu = {},
             onClickFavorite = {}
         )
@@ -500,7 +499,7 @@ private fun GroupDetailScreenForPostPreview() {
             onClickPost = {},
             groupDetailUiState = GroupDetailUiState.Loading,
             onClickJoin = {},
-            onClickGroupEdit = {},
+            onClickGroupSetting = {},
             onClickMenu = {},
             onClickFavorite = {}
         )

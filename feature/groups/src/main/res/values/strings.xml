@@ -5,6 +5,7 @@
     <string name="group_chat">그룹 채팅</string>
     <string name="coming_schedule">다가오는 일정</string>
     <string name="next">다음</string>
+    <string name="group_delete">모임 삭제하기</string>
 
     <!-- 내 모임 -->
     <string name="my_group_create_group">+ 새로운 모임 개설하기</string>
@@ -33,7 +34,6 @@
     <string name="group_detail_group_join">가입하기</string>
     <string name="group_detail_no_meeting">다가오는 일정이 없습니다.</string>
     <string name="group_detail_group_leave">모임 탈퇴하기</string>
-    <string name="group_detail_group_delete">모임 삭제하기</string>
     <string name="group_detail_group_report">모임 신고하기</string>
     <string name="group_detail_host_leave">마지막 모임원 탈퇴 시 모임이 삭제됩니다.</string>
     <string name="group_detail_host_no_leave">모임 탈퇴를 위해 모임장 권한 양도가 필요합니다.</string>
@@ -63,4 +63,16 @@
     <string name="group_open_complete_title">모임 개설이 완료되었습니다!</string>
     <string name="group_open_complete_sub_title">첫 만남을 위한 일정을 만들어보세요.</string>
     <string name="group_open_complete_go_to_group">모임 홈으로</string>
+
+    <!-- 모임 관리 페이지 -->
+    <string name="group_management_page">모임 관리 페이지</string>
+    <string name="group_management_active_status">활동 현황</string>
+    <string name="group_management_group_setting">모임 설정</string>
+    <string name="group_management_yearly_schedule">연간 일정</string>
+    <string name="group_management_monthly_schedule">월간 일정</string>
+    <string name="group_management_member_management">모임원 관리</string>
+    <string name="group_management_group_info_edit">모임 정보 수정</string>
+    <string name="group_management_schedule_management">일정 관리</string>
+    <string name="group_management_create_meet">정기모임 생성</string>
+    <string name="group_management_write_notice">게시판 공지 작성</string>
 </resources>

@@ -104,7 +104,7 @@ private fun CategoryScreen(
             ) {
                 GroupItem(
                     onClick = {
-                        onClickGroup(1)
+                        onClickGroup(4)
                     },
                     imageUrl = "",
                     title = "title",
