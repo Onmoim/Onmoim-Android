@@ -147,7 +147,7 @@ fun GroupDetailRoute(
             },
             onClickConfirm = {
                 showReportDialog = false
-
+                // TODO: api 나오면 연동
             },
             onClickDismiss = {
                 showReportDialog = false
