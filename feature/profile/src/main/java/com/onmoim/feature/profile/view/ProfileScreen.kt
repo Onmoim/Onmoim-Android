@@ -49,6 +49,7 @@ import coil3.request.ImageRequest
 import com.onmoim.core.data.model.Profile
 import com.onmoim.core.designsystem.component.CommonChip
 import com.onmoim.core.designsystem.component.CommonDialog
+import com.onmoim.core.designsystem.component.CommonListItem
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
@@ -173,38 +174,22 @@ private fun ProfileScreen(
             joinGroupCount = 3
         )
         Spacer(Modifier.height(8.dp))
-        Row(
-            modifier = Modifier
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    onClick = onClickNotificationSetting
-                )
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp, vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+        CommonListItem(
+            onClick = onClickNotificationSetting,
+            title = stringResource(R.string.profile_notification_setting),
+            leading = {
                 Image(
                     painter = painterResource(R.drawable.ic_alarm),
                     contentDescription = null
                 )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.profile_notification_setting),
-                    style = OnmoimTheme.typography.caption1Regular.copy(
-                        color = OnmoimTheme.colors.textColor
-                    )
+            },
+            trailing = {
+                Image(
+                    painter = painterResource(R.drawable.ic_arrow_right),
+                    contentDescription = null
                 )
             }
-            Image(
-                painter = painterResource(R.drawable.ic_arrow_right),
-                contentDescription = null
-            )
-        }
+        )
         Text(
             text = stringResource(R.string.profile_withdrawal),
             modifier = Modifier
