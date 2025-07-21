@@ -1,7 +1,16 @@
 package com.onmoim.core.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.onmoim.core.data.constant.HomePopular
+import com.onmoim.core.data.constant.MemberStatus
+import com.onmoim.core.data.model.ActiveStatistics
+import com.onmoim.core.data.model.GroupDetail
 import com.onmoim.core.data.model.HomeGroup
+import com.onmoim.core.data.model.MeetingDetail
+import com.onmoim.core.data.model.Member
+import com.onmoim.core.data.pagingsource.GroupMemberPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.GroupApi
@@ -10,7 +19,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class GroupRepositoryImpl @Inject constructor(
@@ -65,4 +76,111 @@ class GroupRepositoryImpl @Inject constructor(
             throw HttpException(resp)
         }
     }.flowOn(ioDispatcher)
+
+    override fun getGroupDetail(id: Int): Flow<GroupDetail> = flow {
+        val resp = groupApi.getGroupDetail(id)
+        val data = resp.body()?.data
+
+        if (resp.isSuccessful && data != null) {
+            val groupDetail = GroupDetail(
+                id = data.groupId,
+                title = data.title,
+                imageUrl = data.imageUrl,
+                location = data.address,
+                category = data.category,
+                memberCount = data.memberCount,
+                description = data.description,
+                meetingList = data.list.map {
+                    MeetingDetail(
+                        id = 0, // FIXME: 확인 후 수정
+                        title = it.title,
+                        placeName = it.placeName,
+                        startDate = LocalDateTime.parse(it.startDate),
+                        cost = it.cost,
+                        joinCount = it.joinCount,
+                        capacity = it.capacity,
+                        attendance = it.attendance,
+                        isLightning = it.type == "번개모임",
+                        imgUrl = it.imgUrl,
+                        latitude = it.latitude,
+                        longitude = it.longitude
+                    )
+                },
+                isFavorite = data.status.contains("BOOKMARK"),
+                memberStatus = when {
+                    data.status.contains("OWNER") -> MemberStatus.OWNER
+                    data.status.contains("MEMBER") -> MemberStatus.MEMBER
+                    data.status.contains("BAN") -> MemberStatus.BAN
+                    else -> MemberStatus.NONE
+                }
+            )
+            emit(groupDetail)
+        } else {
+            throw HttpException(resp)
+        }
+    }.flowOn(ioDispatcher)
+
+    override suspend fun leaveGroup(id: Int): Result<Unit> {
+        val resp = withContext(ioDispatcher) {
+            groupApi.leaveGroup(id)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
+    }
+
+    override suspend fun deleteGroup(id: Int): Result<Unit> {
+        val resp = withContext(ioDispatcher) {
+            groupApi.deleteGroup(id)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
+    }
+
+    override suspend fun favoriteGroup(id: Int): Result<Unit> {
+        val resp = withContext(ioDispatcher) {
+            groupApi.likeGroup(id)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
+    }
+
+    override fun getActiveStatistics(id: Int): Flow<ActiveStatistics> = flow {
+        val resp = groupApi.getGroupStatistics(id)
+        val data = resp.body()?.data
+
+        if (resp.isSuccessful && data != null) {
+            val activeStatistics = ActiveStatistics(
+                yearlyScheduleCount = data.annualSchedule,
+                monthlyScheduleCount = data.monthlySchedule
+            )
+            emit(activeStatistics)
+        } else {
+            throw HttpException(resp)
+        }
+    }.flowOn(ioDispatcher)
+
+    override fun getGroupMemberPagingData(
+        id: Int,
+        size: Int
+    ): Flow<PagingData<Member>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { GroupMemberPagingSource(groupApi, id) }
+        ).flow.flowOn(ioDispatcher)
+    }
 }

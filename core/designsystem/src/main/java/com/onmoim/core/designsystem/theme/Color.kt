@@ -23,6 +23,7 @@ val TextBlack = Color(0xFF000000)
 
 // Red
 val AccentSoftRed = Color(0xFFF97D7D)
+val AccentSoftRed30 = Color(0x4DF97D7D)
 val AlertRed = Color(0xFFFF0033)
 
 // Black

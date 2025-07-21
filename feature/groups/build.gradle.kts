@@ -8,8 +8,12 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.domain)
+
     implementation(projects.feature.location)
 
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.androidx.paging.runtimeKtx)
+    implementation(libs.androidx.paging.compose)
 }

@@ -248,13 +248,14 @@ private fun MyGroupContainer(
 
                     },
                     isLightning = false,
-                    meetDateTime = LocalDateTime.now().plusDays(2),
+                    startDate = LocalDateTime.now().plusDays(2),
                     title = "퇴근 후 독서 정모: 각자 독서",
-                    location = "카페 언노운",
+                    placeName = "카페 언노운",
                     cost = 10000,
-                    currentNumberOfPeople = 6,
-                    maxNumberOfPeople = 8,
+                    joinCount = 6,
+                    capacity = 8,
                     imageUrl = "https://picsum.photos/200",
+                    attendance = true
                 )
             }
         }

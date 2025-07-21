@@ -13,6 +13,7 @@
 
     <!-- ComingScheduleCard -->
     <string name="coming_schedule_attend">참석</string>
+    <string name="coming_schedule_attend_cancel">참석 취소</string>
     <string name="coming_schedule_date">일시</string>
     <string name="coming_schedule_location">위치</string>
     <string name="coming_schedule_cost">비용</string>
@@ -21,4 +22,11 @@
     <!-- GenderToggle -->
     <string name="male">남</string>
     <string name="female">여</string>
+
+    <!-- GroupImageNotRegBox -->
+    <string name="group_image_not_reg_guide">대표 사진을 등록해 주세요</string>
+
+    <!-- MemberListItem -->
+    <string name="member_list_item_transfer">양도</string>
+    <string name="member_list_item_expulsion">강퇴</string>
 </resources>
