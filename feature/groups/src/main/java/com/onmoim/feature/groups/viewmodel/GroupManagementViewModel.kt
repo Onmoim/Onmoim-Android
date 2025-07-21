@@ -3,6 +3,7 @@ package com.onmoim.feature.groups.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.onmoim.core.data.model.ActiveStatistics
 import com.onmoim.core.data.repository.GroupRepository
 import com.onmoim.feature.groups.constant.GroupManagementTab
@@ -22,7 +23,7 @@ import kotlinx.coroutines.launch
 class GroupManagementViewModel @AssistedInject constructor(
     @Assisted("groupId") private val groupId: Int,
     private val groupRepository: GroupRepository
-): ViewModel() {
+) : ViewModel() {
 
     @AssistedFactory
     interface Factory {
@@ -34,6 +35,9 @@ class GroupManagementViewModel @AssistedInject constructor(
 
     private val _activeStatisticsState = MutableStateFlow<ActiveStatistics?>(null)
     val activeStatisticsState = _activeStatisticsState.asStateFlow()
+
+    val groupMemberPagingData =
+        groupRepository.getGroupMemberPagingData(groupId).cachedIn(viewModelScope)
 
     init {
         fetchActiveStatistics()

@@ -1,6 +1,8 @@
 package com.onmoim.core.network.api
 
+import com.onmoim.core.network.model.BasePageDto
 import com.onmoim.core.network.model.BaseResponse
+import com.onmoim.core.network.model.MemberDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
 import com.onmoim.core.network.model.group.CreatedGroupDto
 import com.onmoim.core.network.model.group.GroupDetailDto
@@ -58,4 +60,11 @@ interface GroupApi {
     suspend fun getGroupStatistics(
         @Path("groupId") groupId: Int
     ): Response<BaseResponse<GroupStatisticsDto>>
+
+    @GET("api/v1/groups/{groupId}/members")
+    suspend fun getGroupMembers(
+        @Path("groupId") groupId: Int,
+        @Query("lastMemberId") lastMemberId: Int? = null,
+        @Query("requestSize") requestSize: Int? = null
+    ): Response<BaseResponse<BasePageDto<MemberDto>>>
 }

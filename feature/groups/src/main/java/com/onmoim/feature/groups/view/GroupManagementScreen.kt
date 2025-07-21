@@ -23,7 +23,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.onmoim.core.data.constant.GroupMemberRole
 import com.onmoim.core.data.model.ActiveStatistics
+import com.onmoim.core.data.model.Member
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.CommonTab
 import com.onmoim.core.designsystem.component.CommonTabRow
@@ -33,6 +38,7 @@ import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.GroupManagementTab
 import com.onmoim.feature.groups.viewmodel.GroupManagementViewModel
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun GroupManagementRoute(
@@ -41,6 +47,8 @@ fun GroupManagementRoute(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val selectedTab by groupManagementViewModel.selectedTabState.collectAsStateWithLifecycle()
     val activeStatistics by groupManagementViewModel.activeStatisticsState.collectAsStateWithLifecycle()
+    val groupMemberPagingItems =
+        groupManagementViewModel.groupMemberPagingData.collectAsLazyPagingItems()
 
     GroupManagementScreen(
         onBack = {
@@ -48,7 +56,8 @@ fun GroupManagementRoute(
         },
         selectedTab = selectedTab,
         onTabChange = groupManagementViewModel::onTabChange,
-        activeStatistics = activeStatistics
+        activeStatistics = activeStatistics,
+        groupMemberPagingItems = groupMemberPagingItems
     )
 }
 
@@ -57,7 +66,8 @@ private fun GroupManagementScreen(
     onBack: () -> Unit,
     selectedTab: GroupManagementTab,
     onTabChange: (GroupManagementTab) -> Unit,
-    activeStatistics: ActiveStatistics?
+    activeStatistics: ActiveStatistics?,
+    groupMemberPagingItems: LazyPagingItems<Member>
 ) {
     Column(
         modifier = Modifier
@@ -110,7 +120,8 @@ private fun GroupManagementScreen(
                         .weight(1f)
                         .fillMaxWidth(),
                     yearlyScheduleCount = activeStatistics?.yearlyScheduleCount ?: 0,
-                    monthlyScheduleCount = activeStatistics?.monthlyScheduleCount ?: 0
+                    monthlyScheduleCount = activeStatistics?.monthlyScheduleCount ?: 0,
+                    groupMemberPagingItems = groupMemberPagingItems
                 )
             }
 
@@ -126,6 +137,7 @@ private fun ActiveStatusContainer(
     modifier: Modifier = Modifier,
     yearlyScheduleCount: Int,
     monthlyScheduleCount: Int,
+    groupMemberPagingItems: LazyPagingItems<Member>
 ) {
     LazyColumn(
         modifier = modifier
@@ -183,37 +195,47 @@ private fun ActiveStatusContainer(
                 )
             }
         }
-        items(20) {
-            Column {
-                Spacer(Modifier.height(10.dp))
-                MemberListItem(
-                    onClick = {
+        items(groupMemberPagingItems.itemCount) { index ->
+            groupMemberPagingItems[index]?.let { member ->
+                Column {
+                    Spacer(Modifier.height(10.dp))
+                    MemberListItem(
+                        onClick = {
 
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 15.dp),
-                    name = "홍길동",
-                    imageUrl = null,
-                    isHost = false
-                )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 15.dp),
+                        name = member.name,
+                        imageUrl = member.profileImageUrl,
+                        isHost = member.role == GroupMemberRole.OWNER
+                    )
+                }
             }
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun GroupManagementScreenPreview() {
+    val members = listOf(
+        Member(id = 1, name = "홍길동", profileImageUrl = "", role = GroupMemberRole.OWNER),
+        Member(id = 2, name = "김길동", profileImageUrl = "", role = GroupMemberRole.MEMBER),
+        Member(id = 3, name = "고길동", profileImageUrl = "", role = GroupMemberRole.MEMBER),
+    )
+    val pagingItems = flowOf(PagingData.from(members)).collectAsLazyPagingItems()
+
     OnmoimTheme {
         GroupManagementScreen(
             onBack = {},
             selectedTab = GroupManagementTab.ACTIVE_STATUS,
             onTabChange = {},
             activeStatistics = ActiveStatistics(
-                yearlyScheduleCount = 10,
-                monthlyScheduleCount = 5
-            )
+                yearlyScheduleCount = 12,
+                monthlyScheduleCount = 3,
+            ),
+            groupMemberPagingItems = pagingItems,
         )
     }
 }

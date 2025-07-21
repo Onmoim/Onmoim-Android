@@ -12,4 +12,5 @@ dependencies {
     implementation(projects.core.network)
 
     implementation(libs.retrofit)
+    implementation(libs.androidx.paging.runtimeKtx)
 }
