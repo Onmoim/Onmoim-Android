@@ -24,7 +24,7 @@ fun GroupDetailAppBar(
     onClickBack: () -> Unit,
     onClickFavorite: () -> Unit,
     onClickShare: () -> Unit,
-    onClickMore: () -> Unit
+    onClickMenu: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -75,7 +75,7 @@ fun GroupDetailAppBar(
                 )
             }
             NavigationIconButton(
-                onClick = onClickMore,
+                onClick = onClickMenu,
                 size = 36.dp
             ) {
                 Icon(
@@ -97,7 +97,7 @@ private fun GroupDetailAppBarPreview() {
             onClickBack = {},
             onClickFavorite = {},
             onClickShare = {},
-            onClickMore = {}
+            onClickMenu = {}
         )
     }
 }
@@ -112,7 +112,7 @@ private fun GroupDetailAppBarFavoritePreview() {
             onClickBack = {},
             onClickFavorite = {},
             onClickShare = {},
-            onClickMore = {}
+            onClickMenu = {}
         )
     }
 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,8 +27,12 @@ import com.onmoim.core.data.constant.MemberStatus
 import com.onmoim.core.data.model.GroupDetail
 import com.onmoim.core.data.model.MeetingDetail
 import com.onmoim.core.designsystem.component.CommonButton
+import com.onmoim.core.designsystem.component.CommonDialog
+import com.onmoim.core.designsystem.component.CommonMenuDialog
+import com.onmoim.core.designsystem.component.CommonMenuItem
 import com.onmoim.core.designsystem.component.CommonTab
 import com.onmoim.core.designsystem.component.CommonTabRow
+import com.onmoim.core.designsystem.component.CommonTextField
 import com.onmoim.core.designsystem.component.group.GroupDetailAppBar
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
@@ -46,6 +51,122 @@ fun GroupDetailRoute(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var selectedTab by remember { mutableStateOf(GroupDetailTab.HOME) }
     val groupDetailUiState by groupDetailViewModel.groupDetailUiState.collectAsStateWithLifecycle()
+    val groupDetail = (groupDetailUiState as? GroupDetailUiState.Success)?.groupDetail
+    var showMenuDialog by remember { mutableStateOf(false) }
+    var showHostLeaveDialog by remember { mutableStateOf(false) }
+    var showMemberLeaveDialog by remember { mutableStateOf(false) }
+    var showReportDialog by remember { mutableStateOf(false) }
+
+    if (showMenuDialog) {
+        GroupMenuDialog(
+            memberStatus = groupDetail?.memberStatus ?: MemberStatus.NONE,
+            onDismissRequest = {
+                showMenuDialog = false
+            },
+            onClickCancel = {
+                showMenuDialog = false
+            },
+            onClickLeave = {
+                showMenuDialog = false
+                if (groupDetail?.memberStatus == MemberStatus.OWNER) {
+                    showHostLeaveDialog = true
+                } else {
+                    showMemberLeaveDialog = true
+                }
+            },
+            onClickDelete = {
+                showMenuDialog = false
+                // TODO: 모임 삭제
+            },
+            onClickReport = {
+                showMenuDialog = false
+                showReportDialog = true
+            }
+        )
+    }
+
+    if (showHostLeaveDialog && groupDetail?.memberCount != null) {
+        CommonDialog(
+            title = groupDetail.title,
+            content = stringResource(
+                id = if (groupDetail.memberCount > 1) {
+                    R.string.group_detail_host_no_leave
+                } else {
+                    R.string.group_detail_host_leave
+                }
+            ),
+            onDismissRequest = {
+                showHostLeaveDialog = false
+            },
+            onClickConfirm = {
+                showHostLeaveDialog = false
+                if (groupDetail.memberCount > 1) {
+                    // TODO: 모임장 권한 양도
+                } else {
+                    // TODO: 모임 탈퇴
+                }
+            },
+            onClickDismiss = {
+                showHostLeaveDialog = false
+            }
+        )
+    }
+
+    if (showMemberLeaveDialog) {
+        CommonDialog(
+            title = groupDetail?.title ?: "",
+            content = stringResource(R.string.group_detail_member_leave),
+            onDismissRequest = {
+                showMemberLeaveDialog = false
+            },
+            onClickConfirm = {
+                showMemberLeaveDialog = false
+
+            },
+            onClickDismiss = {
+                showHostLeaveDialog = false
+            },
+            confirmText = stringResource(R.string.group_detail_leave_btn)
+        )
+    }
+
+    if (showReportDialog) {
+        var reportContent by remember { mutableStateOf("") }
+
+        CommonDialog(
+            title = stringResource(R.string.group_detail_report_dialog_title),
+            onDismissRequest = {
+                showReportDialog = false
+            },
+            onClickConfirm = {
+                showReportDialog = false
+
+            },
+            onClickDismiss = {
+                showReportDialog = false
+            }
+        ) {
+            CommonTextField(
+                value = reportContent,
+                onValueChange = {
+                    reportContent = it
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.group_detail_report_input_hint),
+                        style = OnmoimTheme.typography.body2Regular.copy(
+                            color = OnmoimTheme.colors.gray04
+                        )
+                    )
+                },
+                singleLine = false,
+                innerFieldAlignment = Alignment.TopStart
+            )
+        }
+    }
 
     GroupDetailScreen(
         onBack = {
@@ -63,6 +184,9 @@ fun GroupDetailRoute(
         },
         onClickGroupEdit = {
 
+        },
+        onClickMenu = {
+            showMenuDialog = true
         }
     )
 }
@@ -76,7 +200,8 @@ private fun GroupDetailScreen(
     onClickPost: (id: Int) -> Unit,
     groupDetailUiState: GroupDetailUiState,
     onClickJoin: (id: Int) -> Unit,
-    onClickGroupEdit: (id: Int) -> Unit
+    onClickGroupEdit: (id: Int) -> Unit,
+    onClickMenu: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -93,7 +218,7 @@ private fun GroupDetailScreen(
             onClickBack = onBack,
             onClickFavorite = {},
             onClickShare = {},
-            onClickMore = {}
+            onClickMenu = onClickMenu
         )
         CommonTabRow(
             selectedTabIndex = GroupDetailTab.entries.indexOf(selectedTab),
@@ -186,6 +311,55 @@ private fun GroupDetailScreen(
     }
 }
 
+@Composable
+private fun GroupMenuDialog(
+    memberStatus: MemberStatus,
+    onDismissRequest: () -> Unit,
+    onClickCancel: () -> Unit,
+    onClickLeave: () -> Unit,
+    onClickDelete: () -> Unit,
+    onClickReport: () -> Unit
+) {
+    CommonMenuDialog(
+        onDismissRequest = onDismissRequest,
+        onClickCancel = onClickCancel
+    ) {
+        when (memberStatus) {
+            MemberStatus.OWNER -> {
+                CommonMenuItem(
+                    onClick = onClickLeave,
+                    label = stringResource(R.string.group_detail_group_leave)
+                )
+                CommonMenuItem(
+                    onClick = onClickDelete,
+                    label = stringResource(R.string.group_detail_group_delete),
+                    includeDivider = false
+                )
+            }
+
+            MemberStatus.MEMBER -> {
+                CommonMenuItem(
+                    onClick = onClickReport,
+                    label = stringResource(R.string.group_detail_group_report)
+                )
+                CommonMenuItem(
+                    onClick = onClickLeave,
+                    label = stringResource(R.string.group_detail_group_leave),
+                    includeDivider = false
+                )
+            }
+
+            else -> {
+                CommonMenuItem(
+                    onClick = onClickReport,
+                    label = stringResource(R.string.group_detail_group_report),
+                    includeDivider = false
+                )
+            }
+        }
+    }
+}
+
 private fun getFakeGroupoDetail(memberStatus: MemberStatus): GroupDetail {
     return GroupDetail(
         id = 1,
@@ -228,7 +402,8 @@ private fun GroupDetailScreenForHomePreview1() {
             onClickPost = {},
             groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.NONE)),
             onClickJoin = {},
-            onClickGroupEdit = {}
+            onClickGroupEdit = {},
+            onClickMenu = {}
         )
     }
 }
@@ -245,7 +420,8 @@ private fun GroupDetailScreenForHomePreview2() {
             onClickPost = {},
             groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.OWNER)),
             onClickJoin = {},
-            onClickGroupEdit = {}
+            onClickGroupEdit = {},
+            onClickMenu = {}
         )
     }
 }
@@ -262,7 +438,8 @@ private fun GroupDetailScreenForPostPreview() {
             onClickPost = {},
             groupDetailUiState = GroupDetailUiState.Loading,
             onClickJoin = {},
-            onClickGroupEdit = {}
+            onClickGroupEdit = {},
+            onClickMenu = {}
         )
     }
 }
