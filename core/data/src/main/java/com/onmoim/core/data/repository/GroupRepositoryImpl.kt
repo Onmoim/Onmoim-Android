@@ -137,4 +137,16 @@ class GroupRepositoryImpl @Inject constructor(
             Result.failure(HttpException(resp))
         }
     }
+
+    override suspend fun favoriteGroup(id: Int): Result<Unit> {
+        val resp = withContext(ioDispatcher) {
+            groupApi.likeGroup(id)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
+    }
 }

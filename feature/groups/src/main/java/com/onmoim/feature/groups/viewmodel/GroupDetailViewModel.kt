@@ -81,4 +81,26 @@ class GroupDetailViewModel @AssistedInject constructor(
             }
         }
     }
+
+    fun favoriteGroup(favorite: Boolean) {
+        val groupDetail = (_groupDetailUiState.value as? GroupDetailUiState.Success)?.groupDetail ?: return
+
+        viewModelScope.launch {
+            _groupDetailUiState.value = GroupDetailUiState.Success(
+                groupDetail.copy(
+                    isFavorite = !favorite
+                )
+            )
+
+            groupRepository.favoriteGroup(id).onFailure {
+                Log.e("GroupDetailViewModel", "favoriteGroup error", it)
+                _groupDetailUiState.value = GroupDetailUiState.Success(
+                    groupDetail.copy(
+                        isFavorite = favorite
+                    )
+                )
+                _event.send(GroupDetailEvent.FavoriteGroupFailure(it))
+            }
+        }
+    }
 }

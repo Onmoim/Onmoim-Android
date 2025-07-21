@@ -47,4 +47,9 @@ interface GroupApi {
     suspend fun deleteGroup(
         @Path("groupId") groupId: Int
     ): Response<BaseResponse<String>>
+
+    @POST("api/v1/groups/{groupId}/like")
+    suspend fun likeGroup(
+        @Path("groupId") groupId: Int
+    ): Response<BaseResponse<String>>
 }

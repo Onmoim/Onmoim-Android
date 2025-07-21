@@ -17,4 +17,5 @@ interface GroupRepository {
     fun getGroupDetail(id: Int): Flow<GroupDetail>
     suspend fun leaveGroup(id: Int): Result<Unit>
     suspend fun deleteGroup(id: Int): Result<Unit>
+    suspend fun favoriteGroup(id: Int): Result<Unit>
 }

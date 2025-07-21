@@ -201,7 +201,8 @@ fun GroupDetailRoute(
             },
             onClickMenu = {
                 showMenuDialog = true
-            }
+            },
+            onClickFavorite = groupDetailViewModel::favoriteGroup
         )
         if (isLoading) {
             CircularProgressIndicator(
@@ -238,6 +239,10 @@ fun GroupDetailRoute(
                     ).show()
                     onBackPressedDispatcher?.onBackPressed()
                 }
+
+                is GroupDetailEvent.FavoriteGroupFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -253,7 +258,8 @@ private fun GroupDetailScreen(
     groupDetailUiState: GroupDetailUiState,
     onClickJoin: (id: Int) -> Unit,
     onClickGroupEdit: (id: Int) -> Unit,
-    onClickMenu: () -> Unit
+    onClickMenu: () -> Unit,
+    onClickFavorite: (Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -268,7 +274,9 @@ private fun GroupDetailScreen(
             title = groupTitle ?: "",
             isFavorite = isFavorite ?: false,
             onClickBack = onBack,
-            onClickFavorite = {},
+            onClickFavorite = {
+                isFavorite?.let(onClickFavorite)
+            },
             onClickShare = {},
             onClickMenu = onClickMenu
         )
@@ -455,7 +463,8 @@ private fun GroupDetailScreenForHomePreview1() {
             groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.NONE)),
             onClickJoin = {},
             onClickGroupEdit = {},
-            onClickMenu = {}
+            onClickMenu = {},
+            onClickFavorite = {}
         )
     }
 }
@@ -473,7 +482,8 @@ private fun GroupDetailScreenForHomePreview2() {
             groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.OWNER)),
             onClickJoin = {},
             onClickGroupEdit = {},
-            onClickMenu = {}
+            onClickMenu = {},
+            onClickFavorite = {}
         )
     }
 }
@@ -491,7 +501,8 @@ private fun GroupDetailScreenForPostPreview() {
             groupDetailUiState = GroupDetailUiState.Loading,
             onClickJoin = {},
             onClickGroupEdit = {},
-            onClickMenu = {}
+            onClickMenu = {},
+            onClickFavorite = {}
         )
     }
 }
