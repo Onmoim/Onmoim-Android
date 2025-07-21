@@ -4,6 +4,7 @@ import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.group.CreateGroupRequest
 import com.onmoim.core.network.model.group.CreatedGroupDto
 import com.onmoim.core.network.model.group.GroupDetailDto
+import com.onmoim.core.network.model.group.GroupStatisticsDto
 import com.onmoim.core.network.model.group.PopularGroupDto
 import retrofit2.Response
 import retrofit2.http.Body
@@ -52,4 +53,9 @@ interface GroupApi {
     suspend fun likeGroup(
         @Path("groupId") groupId: Int
     ): Response<BaseResponse<String>>
+
+    @GET("api/v1/groups/{groupId}/statistics")
+    suspend fun getGroupStatistics(
+        @Path("groupId") groupId: Int
+    ): Response<BaseResponse<GroupStatisticsDto>>
 }

@@ -2,6 +2,7 @@ package com.onmoim.core.data.repository
 
 import com.onmoim.core.data.constant.HomePopular
 import com.onmoim.core.data.constant.MemberStatus
+import com.onmoim.core.data.model.ActiveStatistics
 import com.onmoim.core.data.model.GroupDetail
 import com.onmoim.core.data.model.HomeGroup
 import com.onmoim.core.data.model.MeetingDetail
@@ -149,4 +150,19 @@ class GroupRepositoryImpl @Inject constructor(
             Result.failure(HttpException(resp))
         }
     }
+
+    override fun getActiveStatistics(id: Int): Flow<ActiveStatistics> = flow {
+        val resp = groupApi.getGroupStatistics(id)
+        val data = resp.body()?.data
+
+        if (resp.isSuccessful && data != null) {
+            val activeStatistics = ActiveStatistics(
+                yearlyScheduleCount = data.annualSchedule,
+                monthlyScheduleCount = data.monthlySchedule
+            )
+            emit(activeStatistics)
+        } else {
+            throw HttpException(resp)
+        }
+    }.flowOn(ioDispatcher)
 }
