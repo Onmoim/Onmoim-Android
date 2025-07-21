@@ -4,6 +4,7 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,6 +50,7 @@ fun GroupManagementRoute(
     val activeStatistics by groupManagementViewModel.activeStatisticsState.collectAsStateWithLifecycle()
     val groupMemberPagingItems =
         groupManagementViewModel.groupMemberPagingData.collectAsLazyPagingItems()
+    val userId by groupManagementViewModel.userIdState.collectAsStateWithLifecycle()
 
     GroupManagementScreen(
         onBack = {
@@ -58,6 +60,7 @@ fun GroupManagementRoute(
         onTabChange = groupManagementViewModel::onTabChange,
         activeStatistics = activeStatistics,
         groupMemberPagingItems = groupMemberPagingItems,
+        userId = userId,
         onClickTransfer = {},
         onClickExpulsion = {}
     )
@@ -70,6 +73,7 @@ private fun GroupManagementScreen(
     onTabChange: (GroupManagementTab) -> Unit,
     activeStatistics: ActiveStatistics?,
     groupMemberPagingItems: LazyPagingItems<Member>,
+    userId: Int?,
     onClickTransfer: (memberId: Int) -> Unit,
     onClickExpulsion: (memberId: Int) -> Unit
 ) {
@@ -126,6 +130,7 @@ private fun GroupManagementScreen(
                     yearlyScheduleCount = activeStatistics?.yearlyScheduleCount ?: 0,
                     monthlyScheduleCount = activeStatistics?.monthlyScheduleCount ?: 0,
                     groupMemberPagingItems = groupMemberPagingItems,
+                    userId = userId,
                     onClickExpulsion = onClickExpulsion,
                     onClickTransfer = onClickTransfer
                 )
@@ -144,6 +149,7 @@ private fun ActiveStatusContainer(
     yearlyScheduleCount: Int,
     monthlyScheduleCount: Int,
     groupMemberPagingItems: LazyPagingItems<Member>,
+    userId: Int?,
     onClickTransfer: (memberId: Int) -> Unit,
     onClickExpulsion: (memberId: Int) -> Unit
 ) {
@@ -214,14 +220,12 @@ private fun ActiveStatusContainer(
                         onClickExpulsion = {
                             onClickExpulsion(member.id)
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 15.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(horizontal = 15.dp),
                         name = member.name,
                         imageUrl = member.profileImageUrl,
                         isHost = member.role == GroupMemberRole.OWNER,
-                        // FIXME: 본인인 경우 비활성화 해야함
-//                        enabledMenu =
+                        enabledMenu = userId != member.id
                     )
                 }
             }
@@ -249,6 +253,7 @@ private fun GroupManagementScreenPreview() {
                 monthlyScheduleCount = 3,
             ),
             groupMemberPagingItems = pagingItems,
+            userId = 1,
             onClickTransfer = {},
             onClickExpulsion = {}
         )

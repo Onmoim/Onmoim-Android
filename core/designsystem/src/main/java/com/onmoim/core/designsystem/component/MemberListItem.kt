@@ -8,12 +8,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -46,6 +48,7 @@ fun MemberListItem(
     onClickTransfer: () -> Unit,
     onClickExpulsion: () -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     name: String,
     imageUrl: String?,
     isHost: Boolean,
@@ -73,55 +76,62 @@ fun MemberListItem(
             .height(44.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier.size(36.dp)
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .padding(contentPadding),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            when (painterState) {
-                is AsyncImagePainter.State.Loading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .shimmerBackground()
-                    )
-                }
+            Box(
+                modifier = Modifier.size(36.dp)
+            ) {
+                when (painterState) {
+                    is AsyncImagePainter.State.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .shimmerBackground()
+                        )
+                    }
 
-                is AsyncImagePainter.State.Success -> {
+                    is AsyncImagePainter.State.Success -> {
+                        Image(
+                            painter = painter,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
+                    else -> {
+                        Image(
+                            painter = painterResource(R.drawable.ic_user),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+                if (isHost) {
                     Image(
-                        painter = painter,
+                        painter = painterResource(R.drawable.ic_crown),
                         contentDescription = null,
                         modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-
-                else -> {
-                    Image(
-                        painter = painterResource(R.drawable.ic_user),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize()
+                            .align(Alignment.BottomEnd)
+                            .offset(x = 4.dp)
                     )
                 }
             }
-            if (isHost) {
-                Image(
-                    painter = painterResource(R.drawable.ic_crown),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .offset(x = 4.dp)
+            Spacer(Modifier.width(12.dp))
+            Text(
+                text = name,
+                modifier = Modifier.weight(1f),
+                style = OnmoimTheme.typography.body2Regular.copy(
+                    color = OnmoimTheme.colors.textColor
                 )
-            }
-        }
-        Spacer(Modifier.width(12.dp))
-        Text(
-            text = name,
-            modifier = Modifier.weight(1f),
-            style = OnmoimTheme.typography.body2Regular.copy(
-                color = OnmoimTheme.colors.textColor
             )
-        )
+        }
         AnimatedVisibility(
             visible = showMenu,
             enter = expandHorizontally(),

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.onmoim.core.data.model.ActiveStatistics
 import com.onmoim.core.data.repository.GroupRepository
+import com.onmoim.core.domain.usecase.GetUserIdUseCase
 import com.onmoim.feature.groups.constant.GroupManagementTab
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -22,7 +23,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = GroupManagementViewModel.Factory::class)
 class GroupManagementViewModel @AssistedInject constructor(
     @Assisted("groupId") private val groupId: Int,
-    private val groupRepository: GroupRepository
+    private val groupRepository: GroupRepository,
+    private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
     @AssistedFactory
@@ -39,8 +41,12 @@ class GroupManagementViewModel @AssistedInject constructor(
     val groupMemberPagingData =
         groupRepository.getGroupMemberPagingData(groupId).cachedIn(viewModelScope)
 
+    private val _userIdState = MutableStateFlow<Int?>(null)
+    val userIdState = _userIdState.asStateFlow()
+
     init {
         fetchActiveStatistics()
+        fetchUserId()
     }
 
     fun onTabChange(tab: GroupManagementTab) {
@@ -57,6 +63,12 @@ class GroupManagementViewModel @AssistedInject constructor(
             }.collectLatest {
                 _activeStatisticsState.value = it
             }
+        }
+    }
+
+    private fun fetchUserId() {
+        viewModelScope.launch {
+            _userIdState.value = getUserIdUseCase()
         }
     }
 }
