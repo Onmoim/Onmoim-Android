@@ -54,7 +54,12 @@ fun GroupManagementRoute(
         groupMemberPagingItems = groupMemberPagingItems,
         userId = userId,
         onClickTransfer = {},
-        onClickExpulsion = {}
+        onClickExpulsion = {},
+        onClickGroupEdit = {},
+        onClickScheduleManagement = {},
+        onClickCreateMeet = {},
+        onClickWriteNotice = {},
+        onClickGroupDelete = {}
     )
 }
 
@@ -67,7 +72,12 @@ private fun GroupManagementScreen(
     groupMemberPagingItems: LazyPagingItems<Member>,
     userId: Int?,
     onClickTransfer: (memberId: Int) -> Unit,
-    onClickExpulsion: (memberId: Int) -> Unit
+    onClickExpulsion: (memberId: Int) -> Unit,
+    onClickGroupEdit: () -> Unit,
+    onClickScheduleManagement: () -> Unit,
+    onClickCreateMeet: () -> Unit,
+    onClickWriteNotice: () -> Unit,
+    onClickGroupDelete: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -129,7 +139,16 @@ private fun GroupManagementScreen(
             }
 
             GroupManagementTab.GROUP_SETTING -> {
-
+                GroupSettingContainer(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    onClickGroupEdit = onClickGroupEdit,
+                    onClickScheduleManagement = onClickScheduleManagement,
+                    onClickCreateMeet = onClickCreateMeet,
+                    onClickWriteNotice = onClickWriteNotice,
+                    onClickGroupDelete = onClickGroupDelete
+                )
             }
         }
     }
@@ -137,7 +156,7 @@ private fun GroupManagementScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun GroupManagementScreenPreview() {
+private fun GroupManagementScreenForActiveStatusPreview() {
     val members = listOf(
         Member(id = 1, name = "홍길동", profileImageUrl = "", role = GroupMemberRole.OWNER),
         Member(id = 2, name = "김길동", profileImageUrl = "", role = GroupMemberRole.MEMBER),
@@ -157,7 +176,39 @@ private fun GroupManagementScreenPreview() {
             groupMemberPagingItems = pagingItems,
             userId = 1,
             onClickTransfer = {},
-            onClickExpulsion = {}
+            onClickExpulsion = {},
+            onClickGroupEdit = {},
+            onClickScheduleManagement = {},
+            onClickCreateMeet = {},
+            onClickWriteNotice = {},
+            onClickGroupDelete = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun GroupManagementScreenForGroupSettingPreview() {
+    val pagingItems = flowOf(PagingData.empty<Member>()).collectAsLazyPagingItems()
+
+    OnmoimTheme {
+        GroupManagementScreen(
+            onBack = {},
+            selectedTab = GroupManagementTab.GROUP_SETTING,
+            onTabChange = {},
+            activeStatistics = ActiveStatistics(
+                yearlyScheduleCount = 12,
+                monthlyScheduleCount = 3,
+            ),
+            groupMemberPagingItems = pagingItems,
+            userId = 1,
+            onClickTransfer = {},
+            onClickExpulsion = {},
+            onClickGroupEdit = {},
+            onClickScheduleManagement = {},
+            onClickCreateMeet = {},
+            onClickWriteNotice = {},
+            onClickGroupDelete = {}
         )
     }
 }
