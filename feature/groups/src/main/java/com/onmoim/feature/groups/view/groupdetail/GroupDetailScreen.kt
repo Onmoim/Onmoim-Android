@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,6 +62,7 @@ fun GroupDetailRoute(
     var showMemberLeaveDialog by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val isLoading by groupDetailViewModel.isLoading.collectAsStateWithLifecycle()
 
     if (showMenuDialog) {
         GroupMenuDialog(
@@ -81,7 +83,7 @@ fun GroupDetailRoute(
             },
             onClickDelete = {
                 showMenuDialog = false
-                // TODO: 모임 삭제
+                groupDetailViewModel.deleteGroup()
             },
             onClickReport = {
                 showMenuDialog = false
@@ -173,27 +175,40 @@ fun GroupDetailRoute(
         }
     }
 
-    GroupDetailScreen(
-        onBack = {
-            onBackPressedDispatcher?.onBackPressed()
-        },
-        selectedTab = selectedTab,
-        onTabChange = {
-            selectedTab = it
-        },
-        onClickComingSchedule = onNavigateToComingSchedule,
-        onClickPost = onNavigateToPostDetail,
-        groupDetailUiState = groupDetailUiState,
-        onClickJoin = {
+    Box(
+        modifier = Modifier
+            .pointerInteropFilter {
+                isLoading
+            }
+            .fillMaxSize()
+    ) {
+        GroupDetailScreen(
+            onBack = {
+                onBackPressedDispatcher?.onBackPressed()
+            },
+            selectedTab = selectedTab,
+            onTabChange = {
+                selectedTab = it
+            },
+            onClickComingSchedule = onNavigateToComingSchedule,
+            onClickPost = onNavigateToPostDetail,
+            groupDetailUiState = groupDetailUiState,
+            onClickJoin = {
 
-        },
-        onClickGroupEdit = {
+            },
+            onClickGroupEdit = {
 
-        },
-        onClickMenu = {
-            showMenuDialog = true
+            },
+            onClickMenu = {
+                showMenuDialog = true
+            }
+        )
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
-    )
+    }
 
     LaunchedEffect(Unit) {
         groupDetailViewModel.event.collect { event ->
@@ -206,6 +221,19 @@ fun GroupDetailRoute(
                     Toast.makeText(
                         context,
                         context.getString(R.string.group_detail_leave_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    onBackPressedDispatcher?.onBackPressed()
+                }
+
+                is GroupDetailEvent.DeleteGroupFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                GroupDetailEvent.DeleteGroupSuccess -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_delete_success),
                         Toast.LENGTH_SHORT
                     ).show()
                     onBackPressedDispatcher?.onBackPressed()

@@ -125,4 +125,16 @@ class GroupRepositoryImpl @Inject constructor(
             Result.failure(HttpException(resp))
         }
     }
+
+    override suspend fun deleteGroup(id: Int): Result<Unit> {
+        val resp = withContext(ioDispatcher) {
+            groupApi.deleteGroup(id)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
+    }
 }

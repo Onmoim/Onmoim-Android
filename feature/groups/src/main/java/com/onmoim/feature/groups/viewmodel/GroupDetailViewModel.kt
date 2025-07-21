@@ -28,7 +28,8 @@ class GroupDetailViewModel @AssistedInject constructor(
         fun create(@Assisted("id") id: Int): GroupDetailViewModel
     }
 
-    private val _groupDetailUiState = MutableStateFlow<GroupDetailUiState>(GroupDetailUiState.Loading)
+    private val _groupDetailUiState =
+        MutableStateFlow<GroupDetailUiState>(GroupDetailUiState.Loading)
     val groupDetailUiState = _groupDetailUiState.asStateFlow()
 
     private val _event = Channel<GroupDetailEvent>(Channel.BUFFERED)
@@ -62,6 +63,21 @@ class GroupDetailViewModel @AssistedInject constructor(
             }.onSuccess {
                 _isLoading.value = false
                 _event.send(GroupDetailEvent.LeaveGroupSuccess)
+            }
+        }
+    }
+
+    fun deleteGroup() {
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            groupRepository.deleteGroup(id).onFailure {
+                Log.e("GroupDetailViewModel", "deleteGroup error", it)
+                _isLoading.value = false
+                _event.send(GroupDetailEvent.DeleteGroupFailure(it))
+            }.onSuccess {
+                _isLoading.value = false
+                _event.send(GroupDetailEvent.DeleteGroupSuccess)
             }
         }
     }

@@ -42,4 +42,9 @@ interface GroupApi {
     suspend fun leaveGroup(
         @Path("groupId") groupId: Int
     ): Response<BaseResponse<String>>
+
+    @DELETE("api/v1/groups/{groupId}")
+    suspend fun deleteGroup(
+        @Path("groupId") groupId: Int
+    ): Response<BaseResponse<String>>
 }
