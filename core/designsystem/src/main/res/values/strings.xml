@@ -25,4 +25,8 @@
 
     <!-- GroupImageNotRegBox -->
     <string name="group_image_not_reg_guide">대표 사진을 등록해 주세요</string>
+
+    <!-- MemberListItem -->
+    <string name="member_list_item_transfer">양도</string>
+    <string name="member_list_item_expulsion">강퇴</string>
 </resources>

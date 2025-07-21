@@ -57,7 +57,9 @@ fun GroupManagementRoute(
         selectedTab = selectedTab,
         onTabChange = groupManagementViewModel::onTabChange,
         activeStatistics = activeStatistics,
-        groupMemberPagingItems = groupMemberPagingItems
+        groupMemberPagingItems = groupMemberPagingItems,
+        onClickTransfer = {},
+        onClickExpulsion = {}
     )
 }
 
@@ -67,7 +69,9 @@ private fun GroupManagementScreen(
     selectedTab: GroupManagementTab,
     onTabChange: (GroupManagementTab) -> Unit,
     activeStatistics: ActiveStatistics?,
-    groupMemberPagingItems: LazyPagingItems<Member>
+    groupMemberPagingItems: LazyPagingItems<Member>,
+    onClickTransfer: (memberId: Int) -> Unit,
+    onClickExpulsion: (memberId: Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -121,7 +125,9 @@ private fun GroupManagementScreen(
                         .fillMaxWidth(),
                     yearlyScheduleCount = activeStatistics?.yearlyScheduleCount ?: 0,
                     monthlyScheduleCount = activeStatistics?.monthlyScheduleCount ?: 0,
-                    groupMemberPagingItems = groupMemberPagingItems
+                    groupMemberPagingItems = groupMemberPagingItems,
+                    onClickExpulsion = onClickExpulsion,
+                    onClickTransfer = onClickTransfer
                 )
             }
 
@@ -137,7 +143,9 @@ private fun ActiveStatusContainer(
     modifier: Modifier = Modifier,
     yearlyScheduleCount: Int,
     monthlyScheduleCount: Int,
-    groupMemberPagingItems: LazyPagingItems<Member>
+    groupMemberPagingItems: LazyPagingItems<Member>,
+    onClickTransfer: (memberId: Int) -> Unit,
+    onClickExpulsion: (memberId: Int) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
@@ -200,15 +208,20 @@ private fun ActiveStatusContainer(
                 Column {
                     Spacer(Modifier.height(10.dp))
                     MemberListItem(
-                        onClick = {
-
+                        onClickTransfer = {
+                            onClickTransfer(member.id)
+                        },
+                        onClickExpulsion = {
+                            onClickExpulsion(member.id)
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 15.dp),
                         name = member.name,
                         imageUrl = member.profileImageUrl,
-                        isHost = member.role == GroupMemberRole.OWNER
+                        isHost = member.role == GroupMemberRole.OWNER,
+                        // FIXME: 본인인 경우 비활성화 해야함
+//                        enabledMenu =
                     )
                 }
             }
@@ -236,6 +249,8 @@ private fun GroupManagementScreenPreview() {
                 monthlyScheduleCount = 3,
             ),
             groupMemberPagingItems = pagingItems,
+            onClickTransfer = {},
+            onClickExpulsion = {}
         )
     }
 }
