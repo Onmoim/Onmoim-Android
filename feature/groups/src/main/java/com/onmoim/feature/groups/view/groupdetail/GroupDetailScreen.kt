@@ -1,5 +1,6 @@
 package com.onmoim.feature.groups.view.groupdetail
 
+import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,12 +14,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,7 +41,8 @@ import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.GroupDetailPostFilter
 import com.onmoim.feature.groups.constant.GroupDetailTab
-import com.onmoim.feature.groups.viewmodel.GroupDetailUiState
+import com.onmoim.feature.groups.state.GroupDetailEvent
+import com.onmoim.feature.groups.state.GroupDetailUiState
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
 import java.time.LocalDateTime
 
@@ -56,6 +60,7 @@ fun GroupDetailRoute(
     var showHostLeaveDialog by remember { mutableStateOf(false) }
     var showMemberLeaveDialog by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     if (showMenuDialog) {
         GroupMenuDialog(
@@ -103,7 +108,7 @@ fun GroupDetailRoute(
                 if (groupDetail.memberCount > 1) {
                     // TODO: 모임장 권한 양도
                 } else {
-                    // TODO: 모임 탈퇴
+                    groupDetailViewModel.leaveGroup()
                 }
             },
             onClickDismiss = {
@@ -121,7 +126,7 @@ fun GroupDetailRoute(
             },
             onClickConfirm = {
                 showMemberLeaveDialog = false
-
+                groupDetailViewModel.leaveGroup()
             },
             onClickDismiss = {
                 showHostLeaveDialog = false
@@ -189,6 +194,25 @@ fun GroupDetailRoute(
             showMenuDialog = true
         }
     )
+
+    LaunchedEffect(Unit) {
+        groupDetailViewModel.event.collect { event ->
+            when (event) {
+                is GroupDetailEvent.LeaveGroupFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                GroupDetailEvent.LeaveGroupSuccess -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_leave_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    onBackPressedDispatcher?.onBackPressed()
+                }
+            }
+        }
+    }
 }
 
 @Composable

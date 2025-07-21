@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -112,4 +113,16 @@ class GroupRepositoryImpl @Inject constructor(
             throw HttpException(resp)
         }
     }.flowOn(ioDispatcher)
+
+    override suspend fun leaveGroup(id: Int): Result<Unit> {
+        val resp = withContext(ioDispatcher) {
+            groupApi.leaveGroup(id)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
+    }
 }

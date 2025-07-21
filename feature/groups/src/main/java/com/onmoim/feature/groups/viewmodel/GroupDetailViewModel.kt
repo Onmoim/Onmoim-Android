@@ -1,17 +1,21 @@
 package com.onmoim.feature.groups.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.onmoim.core.data.model.GroupDetail
 import com.onmoim.core.data.repository.GroupRepository
+import com.onmoim.feature.groups.state.GroupDetailEvent
+import com.onmoim.feature.groups.state.GroupDetailUiState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = GroupDetailViewModel.Factory::class)
@@ -27,6 +31,12 @@ class GroupDetailViewModel @AssistedInject constructor(
     private val _groupDetailUiState = MutableStateFlow<GroupDetailUiState>(GroupDetailUiState.Loading)
     val groupDetailUiState = _groupDetailUiState.asStateFlow()
 
+    private val _event = Channel<GroupDetailEvent>(Channel.BUFFERED)
+    val event = _event.receiveAsFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
     init {
         fetchGroupDetail()
     }
@@ -40,10 +50,19 @@ class GroupDetailViewModel @AssistedInject constructor(
             }
         }
     }
-}
 
-sealed class GroupDetailUiState {
-    data object Loading : GroupDetailUiState()
-    data class Success(val groupDetail: GroupDetail) : GroupDetailUiState()
-    data class Error(val t: Throwable) : GroupDetailUiState()
+    fun leaveGroup() {
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            groupRepository.leaveGroup(id).onFailure {
+                Log.e("GroupDetailViewModel", "leaveGroup error", it)
+                _isLoading.value = false
+                _event.send(GroupDetailEvent.LeaveGroupFailure(it))
+            }.onSuccess {
+                _isLoading.value = false
+                _event.send(GroupDetailEvent.LeaveGroupSuccess)
+            }
+        }
+    }
 }

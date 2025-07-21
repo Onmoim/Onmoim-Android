@@ -7,6 +7,7 @@ import com.onmoim.core.network.model.group.GroupDetailDto
 import com.onmoim.core.network.model.group.PopularGroupDto
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -36,4 +37,9 @@ interface GroupApi {
     suspend fun getGroupDetail(
         @Path("groupId") groupId: Int
     ): Response<BaseResponse<GroupDetailDto>>
+
+    @DELETE("api/v1/groups/{groupId}/member")
+    suspend fun leaveGroup(
+        @Path("groupId") groupId: Int
+    ): Response<BaseResponse<String>>
 }

@@ -15,4 +15,5 @@ interface GroupRepository {
         capacity: Int
     ): Flow<Int>
     fun getGroupDetail(id: Int): Flow<GroupDetail>
+    suspend fun leaveGroup(id: Int): Result<Unit>
 }
