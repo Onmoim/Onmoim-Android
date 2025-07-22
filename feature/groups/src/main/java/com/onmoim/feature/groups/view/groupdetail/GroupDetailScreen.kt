@@ -52,7 +52,7 @@ fun GroupDetailRoute(
     groupDetailViewModel: GroupDetailViewModel,
     onNavigateToComingSchedule: () -> Unit,
     onNavigateToPostDetail: (id: Int) -> Unit,
-    onNavigateToGroupManagement: (id: Int) -> Unit
+    onNavigateToGroupManagement: () -> Unit,
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var selectedTab by remember { mutableStateOf(GroupDetailTab.HOME) }
@@ -109,7 +109,7 @@ fun GroupDetailRoute(
             onClickConfirm = {
                 showHostLeaveDialog = false
                 if (groupDetail.memberCount > 1) {
-                    // TODO: 모임장 권한 양도
+                    onNavigateToGroupManagement()
                 } else {
                     groupDetailViewModel.leaveGroup()
                 }
@@ -248,7 +248,7 @@ private fun GroupDetailScreen(
     onClickPost: (id: Int) -> Unit,
     groupDetailUiState: GroupDetailUiState,
     onClickJoin: (id: Int) -> Unit,
-    onClickGroupSetting: (id: Int) -> Unit,
+    onClickGroupSetting: () -> Unit,
     onClickMenu: () -> Unit,
     onClickFavorite: (Boolean) -> Unit
 ) {
@@ -327,9 +327,7 @@ private fun GroupDetailScreen(
                                 memberStatus = groupDetail.memberStatus,
                                 onClickComingSchedule = onClickComingSchedule,
                                 onClickAttend = {},
-                                onClickGroupSetting = {
-                                    onClickGroupSetting(groupDetail.id)
-                                }
+                                onClickGroupSetting = onClickGroupSetting
                             )
                             if (groupDetail.memberStatus == MemberStatus.NONE) {
                                 CommonButton(

@@ -140,7 +140,7 @@ fun NavGraphBuilder.groupsGraph(
                 },
                 onNavigateToPostDetail = {},
                 onNavigateToGroupManagement = {
-                    navController.navigateToGroupManagement(it)
+                    navController.navigateToGroupManagement(groupId)
                 }
             )
 
