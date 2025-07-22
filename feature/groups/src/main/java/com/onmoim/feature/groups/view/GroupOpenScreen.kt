@@ -2,8 +2,6 @@ package com.onmoim.feature.groups.view
 
 import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,18 +9,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
@@ -34,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -43,16 +34,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImagePainter
-import coil3.compose.rememberAsyncImagePainter
-import coil3.request.ImageRequest
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.CommonButton
 import com.onmoim.core.designsystem.component.CommonTextField
 import com.onmoim.core.designsystem.component.NavigationIconButton
+import com.onmoim.core.designsystem.component.group.CategoryIcon
 import com.onmoim.core.designsystem.theme.OnmoimTheme
-import com.onmoim.core.designsystem.theme.shadow1
-import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.state.GroupOpenEvent
 import com.onmoim.feature.groups.state.GroupOpenUiState
@@ -155,7 +142,7 @@ private fun GroupOpenScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                text = stringResource(R.string.group_open_category),
+                text = stringResource(R.string.group_category),
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                 style = OnmoimTheme.typography.body2SemiBold.copy(
                     color = OnmoimTheme.colors.textColor
@@ -205,7 +192,7 @@ private fun GroupOpenScreen(
                 }
             )
             Text(
-                text = stringResource(R.string.group_open_group_description),
+                text = stringResource(R.string.group_description),
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                 style = OnmoimTheme.typography.body2SemiBold.copy(
                     color = OnmoimTheme.colors.textColor
@@ -246,7 +233,7 @@ private fun GroupOpenScreen(
                 innerFieldAlignment = Alignment.TopStart
             )
             Text(
-                text = stringResource(R.string.group_open_group_capacity, 0, 300),
+                text = stringResource(R.string.group_capacity, 5, 300),
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                 style = OnmoimTheme.typography.body2SemiBold.copy(
                     color = OnmoimTheme.colors.textColor
@@ -255,10 +242,14 @@ private fun GroupOpenScreen(
             CommonTextField(
                 value = uiState.groupCapacity?.toString() ?: "",
                 onValueChange = { value ->
-                    val capacity = value.toIntOrNull()
-                    if (capacity == null || capacity in 0..300) {
-                        onGroupCapacityChange(capacity)
+                    val capacity = value.toIntOrNull()?.let {
+                        when {
+                            it < 5 -> 5
+                            it > 300 -> 300
+                            else -> it
+                        }
                     }
+                    onGroupCapacityChange(capacity)
                 },
                 modifier = Modifier
                     .padding(horizontal = 15.dp)
@@ -282,55 +273,6 @@ private fun GroupOpenScreen(
                     .align(Alignment.CenterHorizontally),
                 enabled = uiState.isValid()
             )
-        }
-    }
-}
-
-@Composable
-private fun CategoryIcon(
-    modifier: Modifier = Modifier,
-    imageUrl: String?
-) {
-    val painter = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(LocalContext.current).apply {
-            data(imageUrl)
-        }.build()
-    )
-    val painterState by painter.state.collectAsStateWithLifecycle()
-
-    Box(
-        modifier = modifier
-            .size(41.dp)
-            .shadow1(999.dp)
-            .background(
-                color = Color.White,
-                shape = CircleShape
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Crossfade(
-            targetState = painterState,
-            modifier = Modifier.size(29.dp)
-        ) { state ->
-            when (state) {
-                is AsyncImagePainter.State.Loading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .shimmerBackground()
-                    )
-                }
-
-                is AsyncImagePainter.State.Success -> {
-                    Image(
-                        painter = state.painter,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-                else -> {}
-            }
         }
     }
 }
