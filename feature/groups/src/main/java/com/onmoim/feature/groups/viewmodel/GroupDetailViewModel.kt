@@ -42,8 +42,12 @@ class GroupDetailViewModel @AssistedInject constructor(
         fetchGroupDetail()
     }
 
-    fun fetchGroupDetail() {
+    fun fetchGroupDetail(refresh: Boolean = false) {
         viewModelScope.launch {
+            if (refresh) {
+                _groupDetailUiState.value = GroupDetailUiState.Loading
+            }
+
             groupRepository.getGroupDetail(id).catch {
                 _groupDetailUiState.value = GroupDetailUiState.Error(it)
             }.collectLatest {

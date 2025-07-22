@@ -76,4 +76,5 @@
     <string name="group_management_create_meet">정기모임 생성</string>
     <string name="group_management_write_notice">게시판 공지 작성</string>
     <string name="group_management_ban_success">강퇴 되었습니다.</string>
+    <string name="group_management_transfer_success">모임장이 양도 되었습니다.</string>
 </resources>

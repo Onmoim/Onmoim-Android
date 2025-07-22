@@ -13,6 +13,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -71,6 +72,12 @@ interface GroupApi {
 
     @POST("api/v1/groups/{groupId}/ban")
     suspend fun banMember(
+        @Path("groupId") groupId: Int,
+        @Body memberIdRequestDto: MemberIdRequestDto
+    ): Response<BaseResponse<String>>
+
+    @PATCH("api/v1/groups/{groupId}/owner")
+    suspend fun transferGroupOwner(
         @Path("groupId") groupId: Int,
         @Body memberIdRequestDto: MemberIdRequestDto
     ): Response<BaseResponse<String>>

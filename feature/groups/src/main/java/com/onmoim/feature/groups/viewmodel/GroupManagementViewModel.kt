@@ -9,6 +9,7 @@ import com.onmoim.core.data.model.ActiveStatistics
 import com.onmoim.core.data.repository.GroupRepository
 import com.onmoim.core.domain.usecase.GetUserIdUseCase
 import com.onmoim.feature.groups.constant.GroupManagementTab
+import com.onmoim.feature.groups.state.GroupManagementEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -102,9 +103,19 @@ class GroupManagementViewModel @AssistedInject constructor(
             }
         }
     }
-}
 
-sealed class GroupManagementEvent {
-    data object BanSuccess: GroupManagementEvent()
-    data class BanFailure(val t: Throwable): GroupManagementEvent()
+    fun transferOwner(memberId: Int) {
+        viewModelScope.launch {
+            _isLoading.value = true
+
+            groupRepository.transferGroupOwner(groupId, memberId).onFailure {
+                Log.e("GroupManagementViewModel", "transferOwner error", it)
+                _isLoading.value = false
+                _event.send(GroupManagementEvent.TransferOwnerFailure(it))
+            }.onSuccess {
+                _isLoading.value = false
+                _event.send(GroupManagementEvent.TransferOwnerSuccess)
+            }
+        }
+    }
 }

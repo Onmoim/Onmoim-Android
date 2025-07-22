@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +36,7 @@ import com.onmoim.core.designsystem.component.CommonMenuItem
 import com.onmoim.core.designsystem.component.CommonTab
 import com.onmoim.core.designsystem.component.CommonTabRow
 import com.onmoim.core.designsystem.component.CommonTextField
+import com.onmoim.core.designsystem.component.LoadingOverlayBox
 import com.onmoim.core.designsystem.component.group.GroupDetailAppBar
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
@@ -176,12 +176,9 @@ fun GroupDetailRoute(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .pointerInteropFilter {
-                isLoading
-            }
-            .fillMaxSize()
+    LoadingOverlayBox(
+        loading = isLoading,
+        modifier = Modifier.fillMaxSize()
     ) {
         GroupDetailScreen(
             onBack = {
@@ -203,11 +200,6 @@ fun GroupDetailRoute(
             },
             onClickFavorite = groupDetailViewModel::favoriteGroup
         )
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
     }
 
     LaunchedEffect(Unit) {

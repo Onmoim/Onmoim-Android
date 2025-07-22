@@ -15,8 +15,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.onmoim.feature.category.CategoryRoute
 import com.onmoim.feature.category.view.CategoryRoute
-import com.onmoim.feature.groups.groupsGraph
-import com.onmoim.feature.groups.navigateToGroupDetail
+import com.onmoim.feature.groups.navigation.groupsGraph
+import com.onmoim.feature.groups.navigation.navigateToGroupDetail
 import com.onmoim.feature.home.homeGraph
 import com.onmoim.feature.location.navigation.locationGraph
 import com.onmoim.feature.login.navigation.LoginNavigation

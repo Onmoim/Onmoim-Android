@@ -34,13 +34,14 @@ import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.GroupManagementTab
-import com.onmoim.feature.groups.viewmodel.GroupManagementEvent
+import com.onmoim.feature.groups.state.GroupManagementEvent
 import com.onmoim.feature.groups.viewmodel.GroupManagementViewModel
 import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun GroupManagementRoute(
-    groupManagementViewModel: GroupManagementViewModel
+    groupManagementViewModel: GroupManagementViewModel,
+    onBackAndRefresh: () -> Unit
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val selectedTab by groupManagementViewModel.selectedTabState.collectAsStateWithLifecycle()
@@ -64,7 +65,7 @@ fun GroupManagementRoute(
             activeStatistics = activeStatistics,
             groupMemberPagingItems = groupMemberPagingItems,
             userId = userId,
-            onClickTransfer = {},
+            onClickTransfer = groupManagementViewModel::transferOwner,
             onClickBan = groupManagementViewModel::banMember,
             onClickGroupEdit = {},
             onClickScheduleManagement = {},
@@ -87,6 +88,19 @@ fun GroupManagementRoute(
                         context.getString(R.string.group_management_ban_success),
                         Toast.LENGTH_SHORT
                     ).show()
+                }
+
+                is GroupManagementEvent.TransferOwnerFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                GroupManagementEvent.TransferOwnerSuccess -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_management_transfer_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    onBackAndRefresh()
                 }
             }
         }

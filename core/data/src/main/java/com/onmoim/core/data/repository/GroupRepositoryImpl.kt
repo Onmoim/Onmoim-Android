@@ -200,4 +200,20 @@ class GroupRepositoryImpl @Inject constructor(
             Result.failure(HttpException(resp))
         }
     }
+
+    override suspend fun transferGroupOwner(
+        groupId: Int,
+        memberId: Int
+    ): Result<Unit> {
+        val memberIdRequestDto = MemberIdRequestDto(memberId)
+        val resp = withContext(ioDispatcher) {
+            groupApi.transferGroupOwner(groupId, memberIdRequestDto)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
+    }
 }

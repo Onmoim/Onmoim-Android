@@ -1,4 +1,4 @@
-package com.onmoim.feature.groups
+package com.onmoim.feature.groups.navigation
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -14,11 +14,11 @@ import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.onmoim.feature.groups.view.ComingScheduleRoute
 import com.onmoim.feature.groups.view.GroupCategorySelectRoute
-import com.onmoim.feature.groups.view.groupmanagement.GroupManagementRoute
 import com.onmoim.feature.groups.view.GroupOpenCompleteRoute
 import com.onmoim.feature.groups.view.GroupOpenRoute
 import com.onmoim.feature.groups.view.MyGroupRoute
 import com.onmoim.feature.groups.view.groupdetail.GroupDetailRoute
+import com.onmoim.feature.groups.view.groupmanagement.GroupManagementRoute
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
 import com.onmoim.feature.groups.viewmodel.GroupManagementViewModel
 import com.onmoim.feature.groups.viewmodel.GroupOpenViewModel
@@ -128,6 +128,11 @@ fun NavGraphBuilder.groupsGraph(
                     it.create(groupId)
                 }
 
+            val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+            val isRefresh =
+                savedStateHandle?.get<Boolean>(GroupsNavigationBundleKey.REFRESH) ?: false
+            savedStateHandle?.remove<Boolean>(GroupsNavigationBundleKey.REFRESH)
+
             GroupDetailRoute(
                 groupDetailViewModel = groupDetailViewModel,
                 onNavigateToComingSchedule = {
@@ -138,6 +143,12 @@ fun NavGraphBuilder.groupsGraph(
                     navController.navigateToGroupManagement(it)
                 }
             )
+
+            LaunchedEffect(Unit) {
+                if (isRefresh) {
+                    groupDetailViewModel.fetchGroupDetail(true)
+                }
+            }
         }
         composable<GroupCategorySelectRoute> {
             GroupCategorySelectRoute(
@@ -197,7 +208,13 @@ fun NavGraphBuilder.groupsGraph(
                 }
 
             GroupManagementRoute(
-                groupManagementViewModel = groupManagementViewModel
+                groupManagementViewModel = groupManagementViewModel,
+                onBackAndRefresh = {
+                    navController.previousBackStackEntry?.savedStateHandle?.apply {
+                        set(GroupsNavigationBundleKey.REFRESH, true)
+                    }
+                    navController.popBackStack()
+                }
             )
         }
     }

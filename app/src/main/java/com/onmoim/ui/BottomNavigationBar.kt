@@ -28,7 +28,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.category.CategoryRoute
-import com.onmoim.feature.groups.MyGroupRoute
+import com.onmoim.feature.groups.navigation.MyGroupRoute
 import com.onmoim.feature.home.HomeRoute
 import com.onmoim.feature.profile.ProfileRoute
 import com.onmoim.navigation.topLevelRoutes
