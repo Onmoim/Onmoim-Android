@@ -1,5 +1,5 @@
 package com.onmoim.feature.groups.navigation
 
 object GroupsNavigationBundleKey {
-    const val REFRESH = "refresh"
+    const val GROUP_DETAIL_REFRESH = "group_detail_refresh"
 }

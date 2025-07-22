@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -41,7 +40,8 @@ import kotlinx.coroutines.flow.flowOf
 @Composable
 fun GroupManagementRoute(
     groupManagementViewModel: GroupManagementViewModel,
-    onBackAndRefresh: () -> Unit
+    onBackAndRefresh: () -> Unit,
+    onNavigateToGroupEdit: () -> Unit,
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val selectedTab by groupManagementViewModel.selectedTabState.collectAsStateWithLifecycle()
@@ -67,7 +67,7 @@ fun GroupManagementRoute(
             userId = userId,
             onClickTransfer = groupManagementViewModel::transferOwner,
             onClickBan = groupManagementViewModel::banMember,
-            onClickGroupEdit = {},
+            onClickGroupEdit = onNavigateToGroupEdit,
             onClickScheduleManagement = {},
             onClickCreateMeet = {},
             onClickWriteNotice = {},
@@ -135,7 +135,6 @@ private fun GroupManagementScreen(
                     style = OnmoimTheme.typography.body1SemiBold
                 )
             },
-            modifier = Modifier.background(Color.White),
             navigationIcon = {
                 NavigationIconButton(
                     onClick = onBack

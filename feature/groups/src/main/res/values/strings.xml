@@ -77,4 +77,8 @@
     <string name="group_management_write_notice">게시판 공지 작성</string>
     <string name="group_management_ban_success">강퇴 되었습니다.</string>
     <string name="group_management_transfer_success">모임장이 양도 되었습니다.</string>
+
+    <!-- 모임 수정 -->
+    <string name="group_edit">모임 수정</string>
+    <string name="group_open_location">지역</string>
 </resources>
