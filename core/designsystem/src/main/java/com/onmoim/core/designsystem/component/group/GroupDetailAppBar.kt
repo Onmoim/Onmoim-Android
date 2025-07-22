@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +29,7 @@ fun GroupDetailAppBar(
 ) {
     Row(
         modifier = Modifier
+            .statusBarsPadding()
             .fillMaxWidth()
             .height(TopAppBarHeight),
         verticalAlignment = Alignment.CenterVertically

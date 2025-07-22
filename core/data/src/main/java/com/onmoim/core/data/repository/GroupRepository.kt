@@ -17,10 +17,19 @@ interface GroupRepository {
         categoryId: Int,
         capacity: Int
     ): Flow<Int>
+
     fun getGroupDetail(id: Int): Flow<GroupDetail>
     suspend fun leaveGroup(id: Int): Result<Unit>
     suspend fun deleteGroup(id: Int): Result<Unit>
     suspend fun favoriteGroup(id: Int): Result<Unit>
     fun getActiveStatistics(id: Int): Flow<ActiveStatistics>
     fun getGroupMemberPagingData(id: Int, size: Int = 20): Flow<PagingData<Member>>
+    suspend fun banMember(groupId: Int, memberId: Int): Result<Unit>
+    suspend fun transferGroupOwner(groupId: Int, memberId: Int): Result<Unit>
+    suspend fun updateGroup(
+        groupId: Int,
+        description: String,
+        capacity: Int,
+        imageUrl: String? = null
+    ): Result<Unit>
 }

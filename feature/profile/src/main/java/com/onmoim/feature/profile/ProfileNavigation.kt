@@ -9,7 +9,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
-import com.onmoim.feature.groups.navigateToGroupDetail
+import com.onmoim.feature.groups.navigation.navigateToGroupDetail
 import com.onmoim.feature.profile.constant.GroupType
 import com.onmoim.feature.profile.view.GroupListRoute
 import com.onmoim.feature.profile.view.NotificationSettingRoute

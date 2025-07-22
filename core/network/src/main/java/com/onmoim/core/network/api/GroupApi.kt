@@ -3,16 +3,22 @@ package com.onmoim.core.network.api
 import com.onmoim.core.network.model.BasePageDto
 import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.MemberDto
+import com.onmoim.core.network.model.MemberIdRequestDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
 import com.onmoim.core.network.model.group.CreatedGroupDto
 import com.onmoim.core.network.model.group.GroupDetailDto
 import com.onmoim.core.network.model.group.GroupStatisticsDto
 import com.onmoim.core.network.model.group.PopularGroupDto
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -67,4 +73,24 @@ interface GroupApi {
         @Query("lastMemberId") lastMemberId: Int? = null,
         @Query("requestSize") requestSize: Int? = null
     ): Response<BaseResponse<BasePageDto<MemberDto>>>
+
+    @POST("api/v1/groups/{groupId}/ban")
+    suspend fun banMember(
+        @Path("groupId") groupId: Int,
+        @Body memberIdRequestDto: MemberIdRequestDto
+    ): Response<BaseResponse<String>>
+
+    @PATCH("api/v1/groups/{groupId}/owner")
+    suspend fun transferGroupOwner(
+        @Path("groupId") groupId: Int,
+        @Body memberIdRequestDto: MemberIdRequestDto
+    ): Response<BaseResponse<String>>
+
+    @Multipart
+    @PATCH("api/v1/groups/{groupId}")
+    suspend fun updateGroup(
+        @Path("groupId") groupId: Int,
+        @Part("request") requestBody: RequestBody,
+        @Part file: MultipartBody.Part? = null
+    ): Response<BaseResponse<String>>
 }

@@ -8,6 +8,10 @@ data class GroupOpenUiState(
     val groupCapacity: Int? = null,
     val isLoading: Boolean = false
 ) {
-    fun isValid() =
-        locationName.isNotBlank() && locationId > 0 && groupName.isNotBlank() && groupDescription.isNotBlank() && groupCapacity != null
+    fun isValid() = locationName.isNotBlank() &&
+            locationId > 0 &&
+            groupName.isNotBlank() &&
+            groupDescription.isNotBlank() &&
+            groupCapacity != null &&
+            groupCapacity in 5..300
 }

@@ -14,13 +14,20 @@ import com.onmoim.core.data.pagingsource.GroupMemberPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.GroupApi
+import com.onmoim.core.network.model.MemberIdRequestDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import retrofit2.HttpException
+import java.io.File
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -88,11 +95,12 @@ class GroupRepositoryImpl @Inject constructor(
                 imageUrl = data.imageUrl,
                 location = data.address,
                 category = data.category,
+                categoryIconUrl = data.categoryIconUrl,
                 memberCount = data.memberCount,
                 description = data.description,
                 meetingList = data.list.map {
                     MeetingDetail(
-                        id = 0, // FIXME: 확인 후 수정
+                        id = it.meetingId,
                         title = it.title,
                         placeName = it.placeName,
                         startDate = LocalDateTime.parse(it.startDate),
@@ -106,13 +114,14 @@ class GroupRepositoryImpl @Inject constructor(
                         longitude = it.longitude
                     )
                 },
-                isFavorite = data.status.contains("BOOKMARK"),
+                isFavorite = data.likeStatus.contains("LIKE"),
                 memberStatus = when {
                     data.status.contains("OWNER") -> MemberStatus.OWNER
                     data.status.contains("MEMBER") -> MemberStatus.MEMBER
                     data.status.contains("BAN") -> MemberStatus.BAN
                     else -> MemberStatus.NONE
-                }
+                },
+                capacity = data.capacity
             )
             emit(groupDetail)
         } else {
@@ -182,5 +191,71 @@ class GroupRepositoryImpl @Inject constructor(
             ),
             pagingSourceFactory = { GroupMemberPagingSource(groupApi, id) }
         ).flow.flowOn(ioDispatcher)
+    }
+
+    override suspend fun banMember(
+        groupId: Int,
+        memberId: Int
+    ): Result<Unit> {
+        val memberIdRequestDto = MemberIdRequestDto(memberId)
+        val resp = withContext(ioDispatcher) {
+            groupApi.banMember(groupId, memberIdRequestDto)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
+    }
+
+    override suspend fun transferGroupOwner(
+        groupId: Int,
+        memberId: Int
+    ): Result<Unit> {
+        val memberIdRequestDto = MemberIdRequestDto(memberId)
+        val resp = withContext(ioDispatcher) {
+            groupApi.transferGroupOwner(groupId, memberIdRequestDto)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
+    }
+
+    override suspend fun updateGroup(
+        groupId: Int,
+        description: String,
+        capacity: Int,
+        imageUrl: String?
+    ): Result<Unit> {
+        val requestMap: Map<String, Any> = mapOf(
+            "description" to description,
+            "capacity" to capacity
+        )
+        val requestJsonObject = JSONObject(requestMap)
+        val requestBody =
+            requestJsonObject.toString().toRequestBody("application/json".toMediaTypeOrNull())
+
+        val imageFile = imageUrl?.let { File(it) }
+        val imageFilePart = imageFile?.let {
+            MultipartBody.Part.createFormData(
+                "file",
+                it.name,
+                it.asRequestBody("image/*".toMediaTypeOrNull())
+            )
+        }
+
+        val resp = withContext(ioDispatcher) {
+            groupApi.updateGroup(groupId, requestBody, imageFilePart)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
     }
 }

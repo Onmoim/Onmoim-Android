@@ -42,8 +42,12 @@ class GroupDetailViewModel @AssistedInject constructor(
         fetchGroupDetail()
     }
 
-    fun fetchGroupDetail() {
+    fun fetchGroupDetail(refresh: Boolean = false) {
         viewModelScope.launch {
+            if (refresh) {
+                _groupDetailUiState.value = GroupDetailUiState.Loading
+            }
+
             groupRepository.getGroupDetail(id).catch {
                 _groupDetailUiState.value = GroupDetailUiState.Error(it)
             }.collectLatest {
@@ -102,5 +106,13 @@ class GroupDetailViewModel @AssistedInject constructor(
                 _event.send(GroupDetailEvent.FavoriteGroupFailure(it))
             }
         }
+    }
+
+    fun joinGroup() {
+        // TODO: 모임 가입
+    }
+
+    fun attendMeeting(meetingId: Int) {
+        // TODO: 일정 참가
     }
 }

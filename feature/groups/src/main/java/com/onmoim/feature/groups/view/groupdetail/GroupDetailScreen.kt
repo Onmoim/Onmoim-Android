@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +38,7 @@ import com.onmoim.core.designsystem.component.CommonTabRow
 import com.onmoim.core.designsystem.component.CommonTextField
 import com.onmoim.core.designsystem.component.group.GroupDetailAppBar
 import com.onmoim.core.designsystem.theme.OnmoimTheme
+import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.GroupDetailPostFilter
 import com.onmoim.feature.groups.constant.GroupDetailTab
@@ -52,7 +52,7 @@ fun GroupDetailRoute(
     groupDetailViewModel: GroupDetailViewModel,
     onNavigateToComingSchedule: () -> Unit,
     onNavigateToPostDetail: (id: Int) -> Unit,
-    onNavigateToGroupManagement: (id: Int) -> Unit
+    onNavigateToGroupManagement: () -> Unit,
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var selectedTab by remember { mutableStateOf(GroupDetailTab.HOME) }
@@ -109,7 +109,7 @@ fun GroupDetailRoute(
             onClickConfirm = {
                 showHostLeaveDialog = false
                 if (groupDetail.memberCount > 1) {
-                    // TODO: 모임장 권한 양도
+                    onNavigateToGroupManagement()
                 } else {
                     groupDetailViewModel.leaveGroup()
                 }
@@ -176,12 +176,9 @@ fun GroupDetailRoute(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .pointerInteropFilter {
-                isLoading
-            }
-            .fillMaxSize()
+    LoadingOverlayBox(
+        loading = isLoading,
+        modifier = Modifier.fillMaxSize()
     ) {
         GroupDetailScreen(
             onBack = {
@@ -194,20 +191,14 @@ fun GroupDetailRoute(
             onClickComingSchedule = onNavigateToComingSchedule,
             onClickPost = onNavigateToPostDetail,
             groupDetailUiState = groupDetailUiState,
-            onClickJoin = {
-
-            },
+            onClickGroupJoin = groupDetailViewModel::joinGroup,
             onClickGroupSetting = onNavigateToGroupManagement,
             onClickMenu = {
                 showMenuDialog = true
             },
-            onClickFavorite = groupDetailViewModel::favoriteGroup
+            onClickFavorite = groupDetailViewModel::favoriteGroup,
+            onClickMeetAttend = groupDetailViewModel::attendMeeting
         )
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
     }
 
     LaunchedEffect(Unit) {
@@ -255,10 +246,11 @@ private fun GroupDetailScreen(
     onClickComingSchedule: () -> Unit,
     onClickPost: (id: Int) -> Unit,
     groupDetailUiState: GroupDetailUiState,
-    onClickJoin: (id: Int) -> Unit,
-    onClickGroupSetting: (id: Int) -> Unit,
+    onClickGroupJoin: () -> Unit,
+    onClickGroupSetting: () -> Unit,
     onClickMenu: () -> Unit,
-    onClickFavorite: (Boolean) -> Unit
+    onClickFavorite: (Boolean) -> Unit,
+    onClickMeetAttend: (meetingId: Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -334,16 +326,12 @@ private fun GroupDetailScreen(
                                 meetings = groupDetail.meetingList,
                                 memberStatus = groupDetail.memberStatus,
                                 onClickComingSchedule = onClickComingSchedule,
-                                onClickAttend = {},
-                                onClickGroupSetting = {
-                                    onClickGroupSetting(groupDetail.id)
-                                }
+                                onClickMeetAttend = onClickMeetAttend,
+                                onClickGroupSetting = onClickGroupSetting
                             )
                             if (groupDetail.memberStatus == MemberStatus.NONE) {
                                 CommonButton(
-                                    onClick = {
-                                        onClickJoin(groupDetail.id)
-                                    },
+                                    onClick = onClickGroupJoin,
                                     modifier = Modifier
                                         .align(Alignment.BottomCenter)
                                         .padding(bottom = 60.dp),
@@ -425,6 +413,7 @@ private fun getFakeGroupoDetail(memberStatus: MemberStatus): GroupDetail {
         title = "카페에서 문장 한 모금",
         description = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
         category = "인문학/책/글",
+        categoryIconUrl = "https://picsum.photos/200",
         location = "연남동",
         memberCount = 123,
         imageUrl = "https://picsum.photos/200",
@@ -445,7 +434,8 @@ private fun getFakeGroupoDetail(memberStatus: MemberStatus): GroupDetail {
                 longitude = 0
             )
         ),
-        memberStatus = memberStatus
+        memberStatus = memberStatus,
+        capacity = 10
     )
 }
 
@@ -460,10 +450,11 @@ private fun GroupDetailScreenForHomePreview1() {
             onClickComingSchedule = {},
             onClickPost = {},
             groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.NONE)),
-            onClickJoin = {},
+            onClickGroupJoin = {},
             onClickGroupSetting = {},
             onClickMenu = {},
-            onClickFavorite = {}
+            onClickFavorite = {},
+            onClickMeetAttend = {}
         )
     }
 }
@@ -479,10 +470,11 @@ private fun GroupDetailScreenForHomePreview2() {
             onClickComingSchedule = {},
             onClickPost = {},
             groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.OWNER)),
-            onClickJoin = {},
+            onClickGroupJoin = {},
             onClickGroupSetting = {},
             onClickMenu = {},
-            onClickFavorite = {}
+            onClickFavorite = {},
+            onClickMeetAttend = {}
         )
     }
 }
@@ -498,10 +490,11 @@ private fun GroupDetailScreenForPostPreview() {
             onClickComingSchedule = {},
             onClickPost = {},
             groupDetailUiState = GroupDetailUiState.Loading,
-            onClickJoin = {},
+            onClickGroupJoin = {},
             onClickGroupSetting = {},
             onClickMenu = {},
-            onClickFavorite = {}
+            onClickFavorite = {},
+            onClickMeetAttend = {}
         )
     }
 }

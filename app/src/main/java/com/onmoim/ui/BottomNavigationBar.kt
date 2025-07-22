@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -28,7 +29,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.category.CategoryRoute
-import com.onmoim.feature.groups.MyGroupRoute
+import com.onmoim.feature.groups.navigation.MyGroupRoute
 import com.onmoim.feature.home.HomeRoute
 import com.onmoim.feature.profile.ProfileRoute
 import com.onmoim.navigation.topLevelRoutes
@@ -43,6 +44,7 @@ fun BottomNavigationBar(
             .background(
                 color = OnmoimTheme.colors.backgroundColor
             )
+            .navigationBarsPadding()
             .fillMaxWidth()
             .padding(
                 top = 8.dp,

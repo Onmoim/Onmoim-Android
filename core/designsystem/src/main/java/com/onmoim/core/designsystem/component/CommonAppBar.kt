@@ -5,14 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,21 +26,17 @@ import com.onmoim.core.ui.R
 @Composable
 fun CommonAppBar(
     title: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
+    containerColor: Color = OnmoimTheme.colors.backgroundColor,
     minHeight: Dp = TopAppBarHeight,
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable (RowScope.() -> Unit)? = null,
 ) {
     Box(
         modifier = Modifier
-            .windowInsetsPadding(
-                WindowInsets.systemBars.only(
-                    WindowInsetsSides.Horizontal + WindowInsetsSides.Top
-                )
-            )
+            .background(containerColor)
+            .statusBarsPadding()
             .fillMaxWidth()
             .heightIn(min = minHeight)
-            .then(modifier)
     ) {
         if (navigationIcon != null) {
             Box(
@@ -85,7 +77,6 @@ private fun CommonAppBarPreview() {
                     style = OnmoimTheme.typography.body1SemiBold
                 )
             },
-            modifier = Modifier.background(Color.White),
             navigationIcon = {
                 NavigationIconButton(
                     onClick = {}

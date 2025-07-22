@@ -124,7 +124,6 @@ private fun ProfileEditScreen(
                     style = OnmoimTheme.typography.body1SemiBold
                 )
             },
-            modifier = Modifier.background(Color.White),
             navigationIcon = {
                 NavigationIconButton(
                     onClick = onBack

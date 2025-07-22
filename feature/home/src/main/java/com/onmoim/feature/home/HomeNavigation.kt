@@ -10,7 +10,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
-import com.onmoim.feature.groups.navigateToGroupDetail
+import com.onmoim.feature.groups.navigation.navigateToGroupDetail
 import com.onmoim.feature.home.constant.HomeGroupType
 import com.onmoim.feature.home.view.GroupMoreRoute
 import com.onmoim.feature.home.view.HomeRoute
