@@ -23,4 +23,5 @@ interface GroupRepository {
     suspend fun favoriteGroup(id: Int): Result<Unit>
     fun getActiveStatistics(id: Int): Flow<ActiveStatistics>
     fun getGroupMemberPagingData(id: Int, size: Int = 20): Flow<PagingData<Member>>
+    suspend fun banMember(groupId: Int, memberId: Int): Result<Unit>
 }

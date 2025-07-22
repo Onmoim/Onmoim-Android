@@ -14,6 +14,7 @@ import com.onmoim.core.data.pagingsource.GroupMemberPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.GroupApi
+import com.onmoim.core.network.model.MemberIdRequestDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -182,5 +183,21 @@ class GroupRepositoryImpl @Inject constructor(
             ),
             pagingSourceFactory = { GroupMemberPagingSource(groupApi, id) }
         ).flow.flowOn(ioDispatcher)
+    }
+
+    override suspend fun banMember(
+        groupId: Int,
+        memberId: Int
+    ): Result<Unit> {
+        val memberIdRequestDto = MemberIdRequestDto(memberId)
+        val resp = withContext(ioDispatcher) {
+            groupApi.banMember(groupId, memberIdRequestDto)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
     }
 }

@@ -28,5 +28,5 @@
 
     <!-- MemberListItem -->
     <string name="member_list_item_transfer">양도</string>
-    <string name="member_list_item_expulsion">강퇴</string>
+    <string name="member_list_item_ban">강퇴</string>
 </resources>

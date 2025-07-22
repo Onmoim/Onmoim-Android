@@ -3,6 +3,7 @@ package com.onmoim.core.network.api
 import com.onmoim.core.network.model.BasePageDto
 import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.MemberDto
+import com.onmoim.core.network.model.MemberIdRequestDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
 import com.onmoim.core.network.model.group.CreatedGroupDto
 import com.onmoim.core.network.model.group.GroupDetailDto
@@ -67,4 +68,10 @@ interface GroupApi {
         @Query("lastMemberId") lastMemberId: Int? = null,
         @Query("requestSize") requestSize: Int? = null
     ): Response<BaseResponse<BasePageDto<MemberDto>>>
+
+    @POST("api/v1/groups/{groupId}/ban")
+    suspend fun banMember(
+        @Path("groupId") groupId: Int,
+        @Body memberIdRequestDto: MemberIdRequestDto
+    ): Response<BaseResponse<String>>
 }

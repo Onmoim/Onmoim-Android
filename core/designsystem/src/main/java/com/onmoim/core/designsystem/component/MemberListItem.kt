@@ -168,7 +168,7 @@ fun MemberListItem(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = stringResource(R.string.member_list_item_expulsion),
+                        text = stringResource(R.string.member_list_item_ban),
                         style = OnmoimTheme.typography.caption1Bold.copy(
                             color = Color.White
                         )

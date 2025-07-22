@@ -30,7 +30,7 @@ fun ActiveStatusContainer(
     groupMemberPagingItems: LazyPagingItems<Member>,
     userId: Int?,
     onClickTransfer: (memberId: Int) -> Unit,
-    onClickExpulsion: (memberId: Int) -> Unit
+    onClickBan: (memberId: Int) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
@@ -97,7 +97,7 @@ fun ActiveStatusContainer(
                             onClickTransfer(member.id)
                         },
                         onClickExpulsion = {
-                            onClickExpulsion(member.id)
+                            onClickBan(member.id)
                         },
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(horizontal = 15.dp),
