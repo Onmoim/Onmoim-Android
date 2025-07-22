@@ -82,7 +82,7 @@ private fun GroupEditScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(OnmoimTheme.colors.backgroundColor)
-            .imePadding() // FIXME: imePadding 적용시 알 수 없는 패딩 생기고 앱바 없어지는 문제 수정 필요
+            .imePadding()
     ) {
         CommonAppBar(
             title = {
