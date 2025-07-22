@@ -129,7 +129,6 @@ private fun GroupOpenScreen(
             .fillMaxSize()
             .background(OnmoimTheme.colors.backgroundColor)
             .imePadding()
-            .statusBarsPadding()
     ) {
         CommonAppBar(
             title = {
@@ -138,9 +137,6 @@ private fun GroupOpenScreen(
                     style = OnmoimTheme.typography.body1SemiBold
                 )
             },
-            modifier = Modifier
-                .background(Color.White)
-                .consumeWindowInsets(WindowInsets.statusBars),
             navigationIcon = {
                 NavigationIconButton(
                     onClick = onBack

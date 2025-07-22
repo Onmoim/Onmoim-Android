@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,7 +64,6 @@ private fun ComingScheduleScreen(
                     style = OnmoimTheme.typography.body1SemiBold
                 )
             },
-            modifier = Modifier.background(Color.White),
             navigationIcon = {
                 NavigationIconButton(
                     onClick = onBack
