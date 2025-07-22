@@ -191,14 +191,13 @@ fun GroupDetailRoute(
             onClickComingSchedule = onNavigateToComingSchedule,
             onClickPost = onNavigateToPostDetail,
             groupDetailUiState = groupDetailUiState,
-            onClickJoin = {
-
-            },
+            onClickGroupJoin = groupDetailViewModel::joinGroup,
             onClickGroupSetting = onNavigateToGroupManagement,
             onClickMenu = {
                 showMenuDialog = true
             },
-            onClickFavorite = groupDetailViewModel::favoriteGroup
+            onClickFavorite = groupDetailViewModel::favoriteGroup,
+            onClickMeetAttend = groupDetailViewModel::attendMeeting
         )
     }
 
@@ -247,10 +246,11 @@ private fun GroupDetailScreen(
     onClickComingSchedule: () -> Unit,
     onClickPost: (id: Int) -> Unit,
     groupDetailUiState: GroupDetailUiState,
-    onClickJoin: (id: Int) -> Unit,
+    onClickGroupJoin: () -> Unit,
     onClickGroupSetting: () -> Unit,
     onClickMenu: () -> Unit,
-    onClickFavorite: (Boolean) -> Unit
+    onClickFavorite: (Boolean) -> Unit,
+    onClickMeetAttend: (meetingId: Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -326,14 +326,12 @@ private fun GroupDetailScreen(
                                 meetings = groupDetail.meetingList,
                                 memberStatus = groupDetail.memberStatus,
                                 onClickComingSchedule = onClickComingSchedule,
-                                onClickAttend = {},
+                                onClickMeetAttend = onClickMeetAttend,
                                 onClickGroupSetting = onClickGroupSetting
                             )
                             if (groupDetail.memberStatus == MemberStatus.NONE) {
                                 CommonButton(
-                                    onClick = {
-                                        onClickJoin(groupDetail.id)
-                                    },
+                                    onClick = onClickGroupJoin,
                                     modifier = Modifier
                                         .align(Alignment.BottomCenter)
                                         .padding(bottom = 60.dp),
@@ -415,6 +413,7 @@ private fun getFakeGroupoDetail(memberStatus: MemberStatus): GroupDetail {
         title = "카페에서 문장 한 모금",
         description = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
         category = "인문학/책/글",
+        categoryIconUrl = "https://picsum.photos/200",
         location = "연남동",
         memberCount = 123,
         imageUrl = "https://picsum.photos/200",
@@ -435,7 +434,8 @@ private fun getFakeGroupoDetail(memberStatus: MemberStatus): GroupDetail {
                 longitude = 0
             )
         ),
-        memberStatus = memberStatus
+        memberStatus = memberStatus,
+        capacity = 10
     )
 }
 
@@ -450,10 +450,11 @@ private fun GroupDetailScreenForHomePreview1() {
             onClickComingSchedule = {},
             onClickPost = {},
             groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.NONE)),
-            onClickJoin = {},
+            onClickGroupJoin = {},
             onClickGroupSetting = {},
             onClickMenu = {},
-            onClickFavorite = {}
+            onClickFavorite = {},
+            onClickMeetAttend = {}
         )
     }
 }
@@ -469,10 +470,11 @@ private fun GroupDetailScreenForHomePreview2() {
             onClickComingSchedule = {},
             onClickPost = {},
             groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.OWNER)),
-            onClickJoin = {},
+            onClickGroupJoin = {},
             onClickGroupSetting = {},
             onClickMenu = {},
-            onClickFavorite = {}
+            onClickFavorite = {},
+            onClickMeetAttend = {}
         )
     }
 }
@@ -488,10 +490,11 @@ private fun GroupDetailScreenForPostPreview() {
             onClickComingSchedule = {},
             onClickPost = {},
             groupDetailUiState = GroupDetailUiState.Loading,
-            onClickJoin = {},
+            onClickGroupJoin = {},
             onClickGroupSetting = {},
             onClickMenu = {},
-            onClickFavorite = {}
+            onClickFavorite = {},
+            onClickMeetAttend = {}
         )
     }
 }

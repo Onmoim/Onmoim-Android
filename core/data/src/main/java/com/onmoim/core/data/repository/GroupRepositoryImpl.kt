@@ -89,11 +89,12 @@ class GroupRepositoryImpl @Inject constructor(
                 imageUrl = data.imageUrl,
                 location = data.address,
                 category = data.category,
+                categoryIconUrl = data.categoryIconUrl,
                 memberCount = data.memberCount,
                 description = data.description,
                 meetingList = data.list.map {
                     MeetingDetail(
-                        id = 0, // FIXME: 확인 후 수정
+                        id = it.meetingId,
                         title = it.title,
                         placeName = it.placeName,
                         startDate = LocalDateTime.parse(it.startDate),
@@ -107,13 +108,14 @@ class GroupRepositoryImpl @Inject constructor(
                         longitude = it.longitude
                     )
                 },
-                isFavorite = data.status.contains("BOOKMARK"),
+                isFavorite = data.likeStatus.contains("LIKE"),
                 memberStatus = when {
                     data.status.contains("OWNER") -> MemberStatus.OWNER
                     data.status.contains("MEMBER") -> MemberStatus.MEMBER
                     data.status.contains("BAN") -> MemberStatus.BAN
                     else -> MemberStatus.NONE
-                }
+                },
+                capacity = data.capacity
             )
             emit(groupDetail)
         } else {

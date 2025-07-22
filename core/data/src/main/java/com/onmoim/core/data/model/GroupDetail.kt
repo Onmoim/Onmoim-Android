@@ -8,9 +8,11 @@ data class GroupDetail(
     val imageUrl: String?,
     val location: String,
     val category: String,
+    val categoryIconUrl: String,
     val memberCount: Int,
     val description: String,
     val meetingList: List<MeetingDetail>,
     val isFavorite: Boolean,
-    val memberStatus: MemberStatus
+    val memberStatus: MemberStatus,
+    val capacity: Int,
 )

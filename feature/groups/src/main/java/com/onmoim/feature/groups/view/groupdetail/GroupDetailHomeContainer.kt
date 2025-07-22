@@ -42,7 +42,7 @@ fun GroupDetailHomeContainer(
     meetings: List<MeetingDetail>,
     memberStatus: MemberStatus,
     onClickComingSchedule: () -> Unit,
-    onClickAttend: (id: Int) -> Unit,
+    onClickMeetAttend: (id: Int) -> Unit,
     onClickGroupSetting: () -> Unit
 ) {
     Column(
@@ -160,7 +160,7 @@ fun GroupDetailHomeContainer(
                     ComingScheduleCard(
                         modifier = Modifier.fillMaxWidth(),
                         onClickAttend = {
-                            onClickAttend(meet.id)
+                            onClickMeetAttend(meet.id)
                         },
                         isLightning = meet.isLightning,
                         startDate = meet.startDate,

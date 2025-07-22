@@ -11,8 +11,12 @@ data class GroupDetailDto(
     val address: String,
     @SerialName("category")
     val category: String,
+    @SerialName("categoryIconUrl")
+    val categoryIconUrl: String,
     @SerialName("description")
     val description: String,
+    @SerialName("capacity")
+    val capacity: Int,
     @SerialName("groupId")
     val groupId: Int,
     @SerialName("list")
@@ -24,5 +28,7 @@ data class GroupDetailDto(
     @SerialName("imageUrl")
     val imageUrl: String?,
     @SerialName("status")
-    val status: String
+    val status: String,
+    @SerialName("likeStatus")
+    val likeStatus: String
 )

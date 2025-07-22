@@ -107,4 +107,12 @@ class GroupDetailViewModel @AssistedInject constructor(
             }
         }
     }
+
+    fun joinGroup() {
+        // TODO: 모임 가입
+    }
+
+    fun attendMeeting(meetingId: Int) {
+        // TODO: 일정 참가
+    }
 }

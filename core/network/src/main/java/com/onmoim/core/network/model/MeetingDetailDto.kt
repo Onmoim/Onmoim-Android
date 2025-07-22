@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MeetingDetailDto(
+    @SerialName("meetingId")
+    val meetingId: Int,
     @SerialName("attendance")
     val attendance: Boolean,
     @SerialName("capacity")
