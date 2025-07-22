@@ -242,14 +242,7 @@ private fun GroupOpenScreen(
             CommonTextField(
                 value = uiState.groupCapacity?.toString() ?: "",
                 onValueChange = { value ->
-                    val capacity = value.toIntOrNull()?.let {
-                        when {
-                            it < 5 -> 5
-                            it > 300 -> 300
-                            else -> it
-                        }
-                    }
-                    onGroupCapacityChange(capacity)
+                    onGroupCapacityChange(value.toIntOrNull())
                 },
                 modifier = Modifier
                     .padding(horizontal = 15.dp)

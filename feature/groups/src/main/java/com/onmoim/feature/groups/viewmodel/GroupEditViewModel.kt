@@ -4,16 +4,19 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onmoim.core.data.repository.GroupRepository
+import com.onmoim.feature.groups.state.GroupEditEvent
 import com.onmoim.feature.groups.state.GroupEditUiState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,6 +37,9 @@ class GroupEditViewModel @AssistedInject constructor(
     private val _uiState = MutableStateFlow(GroupEditUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val _event = Channel<GroupEditEvent>(Channel.BUFFERED)
+    val event = _event.receiveAsFlow()
+
     init {
         fetchGroupDetail()
     }
@@ -51,10 +57,13 @@ class GroupEditViewModel @AssistedInject constructor(
                         locationName = it.location,
                         groupName = it.title,
                         groupDescription = it.description,
-                        groupCapacity = null, // TODO: 추후 수정
+                        newGroupDescription = it.description,
+                        groupCapacity = it.capacity,
+                        newGroupCapacity = it.capacity,
                         groupImageUrl = it.imageUrl,
+                        newGroupImageUrl = it.imageUrl,
                         categoryName = it.category,
-                        categoryImageUrl = null, // TODO: 추후 수정
+                        categoryImageUrl = it.categoryIconUrl
                     )
                 }
             }
@@ -80,6 +89,38 @@ class GroupEditViewModel @AssistedInject constructor(
     }
 
     fun updateGroupInfo() {
+        val description = uiState.value.newGroupDescription
+        val capacity = uiState.value.newGroupCapacity ?: return
+        val imageUrl = uiState.value.newGroupImageUrl
 
+        viewModelScope.launch {
+            _uiState.update { state ->
+                state.copy(
+                    isLoading = true
+                )
+            }
+
+            groupRepository.updateGroup(
+                groupId = groupId,
+                description = description,
+                capacity = capacity,
+                imageUrl = imageUrl
+            ).onFailure {
+                Log.e("GroupEditViewModel", "updateGroupInfo error", it)
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = false
+                    )
+                }
+                _event.send(GroupEditEvent.EditFailure(it))
+            }.onSuccess {
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = false
+                    )
+                }
+                _event.send(GroupEditEvent.EditSuccess)
+            }
+        }
     }
 }

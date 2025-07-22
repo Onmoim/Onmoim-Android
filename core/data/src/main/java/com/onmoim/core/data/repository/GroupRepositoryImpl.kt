@@ -21,7 +21,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import retrofit2.HttpException
+import java.io.File
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -210,6 +216,40 @@ class GroupRepositoryImpl @Inject constructor(
         val memberIdRequestDto = MemberIdRequestDto(memberId)
         val resp = withContext(ioDispatcher) {
             groupApi.transferGroupOwner(groupId, memberIdRequestDto)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
+    }
+
+    override suspend fun updateGroup(
+        groupId: Int,
+        description: String,
+        capacity: Int,
+        imageUrl: String?
+    ): Result<Unit> {
+        val requestMap: Map<String, Any> = mapOf(
+            "description" to description,
+            "capacity" to capacity
+        )
+        val requestJsonObject = JSONObject(requestMap)
+        val requestBody =
+            requestJsonObject.toString().toRequestBody("application/json".toMediaTypeOrNull())
+
+        val imageFile = imageUrl?.let { File(it) }
+        val imageFilePart = imageFile?.let {
+            MultipartBody.Part.createFormData(
+                "file",
+                it.name,
+                it.asRequestBody("image/*".toMediaTypeOrNull())
+            )
+        }
+
+        val resp = withContext(ioDispatcher) {
+            groupApi.updateGroup(groupId, requestBody, imageFilePart)
         }
 
         return if (resp.isSuccessful) {

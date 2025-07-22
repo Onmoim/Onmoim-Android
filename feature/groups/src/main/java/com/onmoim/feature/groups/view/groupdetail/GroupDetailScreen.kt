@@ -36,9 +36,9 @@ import com.onmoim.core.designsystem.component.CommonMenuItem
 import com.onmoim.core.designsystem.component.CommonTab
 import com.onmoim.core.designsystem.component.CommonTabRow
 import com.onmoim.core.designsystem.component.CommonTextField
-import com.onmoim.core.designsystem.component.LoadingOverlayBox
 import com.onmoim.core.designsystem.component.group.GroupDetailAppBar
 import com.onmoim.core.designsystem.theme.OnmoimTheme
+import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.GroupDetailPostFilter
 import com.onmoim.feature.groups.constant.GroupDetailTab

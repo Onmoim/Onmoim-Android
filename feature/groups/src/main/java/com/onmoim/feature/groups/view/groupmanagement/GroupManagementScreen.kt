@@ -28,7 +28,7 @@ import com.onmoim.core.data.model.Member
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.CommonTab
 import com.onmoim.core.designsystem.component.CommonTabRow
-import com.onmoim.core.designsystem.component.LoadingOverlayBox
+import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
