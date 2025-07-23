@@ -18,12 +18,14 @@ import com.onmoim.feature.groups.view.GroupEditRoute
 import com.onmoim.feature.groups.view.GroupOpenCompleteRoute
 import com.onmoim.feature.groups.view.GroupOpenRoute
 import com.onmoim.feature.groups.view.MyGroupRoute
+import com.onmoim.feature.groups.view.ScheduleManagementRoute
 import com.onmoim.feature.groups.view.groupdetail.GroupDetailRoute
 import com.onmoim.feature.groups.view.groupmanagement.GroupManagementRoute
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
 import com.onmoim.feature.groups.viewmodel.GroupEditViewModel
 import com.onmoim.feature.groups.viewmodel.GroupManagementViewModel
 import com.onmoim.feature.groups.viewmodel.GroupOpenViewModel
+import com.onmoim.feature.groups.viewmodel.ScheduleManagementViewModel
 import com.onmoim.feature.location.navigation.LocationNavigationBundleKey
 import com.onmoim.feature.location.navigation.navigateToLocationSearch
 import kotlinx.serialization.Serializable
@@ -69,6 +71,11 @@ data class GroupEditRoute(
     val groupId: Int
 )
 
+@Serializable
+data class ScheduleManagementRoute(
+    val groupId: Int
+)
+
 fun NavController.navigateToComingSchedule(groupId: Int? = null, navOptions: NavOptions? = null) {
     navigate(ComingScheduleRoute(groupId), navOptions)
 }
@@ -100,6 +107,10 @@ fun NavController.navigateToGroupManagement(groupId: Int, navOptions: NavOptions
 
 fun NavController.navigateToGroupEdit(groupId: Int, navOptions: NavOptions? = null) {
     navigate(GroupEditRoute(groupId), navOptions)
+}
+
+fun NavController.navigateToScheduleManagement(groupId: Int, navOptions: NavOptions? = null) {
+    navigate(ScheduleManagementRoute(groupId), navOptions)
 }
 
 fun NavGraphBuilder.groupsGraph(
@@ -141,7 +152,8 @@ fun NavGraphBuilder.groupsGraph(
 
             val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
             val isRefresh =
-                savedStateHandle?.get<Boolean>(GroupsNavigationBundleKey.GROUP_DETAIL_REFRESH) ?: false
+                savedStateHandle?.get<Boolean>(GroupsNavigationBundleKey.GROUP_DETAIL_REFRESH)
+                    ?: false
             savedStateHandle?.remove<Boolean>(GroupsNavigationBundleKey.GROUP_DETAIL_REFRESH)
 
             GroupDetailRoute(
@@ -228,6 +240,9 @@ fun NavGraphBuilder.groupsGraph(
                 },
                 onNavigateToGroupEdit = {
                     navController.navigateToGroupEdit(groupId)
+                },
+                onNavigateToScheduleManagement = {
+                    navController.navigateToScheduleManagement(groupId)
                 }
             )
         }
@@ -245,6 +260,17 @@ fun NavGraphBuilder.groupsGraph(
                     }
                     navController.popBackStack()
                 }
+            )
+        }
+        composable<ScheduleManagementRoute> { backStackEntry ->
+            val groupId = backStackEntry.toRoute<ScheduleManagementRoute>().groupId
+            val scheduleManagementViewModel =
+                hiltViewModel<ScheduleManagementViewModel, ScheduleManagementViewModel.Factory> {
+                    it.create(groupId)
+                }
+
+            ScheduleManagementRoute(
+                scheduleManagementViewModel = scheduleManagementViewModel
             )
         }
     }

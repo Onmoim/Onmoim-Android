@@ -82,4 +82,10 @@
     <string name="group_edit">모임 수정</string>
     <string name="group_edit_location">지역</string>
     <string name="group_edit_success">모임 수정이 완료되었습니다.</string>
+
+    <!-- 일정 관리 -->
+    <string name="schedule_management">일정 관리</string>
+    <string name="schedule_management_delete_dialog_title">온모임</string>
+    <string name="schedule_management_delete_dialog_content">해당 일정을 삭제하시겠습니까?</string>
+    <string name="schedule_management_delete_success">일정이 삭제되었습니다.</string>
 </resources>
