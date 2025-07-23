@@ -28,11 +28,14 @@ import com.onmoim.core.designsystem.component.group.ComingScheduleCardButtonType
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.ComingScheduleFilter
+import com.onmoim.feature.groups.viewmodel.ComingScheduleViewModel
 import java.time.LocalDateTime
 
 @Composable
 fun ComingScheduleRoute(
-
+    comingScheduleViewModel: ComingScheduleViewModel,
+    onNavigateToCreateSchedule: () -> Unit,
+    onNavigateToMeetingLocation: (meetingId: Int) -> Unit
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -42,7 +45,10 @@ fun ComingScheduleRoute(
         },
         onClickReset = {},
         onClickFilter = {},
-        selectedFilters = emptySet()
+        selectedFilters = emptySet(),
+        showAddScheduleButton = comingScheduleViewModel.groupId != null,
+        onClickCreateSchedule = onNavigateToCreateSchedule,
+        onClickSchedule = onNavigateToMeetingLocation
     )
 }
 
@@ -51,7 +57,10 @@ private fun ComingScheduleScreen(
     onBack: () -> Unit,
     onClickReset: () -> Unit,
     onClickFilter: (ComingScheduleFilter) -> Unit,
-    selectedFilters: Set<ComingScheduleFilter>
+    selectedFilters: Set<ComingScheduleFilter>,
+    showAddScheduleButton: Boolean,
+    onClickCreateSchedule: () -> Unit,
+    onClickSchedule: (meetingId: Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -73,6 +82,18 @@ private fun ComingScheduleScreen(
                         painter = painterResource(R.drawable.ic_arrow_back),
                         contentDescription = null
                     )
+                }
+            },
+            actions = {
+                if (showAddScheduleButton) {
+                    NavigationIconButton(
+                        onClick = onClickCreateSchedule
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_add),
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         )
@@ -148,7 +169,8 @@ private fun ComingScheduleScreen(
                         cost = 1000,
                         joinCount = 6,
                         capacity = 8,
-                        imageUrl = "https://picsum.photos/200"
+                        imageUrl = "https://picsum.photos/200",
+                        onClickCard = {}
                     )
                 }
             }
@@ -164,7 +186,10 @@ private fun ComingScheduleScreenPreview() {
             onBack = {},
             onClickReset = {},
             onClickFilter = {},
-            selectedFilters = emptySet()
+            selectedFilters = emptySet(),
+            showAddScheduleButton = true,
+            onClickCreateSchedule = {},
+            onClickSchedule = {}
         )
     }
 }

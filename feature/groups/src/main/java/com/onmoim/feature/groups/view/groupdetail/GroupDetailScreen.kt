@@ -42,6 +42,7 @@ import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.GroupDetailPostFilter
 import com.onmoim.feature.groups.constant.GroupDetailTab
+import com.onmoim.feature.groups.constant.GroupMemberRole
 import com.onmoim.feature.groups.state.GroupDetailEvent
 import com.onmoim.feature.groups.state.GroupDetailUiState
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
@@ -50,7 +51,7 @@ import java.time.LocalDateTime
 @Composable
 fun GroupDetailRoute(
     groupDetailViewModel: GroupDetailViewModel,
-    onNavigateToComingSchedule: () -> Unit,
+    onNavigateToComingSchedule: (GroupMemberRole) -> Unit,
     onNavigateToPostDetail: (id: Int) -> Unit,
     onNavigateToGroupManagement: () -> Unit,
 ) {
@@ -243,7 +244,7 @@ private fun GroupDetailScreen(
     onBack: () -> Unit,
     selectedTab: GroupDetailTab,
     onTabChange: (GroupDetailTab) -> Unit,
-    onClickComingSchedule: () -> Unit,
+    onClickComingSchedule: (GroupMemberRole) -> Unit,
     onClickPost: (id: Int) -> Unit,
     groupDetailUiState: GroupDetailUiState,
     onClickGroupJoin: () -> Unit,
@@ -325,7 +326,14 @@ private fun GroupDetailScreen(
                                 description = groupDetail.description,
                                 meetings = groupDetail.meetingList,
                                 memberStatus = groupDetail.memberStatus,
-                                onClickComingSchedule = onClickComingSchedule,
+                                onClickComingSchedule = {
+                                    val role = when(groupDetail.memberStatus) {
+                                        MemberStatus.OWNER -> GroupMemberRole.OWNER
+                                        MemberStatus.MEMBER -> GroupMemberRole.MEMBER
+                                        else -> null
+                                    }
+                                    role?.let(onClickComingSchedule)
+                                },
                                 onClickMeetAttend = onClickMeetAttend,
                                 onClickGroupSetting = onClickGroupSetting
                             )

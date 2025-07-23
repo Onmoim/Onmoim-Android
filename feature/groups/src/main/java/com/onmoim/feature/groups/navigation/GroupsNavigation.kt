@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import com.onmoim.feature.groups.constant.GroupMemberRole
 import com.onmoim.feature.groups.view.ComingScheduleRoute
 import com.onmoim.feature.groups.view.GroupCategorySelectRoute
 import com.onmoim.feature.groups.view.GroupEditRoute
@@ -21,6 +22,7 @@ import com.onmoim.feature.groups.view.MyGroupRoute
 import com.onmoim.feature.groups.view.ScheduleManagementRoute
 import com.onmoim.feature.groups.view.groupdetail.GroupDetailRoute
 import com.onmoim.feature.groups.view.groupmanagement.GroupManagementRoute
+import com.onmoim.feature.groups.viewmodel.ComingScheduleViewModel
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
 import com.onmoim.feature.groups.viewmodel.GroupEditViewModel
 import com.onmoim.feature.groups.viewmodel.GroupManagementViewModel
@@ -43,7 +45,8 @@ data class GroupDetailRoute(
 
 @Serializable
 data class ComingScheduleRoute(
-    val id: Int? = null
+    val groupId: Int? = null,
+    val role: GroupMemberRole? = null
 )
 
 @Serializable
@@ -76,8 +79,12 @@ data class ScheduleManagementRoute(
     val groupId: Int
 )
 
-fun NavController.navigateToComingSchedule(groupId: Int? = null, navOptions: NavOptions? = null) {
-    navigate(ComingScheduleRoute(groupId), navOptions)
+fun NavController.navigateToComingSchedule(
+    groupId: Int? = null,
+    groupMemberRole: GroupMemberRole? = null,
+    navOptions: NavOptions? = null
+) {
+    navigate(ComingScheduleRoute(groupId, groupMemberRole), navOptions)
 }
 
 fun NavController.navigateToGroupDetail(id: Int, navOptions: NavOptions? = null) {
@@ -139,9 +146,21 @@ fun NavGraphBuilder.groupsGraph(
             )
         }
         composable<ComingScheduleRoute> { backStackEntry ->
-            val id = backStackEntry.toRoute<ComingScheduleRoute>().id
+            val comingScheduleRoute = backStackEntry.toRoute<ComingScheduleRoute>()
+            val comingScheduleViewModel =
+                hiltViewModel<ComingScheduleViewModel, ComingScheduleViewModel.Factory> {
+                    it.create(comingScheduleRoute.groupId)
+                }
 
-            ComingScheduleRoute()
+            ComingScheduleRoute(
+                comingScheduleViewModel = comingScheduleViewModel,
+                onNavigateToCreateSchedule = {
+
+                },
+                onNavigateToMeetingLocation = {
+
+                }
+            )
         }
         composable<GroupDetailRoute> { backStackEntry ->
             val groupId = backStackEntry.toRoute<GroupDetailRoute>().id
@@ -158,8 +177,8 @@ fun NavGraphBuilder.groupsGraph(
 
             GroupDetailRoute(
                 groupDetailViewModel = groupDetailViewModel,
-                onNavigateToComingSchedule = {
-                    navController.navigateToComingSchedule(groupId)
+                onNavigateToComingSchedule = { role ->
+                    navController.navigateToComingSchedule(groupId, role)
                 },
                 onNavigateToPostDetail = {},
                 onNavigateToGroupManagement = {

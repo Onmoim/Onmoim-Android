@@ -65,6 +65,7 @@ fun ComingScheduleCard(
     joinCount: Int,
     capacity: Int,
     imageUrl: String?,
+    onClickCard: () -> Unit = {},
 ) {
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current).apply {
@@ -76,6 +77,11 @@ fun ComingScheduleCard(
 
     Box(
         modifier = modifier
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = onClickCard
+            )
             .shadow2Block(16.dp)
             .background(
                 color = OnmoimTheme.colors.backgroundColor,
