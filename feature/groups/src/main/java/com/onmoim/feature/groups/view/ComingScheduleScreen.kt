@@ -131,8 +131,8 @@ private fun ComingScheduleScreen(
                                 ComingScheduleFilter.WEEK -> R.string.coming_schedule_week
                                 ComingScheduleFilter.MONTH -> R.string.coming_schedule_month
                                 ComingScheduleFilter.ATTEND -> R.string.coming_schedule_attended
-                                ComingScheduleFilter.REGULAR_MEET -> R.string.coming_schedule_regular_meet
-                                ComingScheduleFilter.LIGHTNING -> R.string.coming_schedule_lightning
+                                ComingScheduleFilter.REGULAR_MEET -> R.string.regular_meet
+                                ComingScheduleFilter.LIGHTNING -> R.string.lightning
                             }
                         ),
                         selected = selectedFilters.contains(filter),

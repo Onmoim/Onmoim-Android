@@ -42,7 +42,8 @@ fun GroupManagementRoute(
     groupManagementViewModel: GroupManagementViewModel,
     onBackAndRefresh: () -> Unit,
     onNavigateToGroupEdit: () -> Unit,
-    onNavigateToScheduleManagement: () -> Unit
+    onNavigateToScheduleManagement: () -> Unit,
+    onNavigateCreateSchedule: () -> Unit,
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val selectedTab by groupManagementViewModel.selectedTabState.collectAsStateWithLifecycle()
@@ -70,9 +71,13 @@ fun GroupManagementRoute(
             onClickBan = groupManagementViewModel::banMember,
             onClickGroupEdit = onNavigateToGroupEdit,
             onClickScheduleManagement = onNavigateToScheduleManagement,
-            onClickCreateMeet = {},
-            onClickWriteNotice = {},
-            onClickGroupDelete = {}
+            onClickCreateMeet = onNavigateCreateSchedule,
+            onClickWriteNotice = {
+                // TODO: 공지사항 작성 구현
+            },
+            onClickGroupDelete = {
+                // TODO: 그룹 삭제 구현
+            }
         )
     }
 

@@ -14,6 +14,7 @@ import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.onmoim.feature.groups.constant.GroupMemberRole
 import com.onmoim.feature.groups.view.ComingScheduleRoute
+import com.onmoim.feature.groups.view.CreateScheduleRoute
 import com.onmoim.feature.groups.view.GroupCategorySelectRoute
 import com.onmoim.feature.groups.view.GroupEditRoute
 import com.onmoim.feature.groups.view.GroupOpenCompleteRoute
@@ -23,6 +24,7 @@ import com.onmoim.feature.groups.view.ScheduleManagementRoute
 import com.onmoim.feature.groups.view.groupdetail.GroupDetailRoute
 import com.onmoim.feature.groups.view.groupmanagement.GroupManagementRoute
 import com.onmoim.feature.groups.viewmodel.ComingScheduleViewModel
+import com.onmoim.feature.groups.viewmodel.CreateScheduleViewModel
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
 import com.onmoim.feature.groups.viewmodel.GroupEditViewModel
 import com.onmoim.feature.groups.viewmodel.GroupManagementViewModel
@@ -79,6 +81,12 @@ data class ScheduleManagementRoute(
     val groupId: Int
 )
 
+@Serializable
+data class CreateScheduleRoute(
+    val groupId: Int,
+    val groupMemberRole: GroupMemberRole
+)
+
 fun NavController.navigateToComingSchedule(
     groupId: Int? = null,
     groupMemberRole: GroupMemberRole? = null,
@@ -120,6 +128,14 @@ fun NavController.navigateToScheduleManagement(groupId: Int, navOptions: NavOpti
     navigate(ScheduleManagementRoute(groupId), navOptions)
 }
 
+fun NavController.navigateToCreateSchedule(
+    groupId: Int,
+    groupMemberRole: GroupMemberRole,
+    navOptions: NavOptions? = null
+) {
+    navigate(CreateScheduleRoute(groupId, groupMemberRole), navOptions)
+}
+
 fun NavGraphBuilder.groupsGraph(
     navController: NavController,
     topBar: @Composable () -> Unit,
@@ -155,7 +171,13 @@ fun NavGraphBuilder.groupsGraph(
             ComingScheduleRoute(
                 comingScheduleViewModel = comingScheduleViewModel,
                 onNavigateToCreateSchedule = {
-
+                    val groupId = requireNotNull(comingScheduleRoute.groupId) {
+                        "groupId가 null이면 안됨"
+                    }
+                    val role = requireNotNull(comingScheduleRoute.role) {
+                        "role이 null이면 안됨"
+                    }
+                    navController.navigateToCreateSchedule(groupId, role)
                 },
                 onNavigateToMeetingLocation = {
 
@@ -262,6 +284,9 @@ fun NavGraphBuilder.groupsGraph(
                 },
                 onNavigateToScheduleManagement = {
                     navController.navigateToScheduleManagement(groupId)
+                },
+                onNavigateCreateSchedule = {
+                    navController.navigateToCreateSchedule(groupId, GroupMemberRole.OWNER)
                 }
             )
         }
@@ -290,6 +315,21 @@ fun NavGraphBuilder.groupsGraph(
 
             ScheduleManagementRoute(
                 scheduleManagementViewModel = scheduleManagementViewModel
+            )
+        }
+        composable<CreateScheduleRoute> { backStackEntry ->
+            val createScheduleRoute = backStackEntry.toRoute<CreateScheduleRoute>()
+            val createScheduleViewModel =
+                hiltViewModel<CreateScheduleViewModel, CreateScheduleViewModel.Factory> {
+                    it.create(createScheduleRoute.groupId)
+                }
+
+            CreateScheduleRoute(
+                createScheduleViewModel = createScheduleViewModel,
+                groupMemberRole = createScheduleRoute.groupMemberRole,
+                onNavigateToMeetingLocationSearch = {
+
+                }
             )
         }
     }
