@@ -35,6 +35,7 @@ import com.onmoim.core.designsystem.component.CommonTab
 import com.onmoim.core.designsystem.component.CommonTabRow
 import com.onmoim.core.designsystem.component.DayCard
 import com.onmoim.core.designsystem.component.group.ComingScheduleCard
+import com.onmoim.core.designsystem.component.group.ComingScheduleCardButtonType
 import com.onmoim.core.designsystem.component.group.GroupItem
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
@@ -244,9 +245,10 @@ private fun MyGroupContainer(
                     modifier = Modifier
                         .padding(horizontal = 15.dp)
                         .fillMaxWidth(),
-                    onClickAttend = {
+                    onClickButton = {
 
                     },
+                    buttonType = ComingScheduleCardButtonType.ATTEND,
                     isLightning = false,
                     startDate = LocalDateTime.now().plusDays(2),
                     title = "퇴근 후 독서 정모: 각자 독서",
@@ -254,8 +256,7 @@ private fun MyGroupContainer(
                     cost = 10000,
                     joinCount = 6,
                     capacity = 8,
-                    imageUrl = "https://picsum.photos/200",
-                    attendance = true
+                    imageUrl = "https://picsum.photos/200"
                 )
             }
         }

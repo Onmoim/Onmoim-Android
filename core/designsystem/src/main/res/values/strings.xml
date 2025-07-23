@@ -2,6 +2,7 @@
 <resources>
     <!-- 공통 -->
     <string name="confirm">확인</string>
+    <string name="delete">삭제</string>
 
     <!-- MeetItem -->
     <string name="meet_item_recommend">추천</string>

@@ -24,6 +24,7 @@ import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.FilterChip
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.component.group.ComingScheduleCard
+import com.onmoim.core.designsystem.component.group.ComingScheduleCardButtonType
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.ComingScheduleFilter
@@ -138,7 +139,8 @@ private fun ComingScheduleScreen(
                 items(2) {
                     ComingScheduleCard(
                         modifier = Modifier.fillMaxWidth(),
-                        onClickAttend = {},
+                        onClickButton = {},
+                        buttonType = ComingScheduleCardButtonType.ATTEND,
                         isLightning = false,
                         startDate = LocalDateTime.now().plusDays(2),
                         title = "퇴근 후 독서 정모: 각자 독서",
@@ -146,8 +148,7 @@ private fun ComingScheduleScreen(
                         cost = 1000,
                         joinCount = 6,
                         capacity = 8,
-                        imageUrl = "https://picsum.photos/200",
-                        attendance = false
+                        imageUrl = "https://picsum.photos/200"
                     )
                 }
             }

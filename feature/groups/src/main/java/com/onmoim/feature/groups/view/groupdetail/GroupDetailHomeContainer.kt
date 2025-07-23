@@ -26,6 +26,7 @@ import com.onmoim.core.data.model.MeetingDetail
 import com.onmoim.core.designsystem.component.CommonChip
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.component.group.ComingScheduleCard
+import com.onmoim.core.designsystem.component.group.ComingScheduleCardButtonType
 import com.onmoim.core.designsystem.component.group.GroupImageBox
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
@@ -159,8 +160,13 @@ fun GroupDetailHomeContainer(
                 meetings.forEach { meet ->
                     ComingScheduleCard(
                         modifier = Modifier.fillMaxWidth(),
-                        onClickAttend = {
+                        onClickButton = {
                             onClickMeetAttend(meet.id)
+                        },
+                        buttonType = if (meet.attendance) {
+                            ComingScheduleCardButtonType.ATTEND_CANCEL
+                        } else {
+                            ComingScheduleCardButtonType.ATTEND
                         },
                         isLightning = meet.isLightning,
                         startDate = meet.startDate,
@@ -169,8 +175,7 @@ fun GroupDetailHomeContainer(
                         cost = meet.cost,
                         joinCount = meet.joinCount,
                         capacity = meet.capacity,
-                        imageUrl = meet.imgUrl,
-                        attendance = meet.attendance
+                        imageUrl = meet.imgUrl
                     )
                 }
             }
