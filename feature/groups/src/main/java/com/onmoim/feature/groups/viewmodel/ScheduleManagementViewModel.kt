@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = ScheduleManagementViewModel.Factory::class)
 class ScheduleManagementViewModel @AssistedInject constructor(
@@ -44,6 +45,17 @@ class ScheduleManagementViewModel @AssistedInject constructor(
     }.cachedIn(viewModelScope)
 
     fun deleteMeeting(meetingId: Int) {
+        viewModelScope.launch {
+            _isLoading.value = true
 
+            meetingRepository.deleteMeeting(groupId, meetingId).onFailure {
+                _isLoading.value = false
+                _event.send(ScheduleManagementEvent.DeleteFailure(it))
+            }.onSuccess {
+                deletedMeetingIds.value += meetingId
+                _isLoading.value = false
+                _event.send(ScheduleManagementEvent.DeleteSuccess)
+            }
+        }
     }
 }

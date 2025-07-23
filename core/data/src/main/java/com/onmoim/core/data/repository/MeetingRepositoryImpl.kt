@@ -12,6 +12,7 @@ import com.onmoim.core.network.api.MeetingApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class MeetingRepositoryImpl @Inject constructor(
@@ -30,5 +31,20 @@ class MeetingRepositoryImpl @Inject constructor(
             ),
             pagingSourceFactory = { MeetingPagingSource(meetingApi, groupId, filter) }
         ).flow.flowOn(ioDispatcher)
+    }
+
+    override suspend fun deleteMeeting(
+        groupId: Int,
+        meetingId: Int
+    ): Result<Unit> {
+        val resp = withContext(ioDispatcher) {
+            meetingApi.deleteMeeting(groupId, meetingId)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(Exception(resp.message()))
+        }
     }
 }

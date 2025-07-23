@@ -4,6 +4,7 @@ import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.meeting.BaseMeetingPageDto
 import com.onmoim.core.network.model.meeting.MeetingDto
 import retrofit2.Response
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -16,4 +17,10 @@ interface MeetingApi {
         @Query("size") size: Int? = null,
         @Query("type") type: String? = null // REGULAR: 정기모임, FLASH: 번개모임
     ): Response<BaseResponse<BaseMeetingPageDto<MeetingDto>>>
+
+    @DELETE("api/v1/groups/{groupId}/meetings/{meetingId}")
+    suspend fun deleteMeeting(
+        @Path("groupId") groupId: Int,
+        @Path("meetingId") meetingId: Int
+    ): Response<BaseResponse<String>>
 }

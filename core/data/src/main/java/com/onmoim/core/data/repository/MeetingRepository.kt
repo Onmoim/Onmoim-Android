@@ -11,4 +11,9 @@ interface MeetingRepository {
         size: Int = 20,
         filter: MeetingType? = null
     ): Flow<PagingData<Meeting>>
+
+    suspend fun deleteMeeting(
+        groupId: Int,
+        meetingId: Int
+    ): Result<Unit>
 }

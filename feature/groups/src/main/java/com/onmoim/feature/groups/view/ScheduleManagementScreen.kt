@@ -213,6 +213,7 @@ fun ScheduleManagementScreenPreview() {
             longitude = 0
         )
     )
+
     OnmoimTheme {
         ScheduleManagementScreen(
             onBack = {},
