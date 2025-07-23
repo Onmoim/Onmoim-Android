@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -145,6 +146,14 @@ fun CreateScheduleRoute(
         onCapacityChange = createScheduleViewModel::onCapacityChange,
         onClickConfirm = createScheduleViewModel::createSchedule
     )
+
+    DisposableEffect(Unit) {
+        onDispose {
+            scope.launch(Dispatchers.IO) {
+                FileUtil.removeTempImagesDir(context)
+            }
+        }
+    }
 }
 
 @Composable
@@ -171,7 +180,7 @@ private fun CreateScheduleScreen(
         CommonAppBar(
             title = {
                 Text(
-                    text = stringResource(R.string.schedule_management),
+                    text = stringResource(R.string.create_schedule),
                     style = OnmoimTheme.typography.body1SemiBold
                 )
             },
