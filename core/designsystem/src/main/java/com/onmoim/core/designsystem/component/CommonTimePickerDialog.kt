@@ -80,23 +80,25 @@ fun CommonTimePickerDialog(
     val context = LocalContext.current
 
     val availableHours = remember(selectedTwelveHourPeriod, minTime) {
-        val minHour = if (selectedTwelveHourPeriod == TwelveHourPeriod.AM) {
-            if (minTime.hour == 0) 1 else minTime.hour
-        } else {
-            if (minTime.hour < 13) 1 else minTime.hour - 12
+        (1..12).filter { h ->
+            val hour24 = when (selectedTwelveHourPeriod) {
+                TwelveHourPeriod.AM -> if (h == 12) 0 else h
+                TwelveHourPeriod.PM -> if (h == 12) 12 else h + 12
+            }
+            hour24 >= minTime.hour
         }
-        (minHour..12).toList()
     }
 
     val availableMinutes = remember(selectedTwelveHourPeriod, selectedHour, minTime) {
-        val minMinute =
-            if (selectedTwelveHourPeriod == TwelveHourPeriod.AM && selectedHour == minTime.hour) {
-                minTime.minute
-            } else if (selectedTwelveHourPeriod == TwelveHourPeriod.PM && selectedHour + 12 == minTime.hour) {
-                minTime.minute
-            } else {
-                0
-            }
+        val hour24 = when (selectedTwelveHourPeriod) {
+            TwelveHourPeriod.AM -> if (selectedHour == 12) 0 else selectedHour
+            TwelveHourPeriod.PM -> if (selectedHour == 12) 12 else selectedHour + 12
+        }
+        val minMinute = if (hour24 == minTime.hour) {
+            minTime.minute
+        } else {
+            0
+        }
         (minMinute..59).toList()
     }
 
