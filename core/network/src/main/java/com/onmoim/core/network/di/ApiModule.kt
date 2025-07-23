@@ -4,6 +4,7 @@ import com.onmoim.core.network.api.AuthApi
 import com.onmoim.core.network.api.CategoryApi
 import com.onmoim.core.network.api.GroupApi
 import com.onmoim.core.network.api.LocationApi
+import com.onmoim.core.network.api.MeetingApi
 import com.onmoim.core.network.api.UserApi
 import dagger.Module
 import dagger.Provides
@@ -29,4 +30,7 @@ object ApiModule {
 
     @Provides
     fun provideGroupApi(retrofit: Retrofit): GroupApi = retrofit.create(GroupApi::class.java)
+
+    @Provides
+    fun provideMeetingApi(retrofit: Retrofit): MeetingApi = retrofit.create(MeetingApi::class.java)
 }

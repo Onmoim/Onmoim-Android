@@ -25,6 +25,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.onmoim.core.data.constant.MeetingType
+import com.onmoim.core.data.model.Meeting
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.CommonDialog
 import com.onmoim.core.designsystem.component.NavigationIconButton
@@ -35,6 +40,7 @@ import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.state.ScheduleManagementEvent
 import com.onmoim.feature.groups.viewmodel.ScheduleManagementViewModel
+import kotlinx.coroutines.flow.flowOf
 import java.time.LocalDateTime
 
 @Composable
@@ -46,6 +52,8 @@ fun ScheduleManagementRoute(
     var selectedDeleteMeetingId by remember { mutableIntStateOf(0) }
     val context = LocalContext.current
     val isLoading by scheduleManagementViewModel.isLoading.collectAsStateWithLifecycle()
+    val meetingPagingItems =
+        scheduleManagementViewModel.meetingPagingData.collectAsLazyPagingItems()
 
     if (showDeleteDialog) {
         CommonDialog(
@@ -74,7 +82,8 @@ fun ScheduleManagementRoute(
             onClickDelete = { meetingId ->
                 selectedDeleteMeetingId = meetingId
                 showDeleteDialog = true
-            }
+            },
+            meetingPagingItems = meetingPagingItems
         )
     }
 
@@ -100,7 +109,8 @@ fun ScheduleManagementRoute(
 @Composable
 private fun ScheduleManagementScreen(
     onBack: () -> Unit,
-    onClickDelete: (meetingId: Int) -> Unit
+    onClickDelete: (meetingId: Int) -> Unit,
+    meetingPagingItems: LazyPagingItems<Meeting>
 ) {
     Column(
         modifier = Modifier
@@ -127,6 +137,7 @@ private fun ScheduleManagementScreen(
         )
         LazyColumn(
             modifier = Modifier
+                .background(OnmoimTheme.colors.gray01)
                 .weight(1f)
                 .fillMaxWidth(),
             contentPadding = PaddingValues(
@@ -135,34 +146,78 @@ private fun ScheduleManagementScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            items(10) {
-                ComingScheduleCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClickButton = {
-
-                    },
-                    buttonType = ComingScheduleCardButtonType.DELETE,
-                    isLightning = false,
-                    startDate = LocalDateTime.now().plusDays(2),
-                    title = "퇴근 후 독서 정모: 각자 독서",
-                    placeName = "카페 언노운",
-                    cost = 1000,
-                    joinCount = 6,
-                    capacity = 8,
-                    imageUrl = "https://picsum.photos/200"
-                )
+            items(meetingPagingItems.itemCount) { index ->
+                meetingPagingItems[index]?.let {
+                    ComingScheduleCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClickButton = {
+                            onClickDelete(it.id)
+                        },
+                        buttonType = ComingScheduleCardButtonType.DELETE,
+                        isLightning = it.type == MeetingType.LIGHTNING,
+                        startDate = it.startDate,
+                        title = it.title,
+                        placeName = it.placeName,
+                        cost = it.cost,
+                        joinCount = it.joinCount,
+                        capacity = it.capacity,
+                        imageUrl = it.imgUrl
+                    )
+                }
             }
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-private fun ScheduleManagementScreenPreview() {
+fun ScheduleManagementScreenPreview() {
+    val dummyMeetings = listOf(
+        Meeting(
+            id = 1,
+            title = "코딩 스터디",
+            placeName = "강남역 카페",
+            startDate = LocalDateTime.now().plusDays(2),
+            cost = 0,
+            joinCount = 5,
+            capacity = 10,
+            type = MeetingType.REGULAR,
+            imgUrl = null,
+            latitude = 0,
+            longitude = 0
+        ),
+        Meeting(
+            id = 2,
+            title = "저녁 식사",
+            placeName = "홍대 맛집",
+            startDate = LocalDateTime.now().plusDays(5),
+            cost = 20000,
+            joinCount = 3,
+            capacity = 6,
+            type = MeetingType.REGULAR,
+            imgUrl = null,
+            latitude = 0,
+            longitude = 0
+        ),
+        Meeting(
+            id = 3,
+            title = "농구 번개",
+            placeName = "여의도 공원",
+            startDate = LocalDateTime.now().plusWeeks(1),
+            cost = 0,
+            joinCount = 8,
+            capacity = 15,
+            type = MeetingType.LIGHTNING,
+            imgUrl = null,
+            latitude = 0,
+            longitude = 0
+        )
+    )
     OnmoimTheme {
         ScheduleManagementScreen(
             onBack = {},
-            onClickDelete = {}
+            onClickDelete = {},
+            meetingPagingItems = flowOf(PagingData.from(dummyMeetings)).collectAsLazyPagingItems()
         )
     }
 }
