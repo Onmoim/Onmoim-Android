@@ -82,7 +82,7 @@ fun GroupImageBox(
                         )
                         Spacer(Modifier.height(12.dp))
                         Text(
-                            text = stringResource(R.string.group_image_not_reg_guide),
+                            text = stringResource(R.string.image_not_reg_guide),
                             style = OnmoimTheme.typography.body2Regular.copy(
                                 color = OnmoimTheme.colors.gray05
                             )
