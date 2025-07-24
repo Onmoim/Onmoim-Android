@@ -60,7 +60,7 @@ class OnmoimAuthenticator @Inject constructor(
                         val reissueTokenRequest = ReissueTokenRequest(refreshToken)
                         val json = Json.encodeToString(reissueTokenRequest)
                         val reqBody = json.toRequestBody("application/json".toMediaType())
-                        url(BuildConfig.BASE_URL)
+                        url("${BuildConfig.BASE_URL}/api/v1/auth/reissue-tkn")
                         post(reqBody)
                     }.build()
                     client.newCall(refreshReq).execute()
