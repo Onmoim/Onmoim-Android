@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "com.onmoim.core.ui"
 }
+
+dependencies {
+    implementation(libs.naverMap)
+}

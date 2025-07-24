@@ -26,6 +26,7 @@ uiTextGoogleFonts = "1.8.3"
 androidx-credentials = "1.5.0"
 googleId = "1.1.1"
 androidDesugarJdkLibs = "2.1.5"
+naverMap = "3.21.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -72,6 +73,7 @@ android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", ver
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 compose-compiler-gradle-plugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
+naverMap = { module = "com.naver.maps:map-sdk", version.ref = "naverMap" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
