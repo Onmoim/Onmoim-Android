@@ -67,7 +67,7 @@ import java.util.Locale
 fun CreateScheduleRoute(
     createScheduleViewModel: CreateScheduleViewModel,
     groupMemberRole: GroupMemberRole,
-    onNavigateToMeetingLocationSearch: () -> Unit
+    onNavigateToMeetingPlaceSearch: () -> Unit
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val uiState by createScheduleViewModel.uiState.collectAsStateWithLifecycle()
@@ -141,7 +141,7 @@ fun CreateScheduleRoute(
         onClickTimeSelect = {
             showTimePicker = true
         },
-        onClickPlaceSelect = onNavigateToMeetingLocationSearch,
+        onClickPlaceSelect = onNavigateToMeetingPlaceSearch,
         onCostChange = createScheduleViewModel::onCostChange,
         onCapacityChange = createScheduleViewModel::onCapacityChange,
         onClickConfirm = createScheduleViewModel::createSchedule

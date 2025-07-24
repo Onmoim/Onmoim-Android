@@ -77,7 +77,7 @@ class CreateScheduleViewModel @AssistedInject constructor(
         }
     }
 
-    fun onPlaceChange(place: String, latitude: Double, longitude: Double) {
+    fun onPlaceChange(place: String, latitude: Double?, longitude: Double?) {
         _uiState.update { state ->
             state.copy(
                 place = place,

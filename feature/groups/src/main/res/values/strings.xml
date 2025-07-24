@@ -11,6 +11,7 @@
     <string name="group_capacity">정원 (%1$d~%2$d)명</string>
     <string name="regular_meet">정기모임</string>
     <string name="lightning">번개</string>
+    <string name="setting">설정</string>
 
     <!-- 내 모임 -->
     <string name="my_group_create_group">+ 새로운 모임 개설하기</string>
@@ -103,4 +104,10 @@
     <string name="create_schedule_cost_hint">예상되는 비용 입력</string>
     <string name="create_schedule_capacity">정원</string>
     <string name="create_schedule_capacity_hint">정원 입력</string>
+
+    <!-- 모임 장소 검색 -->
+    <string name="meeting_place_search">모임 장소 검색</string>
+    <string name="meeting_place_search_text_field_hint">장소 입력</string>
+    <string name="meeting_place_search_permission_guide">위치 권한을 허용하면 내 위치를 확인할 수 있어요.</string>
+    <string name="meeting_place_search_btn_set_place">모임 장소로 설정</string>
 </resources>

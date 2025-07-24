@@ -18,6 +18,7 @@ androidx-core-splashScreen = "1.0.1"
 kotlinx-serialization = "1.9.0"
 ksp = "2.2.0-2.0.2"
 okHttp = "5.1.0"
+playServicesLocation = "21.3.0"
 retrofit = "3.0.0"
 androidx-paging = "3.3.6"
 gms = "4.4.3"
@@ -59,6 +60,7 @@ hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", ve
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidx-hilt" }
 okHttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okHttp" }
 okHttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okHttp" }
+playServicesLocation = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }

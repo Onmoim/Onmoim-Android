@@ -17,4 +17,6 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.androidx.paging.runtimeKtx)
     implementation(libs.androidx.paging.compose)
+    implementation(libs.naverMap)
+    implementation(libs.playServicesLocation)
 }
