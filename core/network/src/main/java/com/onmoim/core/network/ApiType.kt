@@ -8,8 +8,8 @@ import javax.inject.Qualifier
 )
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
-annotation class HttpClientType(val type: OnmoimHttpClientType)
+annotation class ApiType(val type: OnmoimApiType)
 
-enum class OnmoimHttpClientType {
-    DEFAULT, AUTH
+enum class OnmoimApiType {
+    DEFAULT, AUTH, KAKAO
 }

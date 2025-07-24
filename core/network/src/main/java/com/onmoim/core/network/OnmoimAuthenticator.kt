@@ -24,7 +24,7 @@ import javax.inject.Inject
 class OnmoimAuthenticator @Inject constructor(
     private val dataStorePreferences: DataStorePreferences,
     private val authEventBus: AuthEventBus,
-    @HttpClientType(OnmoimHttpClientType.DEFAULT) private val client: OkHttpClient,
+    @ApiType(OnmoimApiType.DEFAULT) private val client: OkHttpClient,
     @Dispatcher(OnmoimDispatcher.IO) private val ioDispatcher: CoroutineDispatcher
 ) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {

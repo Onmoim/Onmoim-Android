@@ -6,6 +6,7 @@ import android.location.Location
 import android.net.Uri
 import android.os.Looper
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -57,6 +58,7 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.Overlay
 import com.naver.maps.map.overlay.OverlayImage
+import com.onmoim.core.data.model.Place
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.theme.OnmoimTheme
@@ -64,9 +66,12 @@ import com.onmoim.core.ui.NaverMap
 import com.onmoim.core.util.checkLocationPermission
 import com.onmoim.core.util.findActivity
 import com.onmoim.feature.groups.R
+import com.onmoim.feature.groups.state.PlaceSearchEvent
 import com.onmoim.feature.groups.viewmodel.MeetingPlaceSearchViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,6 +82,8 @@ fun MeetingPlaceSearchRoute(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val context = LocalContext.current
     val searchKeyword by meetingPlaceSearchViewModel.searchKeyword.collectAsStateWithLifecycle()
+    val places by meetingPlaceSearchViewModel.searchResultState.collectAsStateWithLifecycle()
+    var markers by remember { mutableStateOf(emptyList<Marker>()) }
     var naverMap: NaverMap? by remember {
         mutableStateOf(null)
     }
@@ -100,23 +107,32 @@ fun MeetingPlaceSearchRoute(
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
+    val markerIcon = remember {
+        OverlayImage.fromResource(R.drawable.ic_marker)
+    }
+    var selectedPlace by remember { mutableStateOf<Place?>(null) }
 
-    if (showBottomSheet) {
+    if (showBottomSheet && selectedPlace != null) {
         PlaceInfoModalBottomSheet(
             onDismissRequest = {
                 showBottomSheet = false
+                selectedPlace = null
             },
             sheetState = sheetState,
-            title = "장소 이름",
-            address = "주소",
-            phoneNumber = "02-1234-5678",
+            title = selectedPlace!!.title,
+            address = selectedPlace!!.address,
+            phoneNumber = selectedPlace!!.phoneNumber,
             onClickSetting = {
                 scope.launch { sheetState.hide() }.invokeOnCompletion {
                     if (!sheetState.isVisible) {
                         showBottomSheet = false
                     }
                 }
-                onBackAndSendPlaceInfo("장소 이름", 37.5670135, 126.9783740)
+                onBackAndSendPlaceInfo(
+                    selectedPlace!!.title,
+                    selectedPlace!!.latitude,
+                    selectedPlace!!.longitude
+                )
             }
         )
     }
@@ -157,6 +173,25 @@ fun MeetingPlaceSearchRoute(
         )
     }
 
+    LaunchedEffect(Unit) {
+        meetingPlaceSearchViewModel.event.collect { event ->
+            when (event) {
+                PlaceSearchEvent.SearchEmpty -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.meeting_place_search_empty),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is PlaceSearchEvent.SearchFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    // 라이프사이클 이벤트가 ON_RESUME이면 위치 권한 체크
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         scope.launch {
             delay(30)
@@ -164,6 +199,7 @@ fun MeetingPlaceSearchRoute(
         }
     }
 
+    // 위치 권한 요청 & 실시간 위치 수신
     DisposableEffect(hasLocationPermission, fusedLocationClient) {
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
@@ -220,21 +256,38 @@ fun MeetingPlaceSearchRoute(
         }
     }
 
-    LaunchedEffect(naverMap) {
+    // 마커 표시
+    LaunchedEffect(naverMap, places) {
         if (naverMap != null) {
-            val icon = OverlayImage.fromResource(R.drawable.ic_marker)
-            val marker = Marker()
-            marker.position = LatLng(37.5670135, 126.9783740)
-            marker.icon = icon
-            marker.captionText = "테스트 마커"
-            marker.onClickListener = Overlay.OnClickListener { overlay ->
-                showBottomSheet = true
-                true
+            withContext(Dispatchers.Default) {
+                markers.forEach {
+                    it.map = null
+                }
+
+                markers = places.map {
+                    Marker().apply {
+                        position = LatLng(it.latitude, it.longitude)
+                        icon = markerIcon
+                        captionText = it.title
+                        tag = it.id
+                        onClickListener = Overlay.OnClickListener { overlay ->
+                            selectedPlace = it
+                            showBottomSheet = true
+                            true
+                        }
+                    }
+                }
             }
-            marker.map = naverMap
+
+            withContext(Dispatchers.Main) {
+                markers.forEach {
+                    it.map = naverMap
+                }
+            }
         }
     }
 
+    // 현위치 표시
     LaunchedEffect(naverMap, userLocation) {
         if (naverMap != null && userLocation != null) {
             naverMap!!.apply {

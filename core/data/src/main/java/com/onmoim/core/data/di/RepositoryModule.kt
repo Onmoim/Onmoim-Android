@@ -8,6 +8,8 @@ import com.onmoim.core.data.repository.CategoryRepository
 import com.onmoim.core.data.repository.CategoryRepositoryImpl
 import com.onmoim.core.data.repository.GroupRepository
 import com.onmoim.core.data.repository.GroupRepositoryImpl
+import com.onmoim.core.data.repository.KakaoRepository
+import com.onmoim.core.data.repository.KakaoRepositoryImpl
 import com.onmoim.core.data.repository.LocationRepository
 import com.onmoim.core.data.repository.LocationRepositoryImpl
 import com.onmoim.core.data.repository.MeetingRepository
@@ -62,4 +64,9 @@ abstract class RepositoryModule {
     abstract fun bindMeetingRepository(
         meetingRepositoryImpl: MeetingRepositoryImpl
     ): MeetingRepository
+
+    @Binds
+    abstract fun bindKakaoRepository(
+        kakaoRepositoryImpl: KakaoRepositoryImpl
+    ): KakaoRepository
 }

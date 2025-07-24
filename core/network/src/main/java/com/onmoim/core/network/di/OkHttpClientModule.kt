@@ -4,10 +4,11 @@ import com.onmoim.core.datastore.DataStorePreferences
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.event.AuthEventBus
-import com.onmoim.core.network.HttpClientType
+import com.onmoim.core.network.BuildConfig
+import com.onmoim.core.network.ApiType
+import com.onmoim.core.network.OnmoimApiType
 import com.onmoim.core.network.OnmoimAuthInterceptor
 import com.onmoim.core.network.OnmoimAuthenticator
-import com.onmoim.core.network.OnmoimHttpClientType
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,7 +30,7 @@ object OkHttpClientModule {
         level = HttpLoggingInterceptor.Level.BODY
     }
 
-    @HttpClientType(OnmoimHttpClientType.DEFAULT)
+    @ApiType(OnmoimApiType.DEFAULT)
     @Provides
     @Singleton
     fun provideDefaultOkHttpClient(
@@ -38,7 +39,7 @@ object OkHttpClientModule {
         addInterceptor(httpLoggingInterceptor)
     }.build()
 
-    @HttpClientType(OnmoimHttpClientType.AUTH)
+    @ApiType(OnmoimApiType.AUTH)
     @Provides
     @Singleton
     fun provideAuthOkHttpClient(
@@ -51,12 +52,28 @@ object OkHttpClientModule {
         authenticator(onmoimAuthenticator)
     }.build()
 
+    @ApiType(OnmoimApiType.KAKAO)
+    @Provides
+    @Singleton
+    fun provideKakaoOkHttpClient(
+        httpLoggingInterceptor: HttpLoggingInterceptor
+    ) = OkHttpClient.Builder().apply {
+        addInterceptor(Interceptor { chain ->
+            val request = chain.request()
+                .newBuilder().apply {
+                    addHeader("Authorization", "KakaoAK ${BuildConfig.KAKAO_REST_API_KEY}")
+                }.build()
+            chain.proceed(request)
+        })
+        addInterceptor(httpLoggingInterceptor)
+    }.build()
+
     @Provides
     @Singleton
     fun provideOnmoimAuthenticator(
         dataStorePreferences: DataStorePreferences,
         authEventBus: AuthEventBus,
-        @HttpClientType(OnmoimHttpClientType.DEFAULT) okHttpClient: OkHttpClient,
+        @ApiType(OnmoimApiType.DEFAULT) okHttpClient: OkHttpClient,
         @Dispatcher(OnmoimDispatcher.IO) ioDispatcher: CoroutineDispatcher
     ): Authenticator = OnmoimAuthenticator(
         dataStorePreferences = dataStorePreferences,
