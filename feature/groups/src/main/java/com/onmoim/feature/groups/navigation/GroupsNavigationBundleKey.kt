@@ -5,4 +5,5 @@ object GroupsNavigationBundleKey {
     const val MEETING_PLACE_NAME = "meeting_place_name"
     const val MEETING_PLACE_LATITUDE = "meeting_place_latitude"
     const val MEETING_PLACE_LONGITUDE = "meeting_place_longitude"
+    const val COMING_SCHEDULE_REFRESH = "coming_schedule_refresh"
 }

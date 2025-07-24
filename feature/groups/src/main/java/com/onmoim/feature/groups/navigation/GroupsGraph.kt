@@ -65,6 +65,12 @@ fun NavGraphBuilder.groupsGraph(
                     it.create(comingScheduleRoute.groupId)
                 }
 
+            val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+            val isRefresh =
+                savedStateHandle?.get<Boolean>(GroupsNavigationBundleKey.COMING_SCHEDULE_REFRESH)
+                    ?: false
+            savedStateHandle?.remove<Boolean>(GroupsNavigationBundleKey.COMING_SCHEDULE_REFRESH)
+
             ComingScheduleRoute(
                 comingScheduleViewModel = comingScheduleViewModel,
                 onNavigateToCreateSchedule = {
@@ -80,6 +86,12 @@ fun NavGraphBuilder.groupsGraph(
 
                 }
             )
+
+            LaunchedEffect(Unit) {
+                if (isRefresh) {
+                    // TODO: 일정 목록 새로고침
+                }
+            }
         }
         composable<GroupDetailRoute> { backStackEntry ->
             val groupId = backStackEntry.toRoute<GroupDetailRoute>().id
@@ -227,6 +239,12 @@ fun NavGraphBuilder.groupsGraph(
                 groupMemberRole = createScheduleRoute.groupMemberRole,
                 onNavigateToMeetingPlaceSearch = {
                     navController.navigateToMeetingLocationSearch()
+                },
+                onBackAndRefresh = {
+                    navController.previousBackStackEntry?.savedStateHandle?.apply {
+                        set(GroupsNavigationBundleKey.COMING_SCHEDULE_REFRESH, true)
+                    }
+                    navController.popBackStack()
                 }
             )
 

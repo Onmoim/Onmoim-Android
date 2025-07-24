@@ -3,9 +3,14 @@ package com.onmoim.core.network.api
 import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.meeting.BaseMeetingPageDto
 import com.onmoim.core.network.model.meeting.MeetingDto
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
+import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -22,5 +27,13 @@ interface MeetingApi {
     suspend fun deleteMeeting(
         @Path("groupId") groupId: Int,
         @Path("meetingId") meetingId: Int
+    ): Response<BaseResponse<String>>
+
+    @Multipart
+    @POST("api/v1/groups/{groupId}/meetings")
+    suspend fun createMeeting(
+        @Path("groupId") groupId: Int,
+        @Part("request") requestBody: RequestBody,
+        @Part image: MultipartBody.Part? = null
     ): Response<BaseResponse<String>>
 }

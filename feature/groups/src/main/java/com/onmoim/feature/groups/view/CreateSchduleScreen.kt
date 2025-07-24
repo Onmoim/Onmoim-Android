@@ -1,5 +1,6 @@
 package com.onmoim.feature.groups.view
 
+import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -28,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +56,7 @@ import com.onmoim.core.util.FileUtil
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.GroupMemberRole
 import com.onmoim.feature.groups.constant.ScheduleType
+import com.onmoim.feature.groups.state.CreateScheduleEvent
 import com.onmoim.feature.groups.state.CreateScheduleUiState
 import com.onmoim.feature.groups.viewmodel.CreateScheduleViewModel
 import kotlinx.coroutines.Dispatchers
@@ -67,7 +70,8 @@ import java.util.Locale
 fun CreateScheduleRoute(
     createScheduleViewModel: CreateScheduleViewModel,
     groupMemberRole: GroupMemberRole,
-    onNavigateToMeetingPlaceSearch: () -> Unit
+    onNavigateToMeetingPlaceSearch: () -> Unit,
+    onBackAndRefresh: () -> Unit
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val uiState by createScheduleViewModel.uiState.collectAsStateWithLifecycle()
@@ -146,6 +150,25 @@ fun CreateScheduleRoute(
         onCapacityChange = createScheduleViewModel::onCapacityChange,
         onClickConfirm = createScheduleViewModel::createSchedule
     )
+
+    LaunchedEffect(Unit) {
+        createScheduleViewModel.event.collect { event ->
+            when (event) {
+                CreateScheduleEvent.CreateSuccess -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.create_schedule_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    onBackAndRefresh()
+                }
+
+                is CreateScheduleEvent.CreateFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     DisposableEffect(Unit) {
         onDispose {

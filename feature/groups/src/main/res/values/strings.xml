@@ -104,6 +104,7 @@
     <string name="create_schedule_cost_hint">예상되는 비용 입력</string>
     <string name="create_schedule_capacity">정원</string>
     <string name="create_schedule_capacity_hint">정원 입력</string>
+    <string name="create_schedule_success">일정이 생성되었습니다.</string>
 
     <!-- 모임 장소 검색 -->
     <string name="meeting_place_search">모임 장소 검색</string>

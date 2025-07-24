@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.onmoim.android.library)
+    alias(libs.plugins.onmoim.kotlin.library.serialization)
 }
 
 android {
