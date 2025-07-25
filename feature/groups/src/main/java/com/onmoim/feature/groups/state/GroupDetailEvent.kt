@@ -12,4 +12,9 @@ sealed class GroupDetailEvent {
     data class AttendMeetingFailure(val t: Throwable) : GroupDetailEvent()
     data object LeaveMeetingSuccess : GroupDetailEvent()
     data class LeaveMeetingFailure(val t: Throwable) : GroupDetailEvent()
+    data object JoinGroupSuccess: GroupDetailEvent()
+    data object JoinGroupBanned: GroupDetailEvent()
+    data object JoinGroupNotFound: GroupDetailEvent()
+    data object JoinGroupOverCapacity: GroupDetailEvent()
+    data class JoinGroupFailure(val t: Throwable) : GroupDetailEvent()
 }

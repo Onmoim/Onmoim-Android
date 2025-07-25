@@ -2,6 +2,7 @@ package com.onmoim.core.data.repository
 
 import androidx.paging.PagingData
 import com.onmoim.core.data.constant.HomePopular
+import com.onmoim.core.data.constant.JoinGroupResult
 import com.onmoim.core.data.model.ActiveStatistics
 import com.onmoim.core.data.model.GroupDetail
 import com.onmoim.core.data.model.HomeGroup
@@ -32,4 +33,5 @@ interface GroupRepository {
         capacity: Int,
         imageUrl: String? = null
     ): Result<Unit>
+    suspend fun joinGroup(groupId: Int): Result<JoinGroupResult>
 }

@@ -1,9 +1,9 @@
 package com.onmoim.core.network.api
 
-import com.onmoim.core.network.model.group.BaseGroupPageDto
 import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.MemberDto
 import com.onmoim.core.network.model.MemberIdRequestDto
+import com.onmoim.core.network.model.group.BaseGroupPageDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
 import com.onmoim.core.network.model.group.CreatedGroupDto
 import com.onmoim.core.network.model.group.GroupDetailDto
@@ -92,5 +92,10 @@ interface GroupApi {
         @Path("groupId") groupId: Int,
         @Part("request") requestBody: RequestBody,
         @Part file: MultipartBody.Part? = null
+    ): Response<BaseResponse<String>>
+
+    @POST("api/v1/groups/{groupId}/join")
+    suspend fun joinGroup(
+        @Path("groupId") groupId: Int
     ): Response<BaseResponse<String>>
 }

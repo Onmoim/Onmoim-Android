@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.onmoim.core.data.constant.HomePopular
+import com.onmoim.core.data.constant.JoinGroupResult
 import com.onmoim.core.data.constant.MemberStatus
 import com.onmoim.core.data.model.ActiveStatistics
 import com.onmoim.core.data.model.GroupDetail
@@ -256,6 +257,20 @@ class GroupRepositoryImpl @Inject constructor(
             Result.success(Unit)
         } else {
             Result.failure(HttpException(resp))
+        }
+    }
+
+    override suspend fun joinGroup(groupId: Int): Result<JoinGroupResult> {
+        val resp = withContext(ioDispatcher) {
+            groupApi.joinGroup(groupId)
+        }
+
+        return when {
+            resp.isSuccessful -> Result.success(JoinGroupResult.SUCCESS)
+            resp.code() == 400 -> Result.success(JoinGroupResult.BANNED)
+            resp.code() == 404 -> Result.success(JoinGroupResult.NOT_FOUND)
+            resp.code() == 409 -> Result.success(JoinGroupResult.OVER_CAPACITY)
+            else -> Result.failure(HttpException(resp))
         }
     }
 }

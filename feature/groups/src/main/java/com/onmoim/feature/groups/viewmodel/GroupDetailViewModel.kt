@@ -3,6 +3,7 @@ package com.onmoim.feature.groups.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.onmoim.core.data.constant.JoinGroupResult
 import com.onmoim.core.data.constant.JoinMeetingResult
 import com.onmoim.core.data.constant.LeaveMeetingResult
 import com.onmoim.core.data.repository.GroupRepository
@@ -121,7 +122,38 @@ class GroupDetailViewModel @AssistedInject constructor(
     }
 
     fun joinGroup() {
-        // TODO: 모임 가입
+        _isLoading.value = true
+
+        viewModelScope.launch {
+            groupRepository.joinGroup(groupId).onFailure {
+                Log.e("GroupDetailViewModel", "joinGroup error", it)
+                _isLoading.value = false
+                _event.send(GroupDetailEvent.JoinGroupFailure(it))
+            }.onSuccess { result ->
+                when (result) {
+                    JoinGroupResult.SUCCESS -> {
+                        fetchGroupDetail(true)
+                        _event.send(GroupDetailEvent.JoinGroupSuccess)
+                    }
+
+                    JoinGroupResult.BANNED -> {
+                        _isLoading.value = false
+                        _event.send(GroupDetailEvent.JoinGroupBanned)
+                    }
+
+                    JoinGroupResult.NOT_FOUND -> {
+                        _isLoading.value = false
+                        _event.send(GroupDetailEvent.JoinGroupNotFound)
+                    }
+
+                    JoinGroupResult.OVER_CAPACITY -> {
+                        _isLoading.value = false
+                        _event.send(GroupDetailEvent.JoinGroupOverCapacity)
+                    }
+                }
+
+            }
+        }
     }
 
     fun attendMeeting(meetingId: Int) {

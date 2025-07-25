@@ -276,6 +276,42 @@ fun GroupDetailRoute(
                         Toast.LENGTH_SHORT
                     ).show()
                 }
+
+                GroupDetailEvent.JoinGroupBanned -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_group_banned),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is GroupDetailEvent.JoinGroupFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                GroupDetailEvent.JoinGroupNotFound -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_group_not_found),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                GroupDetailEvent.JoinGroupOverCapacity -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_group_over_capacity),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                GroupDetailEvent.JoinGroupSuccess -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_group_join_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
