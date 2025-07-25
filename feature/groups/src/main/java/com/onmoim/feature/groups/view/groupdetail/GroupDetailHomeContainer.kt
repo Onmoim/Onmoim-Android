@@ -44,6 +44,7 @@ fun GroupDetailHomeContainer(
     memberStatus: MemberStatus,
     onClickComingSchedule: () -> Unit,
     onClickMeetAttend: (id: Int) -> Unit,
+    onClickMeetLeave: (id: Int) -> Unit,
     onClickGroupSetting: () -> Unit
 ) {
     Column(
@@ -161,7 +162,11 @@ fun GroupDetailHomeContainer(
                     ComingScheduleCard(
                         modifier = Modifier.fillMaxWidth(),
                         onClickButton = {
-                            onClickMeetAttend(meet.id)
+                            if (meet.attendance) {
+                                onClickMeetLeave(meet.id)
+                            } else {
+                                onClickMeetAttend(meet.id)
+                            }
                         },
                         buttonType = if (meet.attendance) {
                             ComingScheduleCardButtonType.ATTEND_CANCEL

@@ -199,7 +199,8 @@ fun GroupDetailRoute(
                 showMenuDialog = true
             },
             onClickFavorite = groupDetailViewModel::favoriteGroup,
-            onClickMeetAttend = groupDetailViewModel::attendMeeting
+            onClickMeetAttend = groupDetailViewModel::attendMeeting,
+            onClickMeetLeave = groupDetailViewModel::leaveMeeting
         )
     }
 
@@ -235,6 +236,46 @@ fun GroupDetailRoute(
                 is GroupDetailEvent.FavoriteGroupFailure -> {
                     Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
                 }
+
+                is GroupDetailEvent.AttendMeetingFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                GroupDetailEvent.AttendMeetingOverCapacity -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_attend_meeting_over_capacity),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                GroupDetailEvent.AttendMeetingSuccess -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_attend_meeting_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is GroupDetailEvent.LeaveMeetingFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                GroupDetailEvent.LeaveMeetingSuccess -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_leave_meeting_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                GroupDetailEvent.MeetingNotFound -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_meeting_not_found),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
@@ -252,7 +293,8 @@ private fun GroupDetailScreen(
     onClickGroupSetting: () -> Unit,
     onClickMenu: () -> Unit,
     onClickFavorite: (Boolean) -> Unit,
-    onClickMeetAttend: (meetingId: Int) -> Unit
+    onClickMeetAttend: (meetingId: Int) -> Unit,
+    onClickMeetLeave: (meetingId: Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -339,6 +381,7 @@ private fun GroupDetailScreen(
                                     role?.let(onClickComingSchedule)
                                 },
                                 onClickMeetAttend = onClickMeetAttend,
+                                onClickMeetLeave = onClickMeetLeave,
                                 onClickGroupSetting = onClickGroupSetting
                             )
                             if (groupDetail.memberStatus == MemberStatus.NONE) {
@@ -480,7 +523,8 @@ private fun GroupDetailScreenForHomePreview1() {
             onClickGroupSetting = {},
             onClickMenu = {},
             onClickFavorite = {},
-            onClickMeetAttend = {}
+            onClickMeetAttend = {},
+            onClickMeetLeave = {}
         )
     }
 }
@@ -500,7 +544,8 @@ private fun GroupDetailScreenForHomePreview2() {
             onClickGroupSetting = {},
             onClickMenu = {},
             onClickFavorite = {},
-            onClickMeetAttend = {}
+            onClickMeetAttend = {},
+            onClickMeetLeave = {}
         )
     }
 }
@@ -520,7 +565,8 @@ private fun GroupDetailScreenForPostPreview() {
             onClickGroupSetting = {},
             onClickMenu = {},
             onClickFavorite = {},
-            onClickMeetAttend = {}
+            onClickMeetAttend = {},
+            onClickMeetLeave = {}
         )
     }
 }
