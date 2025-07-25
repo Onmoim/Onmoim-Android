@@ -124,7 +124,7 @@ class CreateScheduleViewModel @AssistedInject constructor(
 
         val type = when (uiState.value.type) {
             ScheduleType.REGULAR -> "REGULAR"
-            ScheduleType.LIGHTNING -> "LIGHTNING"
+            ScheduleType.LIGHTNING -> "FLASH"
             null -> "REGULAR"
         }
         val startDateTime = LocalDateTime.of(uiState.value.startDate, uiState.value.startTime)
