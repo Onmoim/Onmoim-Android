@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import com.onmoim.feature.groups.constant.BoardType
 import com.onmoim.feature.groups.constant.GroupMemberRole
 import com.onmoim.feature.groups.view.ComingScheduleRoute
 import com.onmoim.feature.groups.view.CreateScheduleRoute
@@ -23,12 +24,14 @@ import com.onmoim.feature.groups.view.ScheduleManagementRoute
 import com.onmoim.feature.groups.view.groupdetail.GroupDetailRoute
 import com.onmoim.feature.groups.view.groupmanagement.GroupManagementRoute
 import com.onmoim.feature.groups.view.meetingplacesearch.MeetingPlaceSearchRoute
+import com.onmoim.feature.groups.view.post.PostWriteRoute
 import com.onmoim.feature.groups.viewmodel.ComingScheduleViewModel
 import com.onmoim.feature.groups.viewmodel.CreateScheduleViewModel
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
 import com.onmoim.feature.groups.viewmodel.GroupEditViewModel
 import com.onmoim.feature.groups.viewmodel.GroupManagementViewModel
 import com.onmoim.feature.groups.viewmodel.GroupOpenViewModel
+import com.onmoim.feature.groups.viewmodel.PostWriteViewModel
 import com.onmoim.feature.groups.viewmodel.ScheduleManagementViewModel
 import com.onmoim.feature.location.navigation.LocationNavigationBundleKey
 import com.onmoim.feature.location.navigation.navigateToLocationSearch
@@ -100,12 +103,6 @@ fun NavGraphBuilder.groupsGraph(
                     it.create(groupId)
                 }
 
-            val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
-            val isRefresh =
-                savedStateHandle?.get<Boolean>(GroupsNavigationBundleKey.GROUP_DETAIL_REFRESH)
-                    ?: false
-            savedStateHandle?.remove<Boolean>(GroupsNavigationBundleKey.GROUP_DETAIL_REFRESH)
-
             GroupDetailRoute(
                 groupDetailViewModel = groupDetailViewModel,
                 onNavigateToComingSchedule = { role ->
@@ -114,13 +111,37 @@ fun NavGraphBuilder.groupsGraph(
                 onNavigateToPostDetail = {},
                 onNavigateToGroupManagement = {
                     navController.navigateToGroupManagement(groupId)
+                },
+                onNavigateToPostWrite = { isOwner ->
+                    navController.navigateToPostWrite(groupId, isOwner)
                 }
             )
 
             LaunchedEffect(Unit) {
+                val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+                val isRefresh =
+                    savedStateHandle?.get<Boolean>(GroupsNavigationBundleKey.GROUP_DETAIL_REFRESH)
+                        ?: false
+                val boardRefreshType =
+                    savedStateHandle?.get<String>(GroupsNavigationBundleKey.BOARD_REFRESH_TYPE)
+                val boardType = when (boardRefreshType) {
+                    "NOTICE" -> BoardType.NOTICE
+                    "INTRO" -> BoardType.INTRO
+                    "REVIEW" -> BoardType.REVIEW
+                    "FREE" -> BoardType.FREE
+                    else -> null
+                }
+
                 if (isRefresh) {
                     groupDetailViewModel.fetchGroupDetail(true)
                 }
+
+                if (boardType != null) {
+                    // TODO: 게시판 새로고침
+                }
+
+                savedStateHandle?.remove<Boolean>(GroupsNavigationBundleKey.GROUP_DETAIL_REFRESH)
+                savedStateHandle?.remove<String>(GroupsNavigationBundleKey.BOARD_REFRESH_TYPE)
             }
         }
         composable<GroupCategorySelectRoute> {
@@ -272,6 +293,30 @@ fun NavGraphBuilder.groupsGraph(
                         set(GroupsNavigationBundleKey.MEETING_PLACE_NAME, placeName)
                         set(GroupsNavigationBundleKey.MEETING_PLACE_LATITUDE, latitude)
                         set(GroupsNavigationBundleKey.MEETING_PLACE_LONGITUDE, longitude)
+                    }
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<PostWriteRoute> { backStackEntry ->
+            val postWriteRoute = backStackEntry.toRoute<PostWriteRoute>()
+            val postWriteViewModel = hiltViewModel<PostWriteViewModel, PostWriteViewModel.Factory> {
+                it.create(postWriteRoute.groupId)
+            }
+
+            PostWriteRoute(
+                postWriteViewModel = postWriteViewModel,
+                isOwner = postWriteRoute.isOwner,
+                onBackAndRefresh = { type ->
+                    val boardRefreshType = when (type) {
+                        BoardType.NOTICE -> "NOTICE"
+                        BoardType.INTRO -> "INTRO"
+                        BoardType.REVIEW -> "REVIEW"
+                        BoardType.FREE -> "FREE"
+                    }
+
+                    navController.previousBackStackEntry?.savedStateHandle?.apply {
+                        set(GroupsNavigationBundleKey.BOARD_REFRESH_TYPE, boardRefreshType)
                     }
                     navController.popBackStack()
                 }

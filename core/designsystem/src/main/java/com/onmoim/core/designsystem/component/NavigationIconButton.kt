@@ -1,5 +1,6 @@
 package com.onmoim.core.designsystem.component
 
+import androidx.compose.foundation.Indication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,7 @@ fun NavigationIconButton(
     modifier: Modifier = Modifier,
     size: Dp = NavigationIconSize,
     enabled: Boolean = true,
+    indication: Indication? = ripple(),
     content: @Composable () -> Unit
 ) {
     Box(
@@ -33,7 +35,7 @@ fun NavigationIconButton(
                     enabled = enabled,
                     role = Role.Button,
                     interactionSource = remember { MutableInteractionSource() },
-                    indication = ripple()
+                    indication = indication
                 ),
         contentAlignment = Alignment.Center
     ) {

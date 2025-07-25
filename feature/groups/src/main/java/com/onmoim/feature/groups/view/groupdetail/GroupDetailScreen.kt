@@ -2,7 +2,9 @@ package com.onmoim.feature.groups.view.groupdetail
 
 import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -22,7 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,7 +52,7 @@ import com.onmoim.core.designsystem.component.group.GroupDetailAppBar
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.feature.groups.R
-import com.onmoim.feature.groups.constant.GroupDetailPostFilter
+import com.onmoim.feature.groups.constant.GroupDetailPostType
 import com.onmoim.feature.groups.constant.GroupDetailTab
 import com.onmoim.feature.groups.constant.GroupMemberRole
 import com.onmoim.feature.groups.state.GroupDetailEvent
@@ -61,6 +67,7 @@ fun GroupDetailRoute(
     onNavigateToComingSchedule: (GroupMemberRole) -> Unit,
     onNavigateToPostDetail: (id: Int) -> Unit,
     onNavigateToGroupManagement: () -> Unit,
+    onNavigateToPostWrite: (isOwner: Boolean) -> Unit,
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var selectedTab by remember { mutableStateOf(GroupDetailTab.HOME) }
@@ -216,12 +223,13 @@ fun GroupDetailRoute(
             postFilter = postFilter,
             onPostFilterChange = groupDetailViewModel::onPostFilterChange,
             postPagingItems = when (postFilter) {
-                GroupDetailPostFilter.ALL -> allPostPagingItems
-                GroupDetailPostFilter.NOTICE -> noticePostPagingItems
-                GroupDetailPostFilter.REG_GREETING -> introPostPagingItems
-                GroupDetailPostFilter.MEET_REVIEW -> reviewPostPagingItems
-                GroupDetailPostFilter.FREE_BOARD -> freePostPagingItems
-            }
+                GroupDetailPostType.ALL -> allPostPagingItems
+                GroupDetailPostType.NOTICE -> noticePostPagingItems
+                GroupDetailPostType.INTRO -> introPostPagingItems
+                GroupDetailPostType.REVIEW -> reviewPostPagingItems
+                GroupDetailPostType.FREE -> freePostPagingItems
+            },
+            onClickPostWrite = onNavigateToPostWrite
         )
     }
 
@@ -352,9 +360,10 @@ private fun GroupDetailScreen(
     onClickFavorite: (Boolean) -> Unit,
     onClickMeetAttend: (meetingId: Int) -> Unit,
     onClickMeetLeave: (meetingId: Int) -> Unit,
-    postFilter: GroupDetailPostFilter,
-    onPostFilterChange: (GroupDetailPostFilter) -> Unit,
-    postPagingItems: LazyPagingItems<Post>
+    postFilter: GroupDetailPostType,
+    onPostFilterChange: (GroupDetailPostType) -> Unit,
+    postPagingItems: LazyPagingItems<Post>,
+    onClickPostWrite: (isOwner: Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -364,6 +373,8 @@ private fun GroupDetailScreen(
         val groupTitle = (groupDetailUiState as? GroupDetailUiState.Success)?.groupDetail?.title
         val isFavorite =
             (groupDetailUiState as? GroupDetailUiState.Success)?.groupDetail?.isFavorite
+        val memberStatus =
+            (groupDetailUiState as? GroupDetailUiState.Success)?.groupDetail?.memberStatus
 
         GroupDetailAppBar(
             title = groupTitle ?: "",
@@ -466,6 +477,28 @@ private fun GroupDetailScreen(
                         onFilterChange = onPostFilterChange,
                         postPagingItems = postPagingItems
                     )
+                    if (memberStatus == MemberStatus.OWNER || memberStatus == MemberStatus.MEMBER) {
+                        Box(
+                            modifier = Modifier
+                                .padding(end = 15.dp, bottom = 40.dp)
+                                .align(Alignment.BottomEnd)
+                                .clickable {
+                                    onClickPostWrite(memberStatus == MemberStatus.OWNER)
+                                }
+                                .background(
+                                    color = OnmoimTheme.colors.primaryBlue,
+                                    shape = CircleShape
+                                )
+                                .size(60.dp)
+                                .clip(CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.ic_pencil),
+                                contentDescription = null
+                            )
+                        }
+                    }
                 }
 
                 GroupDetailTab.CHAT -> {}
@@ -617,9 +650,10 @@ private fun GroupDetailScreenForHomePreview1() {
             onClickFavorite = {},
             onClickMeetAttend = {},
             onClickMeetLeave = {},
-            postFilter = GroupDetailPostFilter.ALL,
+            postFilter = GroupDetailPostType.ALL,
             onPostFilterChange = {},
-            postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems()
+            postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems(),
+            onClickPostWrite = {}
         )
     }
 }
@@ -641,9 +675,10 @@ private fun GroupDetailScreenForHomePreview2() {
             onClickFavorite = {},
             onClickMeetAttend = {},
             onClickMeetLeave = {},
-            postFilter = GroupDetailPostFilter.ALL,
+            postFilter = GroupDetailPostType.ALL,
             onPostFilterChange = {},
-            postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems()
+            postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems(),
+            onClickPostWrite = {}
         )
     }
 }
@@ -658,16 +693,17 @@ private fun GroupDetailScreenForPostPreview() {
             onTabChange = {},
             onClickComingSchedule = {},
             onClickPost = {},
-            groupDetailUiState = GroupDetailUiState.Loading,
+            groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.OWNER)),
             onClickGroupJoin = {},
             onClickGroupSetting = {},
             onClickMenu = {},
             onClickFavorite = {},
             onClickMeetAttend = {},
             onClickMeetLeave = {},
-            postFilter = GroupDetailPostFilter.ALL,
+            postFilter = GroupDetailPostType.ALL,
             onPostFilterChange = {},
-            postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems()
+            postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems(),
+            onClickPostWrite = {}
         )
     }
 }

@@ -12,6 +12,12 @@
     <string name="regular_meet">정기모임</string>
     <string name="lightning">번개</string>
     <string name="setting">설정</string>
+    <string name="notice_board">공지</string>
+    <string name="intro_board">가입인사</string>
+    <string name="review_board">모임후기</string>
+    <string name="free_board">자유게시판</string>
+    <string name="confirm">확인</string>
+    <string name="onmoim">온모임</string>
 
     <!-- 내 모임 -->
     <string name="my_group_create_group">+ 새로운 모임 개설하기</string>
@@ -29,10 +35,6 @@
     <string name="group_detail_chip_member_count">멤버 %d</string>
     <string name="group_detail_chip_operating">운영중</string>
     <string name="group_detail_post_all">전체</string>
-    <string name="group_detail_post_notice">공지</string>
-    <string name="group_detail_post_reg_greeting">가입인사</string>
-    <string name="group_detail_post_meet_review">모임후기</string>
-    <string name="group_detail_post_free_board">자유게시판</string>
     <string name="group_detail_post_view_mode_post">게시글</string>
     <string name="group_detail_post_view_mode_album">사진첩</string>
     <string name="group_detail_group_join">가입하기</string>
@@ -120,4 +122,11 @@
     <string name="meeting_place_search_permission_guide">위치 권한을 허용하면 내 위치를 확인할 수 있어요.</string>
     <string name="meeting_place_search_btn_set_place">모임 장소로 설정</string>
     <string name="meeting_place_search_empty">검색 결과가 없습니다.</string>
+
+    <!-- 게시글 작성 -->
+    <string name="post_write">게시글 작성</string>
+    <string name="post_write_board_category">게시글 카테고리</string>
+    <string name="post_write_board_title">제목</string>
+    <string name="post_write_board_content">게시글 내용</string>
+    <string name="post_write_delete_image_dialog_content">사진을 삭제하시겠습니까?</string>
 </resources>

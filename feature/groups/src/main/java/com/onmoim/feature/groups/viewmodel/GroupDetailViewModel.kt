@@ -11,7 +11,7 @@ import com.onmoim.core.data.constant.PostType
 import com.onmoim.core.data.repository.GroupRepository
 import com.onmoim.core.data.repository.MeetingRepository
 import com.onmoim.core.data.repository.PostRepository
-import com.onmoim.feature.groups.constant.GroupDetailPostFilter
+import com.onmoim.feature.groups.constant.GroupDetailPostType
 import com.onmoim.feature.groups.state.GroupDetailEvent
 import com.onmoim.feature.groups.state.GroupDetailUiState
 import dagger.assisted.Assisted
@@ -48,7 +48,7 @@ class GroupDetailViewModel @AssistedInject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-    private val _postFilterState = MutableStateFlow(GroupDetailPostFilter.ALL)
+    private val _postFilterState = MutableStateFlow(GroupDetailPostType.ALL)
     val postFilterState = _postFilterState.asStateFlow()
 
     val allPostPagingData =
@@ -227,7 +227,7 @@ class GroupDetailViewModel @AssistedInject constructor(
         }
     }
 
-    fun onPostFilterChange(value: GroupDetailPostFilter) {
+    fun onPostFilterChange(value: GroupDetailPostType) {
         _postFilterState.value = value
     }
 }

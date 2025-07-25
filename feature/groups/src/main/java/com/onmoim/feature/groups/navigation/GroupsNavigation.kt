@@ -61,6 +61,12 @@ data class CreateScheduleRoute(
 @Serializable
 object MeetingPlaceSearchRoute
 
+@Serializable
+data class PostWriteRoute(
+    val groupId: Int,
+    val isOwner: Boolean
+)
+
 fun NavController.navigateToComingSchedule(
     groupId: Int? = null,
     groupMemberRole: GroupMemberRole? = null,
@@ -112,4 +118,12 @@ fun NavController.navigateToCreateSchedule(
 
 fun NavController.navigateToMeetingLocationSearch(navOptions: NavOptions? = null) {
     navigate(MeetingPlaceSearchRoute, navOptions)
+}
+
+fun NavController.navigateToPostWrite(
+    groupId: Int,
+    isOwner: Boolean,
+    navOptions: NavOptions? = null
+) {
+    navigate(PostWriteRoute(groupId, isOwner), navOptions)
 }

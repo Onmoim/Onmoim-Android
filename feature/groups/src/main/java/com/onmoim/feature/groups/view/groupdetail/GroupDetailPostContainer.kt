@@ -42,15 +42,15 @@ import com.onmoim.core.designsystem.component.group.PostCard
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.groups.R
-import com.onmoim.feature.groups.constant.GroupDetailPostFilter
+import com.onmoim.feature.groups.constant.GroupDetailPostType
 import com.onmoim.feature.groups.constant.GroupDetailPostViewMode
 
 @Composable
 fun GroupDetailPostContainer(
     onClickPost: (id: Int) -> Unit,
     modifier: Modifier = Modifier,
-    selectedFilter: GroupDetailPostFilter,
-    onFilterChange: (GroupDetailPostFilter) -> Unit,
+    selectedFilter: GroupDetailPostType,
+    onFilterChange: (GroupDetailPostType) -> Unit,
     initialViewMode: GroupDetailPostViewMode = GroupDetailPostViewMode.POST,
     postPagingItems: LazyPagingItems<Post>
 ) {
@@ -68,15 +68,15 @@ fun GroupDetailPostContainer(
                 ),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            GroupDetailPostFilter.entries.forEach { filter ->
+            GroupDetailPostType.entries.forEach { filter ->
                 Text(
                     text = stringResource(
                         id = when (filter) {
-                            GroupDetailPostFilter.ALL -> R.string.group_detail_post_all
-                            GroupDetailPostFilter.NOTICE -> R.string.group_detail_post_notice
-                            GroupDetailPostFilter.REG_GREETING -> R.string.group_detail_post_reg_greeting
-                            GroupDetailPostFilter.MEET_REVIEW -> R.string.group_detail_post_meet_review
-                            GroupDetailPostFilter.FREE_BOARD -> R.string.group_detail_post_free_board
+                            GroupDetailPostType.ALL -> R.string.group_detail_post_all
+                            GroupDetailPostType.NOTICE -> R.string.notice_board
+                            GroupDetailPostType.INTRO -> R.string.intro_board
+                            GroupDetailPostType.REVIEW -> R.string.review_board
+                            GroupDetailPostType.FREE -> R.string.free_board
                         }
                     ),
                     modifier = Modifier
