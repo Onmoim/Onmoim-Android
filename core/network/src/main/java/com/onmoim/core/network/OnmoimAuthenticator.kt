@@ -6,6 +6,7 @@ import com.onmoim.core.datastore.PreferencesKey
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.event.AuthEventBus
+import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.auth.ReissueTokenRequest
 import com.onmoim.core.network.model.auth.TokenDto
 import kotlinx.coroutines.CoroutineDispatcher
@@ -74,14 +75,16 @@ class OnmoimAuthenticator @Inject constructor(
 
                 if (refreshResp.isSuccessful) {
                     val respJson = refreshResp.body.string()
-                    val respData = Json.decodeFromString<TokenDto>(respJson)
+                    val json = Json { ignoreUnknownKeys = true }
+                    val respData = json.decodeFromString<BaseResponse<TokenDto>>(respJson)
+                    val token = respData.data
 
                     runBlocking(ioDispatcher) {
                         dataStorePreferences.putString(
                             PreferencesKey.ACCESS_TOKEN,
-                            respData.accessToken
+                            token.accessToken
                         )
-                        respData.refreshToken?.let {
+                        token.refreshToken?.let {
                             dataStorePreferences.putString(
                                 PreferencesKey.REFRESH_TOKEN,
                                 it
@@ -90,7 +93,7 @@ class OnmoimAuthenticator @Inject constructor(
                     }
 
                     return response.request.newBuilder().apply {
-                        header("Authorization", "Bearer ${respData.accessToken}")
+                        header("Authorization", "Bearer ${token.accessToken}")
                     }.build()
                 } else {
                     runBlocking(ioDispatcher) {
