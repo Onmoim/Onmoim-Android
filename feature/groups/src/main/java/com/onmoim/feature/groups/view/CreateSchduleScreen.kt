@@ -28,7 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -161,19 +160,14 @@ fun CreateScheduleRoute(
                         Toast.LENGTH_SHORT
                     ).show()
                     onBackAndRefresh()
+                    scope.launch(Dispatchers.IO) {
+                        FileUtil.removeTempImagesDir(context)
+                    }
                 }
 
                 is CreateScheduleEvent.CreateFailure -> {
                     Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
                 }
-            }
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            scope.launch(Dispatchers.IO) {
-                FileUtil.removeTempImagesDir(context)
             }
         }
     }
