@@ -3,6 +3,8 @@ package com.onmoim.core.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.onmoim.core.data.constant.JoinMeetingResult
+import com.onmoim.core.data.constant.LeaveMeetingResult
 import com.onmoim.core.data.constant.MeetingType
 import com.onmoim.core.data.model.Meeting
 import com.onmoim.core.data.pagingsource.MeetingPagingSource
@@ -98,6 +100,56 @@ class MeetingRepositoryImpl @Inject constructor(
             Result.success(Unit)
         } else {
             Result.failure(Exception(resp.message()))
+        }
+    }
+
+    override suspend fun joinMeeting(
+        groupId: Int,
+        meetingId: Int
+    ): Result<JoinMeetingResult> {
+        val resp = withContext(ioDispatcher) {
+            meetingApi.joinMeeting(groupId, meetingId)
+        }
+
+        return when {
+            resp.isSuccessful -> {
+                Result.success(JoinMeetingResult.SUCCESS)
+            }
+
+            resp.code() == 404 -> {
+                Result.success(JoinMeetingResult.NOT_FOUND)
+            }
+
+            resp.code() == 409 -> {
+                Result.success(JoinMeetingResult.OVER_CAPACITY)
+            }
+
+            else -> {
+                Result.failure(Exception(resp.message()))
+            }
+        }
+    }
+
+    override suspend fun leaveMeeting(
+        groupId: Int,
+        meetingId: Int
+    ): Result<LeaveMeetingResult> {
+        val resp = withContext(ioDispatcher) {
+            meetingApi.leaveMeeting(groupId, meetingId)
+        }
+
+        return when {
+            resp.isSuccessful -> {
+                Result.success(LeaveMeetingResult.SUCCESS)
+            }
+
+            resp.code() == 404 -> {
+                Result.success(LeaveMeetingResult.NOT_FOUND)
+            }
+
+            else -> {
+                Result.failure(Exception(resp.message()))
+            }
         }
     }
 }

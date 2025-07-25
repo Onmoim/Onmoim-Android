@@ -1,6 +1,8 @@
 package com.onmoim.core.data.repository
 
 import androidx.paging.PagingData
+import com.onmoim.core.data.constant.JoinMeetingResult
+import com.onmoim.core.data.constant.LeaveMeetingResult
 import com.onmoim.core.data.constant.MeetingType
 import com.onmoim.core.data.model.Meeting
 import kotlinx.coroutines.flow.Flow
@@ -30,4 +32,7 @@ interface MeetingRepository {
         cost: Long,
         imagePath: String?
     ): Result<Unit>
+
+    suspend fun joinMeeting(groupId: Int, meetingId: Int): Result<JoinMeetingResult>
+    suspend fun leaveMeeting(groupId: Int, meetingId: Int): Result<LeaveMeetingResult>
 }

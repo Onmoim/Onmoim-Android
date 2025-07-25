@@ -36,4 +36,16 @@ interface MeetingApi {
         @Part("request") requestBody: RequestBody,
         @Part image: MultipartBody.Part? = null
     ): Response<BaseResponse<Int>>
+
+    @POST("api/v1/groups/{groupId}/meetings/{meetingId}/join")
+    suspend fun joinMeeting(
+        @Path("groupId") groupId: Int,
+        @Path("meetingId") meetingId: Int
+    ): Response<BaseResponse<String>>
+
+    @POST("api/v1/groups/{groupId}/meetings/{meetingId}/leave")
+    suspend fun leaveMeeting(
+        @Path("groupId") groupId: Int,
+        @Path("meetingId") meetingId: Int
+    ): Response<BaseResponse<String>>
 }
