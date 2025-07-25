@@ -259,11 +259,11 @@ fun MeetingPlaceSearchRoute(
     // 마커 표시
     LaunchedEffect(naverMap, places) {
         if (naverMap != null) {
-            withContext(Dispatchers.Default) {
-                markers.forEach {
-                    it.map = null
-                }
+            markers.forEach {
+                it.map = null
+            }
 
+            withContext(Dispatchers.Default) {
                 markers = places.map {
                     Marker().apply {
                         position = LatLng(it.latitude, it.longitude)
@@ -279,10 +279,8 @@ fun MeetingPlaceSearchRoute(
                 }
             }
 
-            withContext(Dispatchers.Main) {
-                markers.forEach {
-                    it.map = naverMap
-                }
+            markers.forEach {
+                it.map = naverMap
             }
         }
     }
