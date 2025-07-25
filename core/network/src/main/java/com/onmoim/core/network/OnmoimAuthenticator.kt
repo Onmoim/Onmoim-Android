@@ -77,7 +77,7 @@ class OnmoimAuthenticator @Inject constructor(
                     val respJson = refreshResp.body.string()
                     val json = Json { ignoreUnknownKeys = true }
                     val respData = json.decodeFromString<BaseResponse<TokenDto>>(respJson)
-                    val token = respData.data
+                    val token = respData.data ?: return null
 
                     runBlocking(ioDispatcher) {
                         dataStorePreferences.putString(
