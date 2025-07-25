@@ -49,101 +49,101 @@ fun GroupDetailHomeContainer(
     Column(
         modifier = modifier
     ) {
-        GroupImageBox(
-            onClick = onClickGroupSetting,
-            modifier = Modifier.aspectRatio(20 / 9f),
-            imageUrl = imageUrl
-        )
-        Spacer(Modifier.height(20.dp))
-        Row(
+        Column(
             modifier = Modifier
+                .background(OnmoimTheme.colors.backgroundColor)
                 .fillMaxWidth()
-                .padding(horizontal = 15.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            CommonChip(location)
-            CommonChip(category)
-            CommonChip(stringResource(R.string.group_detail_chip_member_count, memberCount))
-            if (memberStatus == MemberStatus.OWNER) {
-                CommonChip(
-                    label = stringResource(R.string.group_detail_chip_operating),
-                    backgroundColor = OnmoimTheme.colors.accentSoftRed,
-                    textColor = Color.White
-                )
-            }
-        }
-        Row(
-            modifier = Modifier
-                .padding(start = 16.dp, end = 6.dp)
-                .fillMaxWidth()
-                .height(62.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = title,
-                modifier = Modifier.weight(1f),
-                style = OnmoimTheme.typography.body1SemiBold.copy(
-                    color = OnmoimTheme.colors.textColor
-                )
+            GroupImageBox(
+                onClick = onClickGroupSetting,
+                modifier = Modifier.aspectRatio(20 / 9f),
+                imageUrl = imageUrl
             )
-            if (memberStatus == MemberStatus.OWNER) {
-                NavigationIconButton(
-                    onClick = onClickGroupSetting
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_setting),
-                        contentDescription = null
+            Spacer(Modifier.height(20.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                CommonChip(location)
+                CommonChip(category)
+                CommonChip(stringResource(R.string.group_detail_chip_member_count, memberCount))
+                if (memberStatus == MemberStatus.OWNER) {
+                    CommonChip(
+                        label = stringResource(R.string.group_detail_chip_operating),
+                        backgroundColor = OnmoimTheme.colors.accentSoftRed,
+                        textColor = Color.White
                     )
                 }
             }
-        }
-        Text(
-            text = description,
-            modifier = Modifier
-                .padding(
-                    start = 15.dp,
-                    end = 15.dp,
-                    bottom = 20.dp
+            Row(
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 6.dp)
+                    .fillMaxWidth()
+                    .height(62.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = title,
+                    modifier = Modifier.weight(1f),
+                    style = OnmoimTheme.typography.body1SemiBold.copy(
+                        color = OnmoimTheme.colors.textColor
+                    )
                 )
-                .fillMaxWidth(),
-            style = OnmoimTheme.typography.body2Regular.copy(
-                color = OnmoimTheme.colors.textColor
-            )
-        )
-        Row(
-            modifier = Modifier
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    onClick = onClickComingSchedule
-                )
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 21.5.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+                if (memberStatus == MemberStatus.OWNER) {
+                    NavigationIconButton(
+                        onClick = onClickGroupSetting
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_setting),
+                            contentDescription = null
+                        )
+                    }
+                }
+            }
             Text(
-                text = stringResource(R.string.coming_schedule),
-                style = OnmoimTheme.typography.body1SemiBold.copy(
+                text = description,
+                modifier = Modifier
+                    .padding(
+                        start = 15.dp,
+                        end = 15.dp,
+                        bottom = 20.dp
+                    )
+                    .fillMaxWidth(),
+                style = OnmoimTheme.typography.body2Regular.copy(
                     color = OnmoimTheme.colors.textColor
                 )
             )
-            Icon(
-                painter = painterResource(id = R.drawable.ic_arrow_right),
-                contentDescription = null
-            )
+            Row(
+                modifier = Modifier
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = onClickComingSchedule
+                    )
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 21.5.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.coming_schedule),
+                    style = OnmoimTheme.typography.body1SemiBold.copy(
+                        color = OnmoimTheme.colors.textColor
+                    )
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_arrow_right),
+                    contentDescription = null
+                )
+            }
         }
+        Spacer(Modifier.height(20.dp))
         Column(
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
-                .background(
-                    color = OnmoimTheme.colors.gray01
-                )
-                .padding(
-                    vertical = 20.dp,
-                    horizontal = 15.dp
-                ),
+                .padding(horizontal = 15.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             if (meetings.isEmpty()) {

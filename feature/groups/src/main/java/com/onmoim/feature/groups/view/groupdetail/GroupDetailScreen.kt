@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -316,8 +317,11 @@ private fun GroupDetailScreen(
 
                             GroupDetailHomeContainer(
                                 modifier = Modifier
+                                    .verticalScroll(rememberScrollState())
+                                    .background(OnmoimTheme.colors.gray01)
                                     .fillMaxSize()
-                                    .verticalScroll(rememberScrollState()),
+                                    .padding(bottom = 20.dp)
+                                    .navigationBarsPadding(),
                                 title = groupDetail.title,
                                 imageUrl = groupDetail.imageUrl,
                                 location = groupDetail.location,
@@ -327,7 +331,7 @@ private fun GroupDetailScreen(
                                 meetings = groupDetail.meetingList,
                                 memberStatus = groupDetail.memberStatus,
                                 onClickComingSchedule = {
-                                    val role = when(groupDetail.memberStatus) {
+                                    val role = when (groupDetail.memberStatus) {
                                         MemberStatus.OWNER -> GroupMemberRole.OWNER
                                         MemberStatus.MEMBER -> GroupMemberRole.MEMBER
                                         else -> null
@@ -432,6 +436,20 @@ private fun getFakeGroupoDetail(memberStatus: MemberStatus): GroupDetail {
                 title = "퇴근 후 독서 정모: 각자 독서",
                 placeName = "카페 언노운",
                 startDate = LocalDateTime.now().plusDays(2),
+                cost = 10000,
+                joinCount = 6,
+                capacity = 8,
+                attendance = false,
+                isLightning = false,
+                imgUrl = null,
+                latitude = 0.0,
+                longitude = 0.0
+            ),
+            MeetingDetail(
+                id = 2,
+                title = "제목제목",
+                placeName = "장소장소",
+                startDate = LocalDateTime.now().plusDays(7),
                 cost = 10000,
                 joinCount = 6,
                 capacity = 8,
