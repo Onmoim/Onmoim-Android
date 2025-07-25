@@ -35,5 +35,5 @@ interface MeetingApi {
         @Path("groupId") groupId: Int,
         @Part("request") requestBody: RequestBody,
         @Part image: MultipartBody.Part? = null
-    ): Response<BaseResponse<String>>
+    ): Response<BaseResponse<Int>>
 }
