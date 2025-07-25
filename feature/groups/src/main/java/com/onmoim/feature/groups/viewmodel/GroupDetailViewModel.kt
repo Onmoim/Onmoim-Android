@@ -49,6 +49,7 @@ class GroupDetailViewModel @AssistedInject constructor(
             }
 
             groupRepository.getGroupDetail(id).catch {
+                Log.e("GroupDetailViewModel", "fetchGroupDetail error", it)
                 _groupDetailUiState.value = GroupDetailUiState.Error(it)
             }.collectLatest {
                 _groupDetailUiState.value = GroupDetailUiState.Success(it)

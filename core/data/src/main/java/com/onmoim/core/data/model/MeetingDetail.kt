@@ -13,6 +13,6 @@ data class MeetingDetail(
     val attendance: Boolean,
     val isLightning: Boolean,
     val imgUrl: String?,
-    val latitude: Int,
-    val longitude: Int
+    val latitude: Double,
+    val longitude: Double
 )
