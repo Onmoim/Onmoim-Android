@@ -8,6 +8,7 @@ import com.onmoim.core.network.api.GroupApi
 import com.onmoim.core.network.api.KakaoApi
 import com.onmoim.core.network.api.LocationApi
 import com.onmoim.core.network.api.MeetingApi
+import com.onmoim.core.network.api.PostApi
 import com.onmoim.core.network.api.UserApi
 import dagger.Module
 import dagger.Provides
@@ -46,4 +47,8 @@ object ApiModule {
     @Provides
     fun provideKakaoApi(@ApiType(OnmoimApiType.KAKAO) retrofit: Retrofit): KakaoApi =
         retrofit.create(KakaoApi::class.java)
+
+    @Provides
+    fun providePostApi(@ApiType(OnmoimApiType.AUTH) retrofit: Retrofit): PostApi =
+        retrofit.create(PostApi::class.java)
 }

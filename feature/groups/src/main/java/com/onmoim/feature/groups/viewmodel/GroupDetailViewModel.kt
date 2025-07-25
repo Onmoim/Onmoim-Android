@@ -3,11 +3,15 @@ package com.onmoim.feature.groups.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.onmoim.core.data.constant.JoinGroupResult
 import com.onmoim.core.data.constant.JoinMeetingResult
 import com.onmoim.core.data.constant.LeaveMeetingResult
+import com.onmoim.core.data.constant.PostType
 import com.onmoim.core.data.repository.GroupRepository
 import com.onmoim.core.data.repository.MeetingRepository
+import com.onmoim.core.data.repository.PostRepository
+import com.onmoim.feature.groups.constant.GroupDetailPostFilter
 import com.onmoim.feature.groups.state.GroupDetailEvent
 import com.onmoim.feature.groups.state.GroupDetailUiState
 import dagger.assisted.Assisted
@@ -26,7 +30,8 @@ import kotlinx.coroutines.launch
 class GroupDetailViewModel @AssistedInject constructor(
     @Assisted("groupId") private val groupId: Int,
     private val groupRepository: GroupRepository,
-    private val meetingRepository: MeetingRepository
+    private val meetingRepository: MeetingRepository,
+    private val postRepository: PostRepository
 ) : ViewModel() {
     @AssistedFactory
     interface Factory {
@@ -42,6 +47,20 @@ class GroupDetailViewModel @AssistedInject constructor(
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
+
+    private val _postFilterState = MutableStateFlow(GroupDetailPostFilter.ALL)
+    val postFilterState = _postFilterState.asStateFlow()
+
+    val allPostPagingData =
+        postRepository.getPostPagingData(groupId, PostType.ALL).cachedIn(viewModelScope)
+    val noticePostPagingData =
+        postRepository.getPostPagingData(groupId, PostType.NOTICE).cachedIn(viewModelScope)
+    val introPostPagingData =
+        postRepository.getPostPagingData(groupId, PostType.INTRODUCTION).cachedIn(viewModelScope)
+    val reviewPostPagingData =
+        postRepository.getPostPagingData(groupId, PostType.REVIEW).cachedIn(viewModelScope)
+    val freePostPagingData =
+        postRepository.getPostPagingData(groupId, PostType.FREE).cachedIn(viewModelScope)
 
     init {
         fetchGroupDetail()
@@ -206,5 +225,9 @@ class GroupDetailViewModel @AssistedInject constructor(
                 }
             }
         }
+    }
+
+    fun onPostFilterChange(value: GroupDetailPostFilter) {
+        _postFilterState.value = value
     }
 }

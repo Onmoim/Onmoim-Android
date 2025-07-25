@@ -27,9 +27,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.onmoim.core.data.constant.MemberStatus
+import com.onmoim.core.data.constant.PostType
 import com.onmoim.core.data.model.GroupDetail
 import com.onmoim.core.data.model.MeetingDetail
+import com.onmoim.core.data.model.Post
 import com.onmoim.core.designsystem.component.CommonButton
 import com.onmoim.core.designsystem.component.CommonDialog
 import com.onmoim.core.designsystem.component.CommonMenuDialog
@@ -47,6 +52,7 @@ import com.onmoim.feature.groups.constant.GroupMemberRole
 import com.onmoim.feature.groups.state.GroupDetailEvent
 import com.onmoim.feature.groups.state.GroupDetailUiState
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
+import kotlinx.coroutines.flow.flowOf
 import java.time.LocalDateTime
 
 @Composable
@@ -60,6 +66,12 @@ fun GroupDetailRoute(
     var selectedTab by remember { mutableStateOf(GroupDetailTab.HOME) }
     val groupDetailUiState by groupDetailViewModel.groupDetailUiState.collectAsStateWithLifecycle()
     val groupDetail = (groupDetailUiState as? GroupDetailUiState.Success)?.groupDetail
+    val postFilter by groupDetailViewModel.postFilterState.collectAsStateWithLifecycle()
+    val allPostPagingItems = groupDetailViewModel.allPostPagingData.collectAsLazyPagingItems()
+    val noticePostPagingItems = groupDetailViewModel.noticePostPagingData.collectAsLazyPagingItems()
+    val introPostPagingItems = groupDetailViewModel.introPostPagingData.collectAsLazyPagingItems()
+    val reviewPostPagingItems = groupDetailViewModel.reviewPostPagingData.collectAsLazyPagingItems()
+    val freePostPagingItems = groupDetailViewModel.freePostPagingData.collectAsLazyPagingItems()
     var showMenuDialog by remember { mutableStateOf(false) }
     var showHostLeaveDialog by remember { mutableStateOf(false) }
     var showMemberLeaveDialog by remember { mutableStateOf(false) }
@@ -200,7 +212,16 @@ fun GroupDetailRoute(
             },
             onClickFavorite = groupDetailViewModel::favoriteGroup,
             onClickMeetAttend = groupDetailViewModel::attendMeeting,
-            onClickMeetLeave = groupDetailViewModel::leaveMeeting
+            onClickMeetLeave = groupDetailViewModel::leaveMeeting,
+            postFilter = postFilter,
+            onPostFilterChange = groupDetailViewModel::onPostFilterChange,
+            postPagingItems = when (postFilter) {
+                GroupDetailPostFilter.ALL -> allPostPagingItems
+                GroupDetailPostFilter.NOTICE -> noticePostPagingItems
+                GroupDetailPostFilter.REG_GREETING -> introPostPagingItems
+                GroupDetailPostFilter.MEET_REVIEW -> reviewPostPagingItems
+                GroupDetailPostFilter.FREE_BOARD -> freePostPagingItems
+            }
         )
     }
 
@@ -330,7 +351,10 @@ private fun GroupDetailScreen(
     onClickMenu: () -> Unit,
     onClickFavorite: (Boolean) -> Unit,
     onClickMeetAttend: (meetingId: Int) -> Unit,
-    onClickMeetLeave: (meetingId: Int) -> Unit
+    onClickMeetLeave: (meetingId: Int) -> Unit,
+    postFilter: GroupDetailPostFilter,
+    onPostFilterChange: (GroupDetailPostFilter) -> Unit,
+    postPagingItems: LazyPagingItems<Post>
 ) {
     Column(
         modifier = Modifier
@@ -438,8 +462,9 @@ private fun GroupDetailScreen(
                     GroupDetailPostContainer(
                         onClickPost = onClickPost,
                         modifier = Modifier.fillMaxSize(),
-                        selectedFilter = GroupDetailPostFilter.ALL,
-                        onFilterChange = {}
+                        selectedFilter = postFilter,
+                        onFilterChange = onPostFilterChange,
+                        postPagingItems = postPagingItems
                     )
                 }
 
@@ -496,6 +521,37 @@ private fun GroupMenuDialog(
             }
         }
     }
+}
+
+private fun getFakePosts(): List<Post> {
+    return listOf(
+        Post(
+            id = 1,
+            title = "첫 번째 게시물",
+            content = "이것은 첫 번째 게시물의 내용입니다.",
+            name = "작성자1",
+            profileImageUrl = null,
+            type = PostType.NOTICE,
+            createdDate = LocalDateTime.now(),
+            modifiedDate = LocalDateTime.now(),
+            imageUrls = emptyList(),
+            likeCount = 10,
+            isLiked = false
+        ),
+        Post(
+            id = 2,
+            title = "두 번째 게시물",
+            content = "이것은 두 번째 게시물의 내용입니다.",
+            name = "작성자2",
+            profileImageUrl = null,
+            type = PostType.FREE,
+            createdDate = LocalDateTime.now(),
+            modifiedDate = LocalDateTime.now(),
+            imageUrls = emptyList(),
+            likeCount = 5,
+            isLiked = true
+        )
+    )
 }
 
 private fun getFakeGroupoDetail(memberStatus: MemberStatus): GroupDetail {
@@ -560,7 +616,10 @@ private fun GroupDetailScreenForHomePreview1() {
             onClickMenu = {},
             onClickFavorite = {},
             onClickMeetAttend = {},
-            onClickMeetLeave = {}
+            onClickMeetLeave = {},
+            postFilter = GroupDetailPostFilter.ALL,
+            onPostFilterChange = {},
+            postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems()
         )
     }
 }
@@ -581,7 +640,10 @@ private fun GroupDetailScreenForHomePreview2() {
             onClickMenu = {},
             onClickFavorite = {},
             onClickMeetAttend = {},
-            onClickMeetLeave = {}
+            onClickMeetLeave = {},
+            postFilter = GroupDetailPostFilter.ALL,
+            onPostFilterChange = {},
+            postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems()
         )
     }
 }
@@ -602,7 +664,10 @@ private fun GroupDetailScreenForPostPreview() {
             onClickMenu = {},
             onClickFavorite = {},
             onClickMeetAttend = {},
-            onClickMeetLeave = {}
+            onClickMeetLeave = {},
+            postFilter = GroupDetailPostFilter.ALL,
+            onPostFilterChange = {},
+            postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems()
         )
     }
 }

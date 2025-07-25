@@ -10,13 +10,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,16 +32,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
+import com.onmoim.core.data.model.Post
 import com.onmoim.core.designsystem.component.group.PostCard
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.GroupDetailPostFilter
 import com.onmoim.feature.groups.constant.GroupDetailPostViewMode
-import java.time.LocalDateTime
 
 @Composable
 fun GroupDetailPostContainer(
@@ -49,9 +51,11 @@ fun GroupDetailPostContainer(
     modifier: Modifier = Modifier,
     selectedFilter: GroupDetailPostFilter,
     onFilterChange: (GroupDetailPostFilter) -> Unit,
-    initialViewMode: GroupDetailPostViewMode = GroupDetailPostViewMode.POST
+    initialViewMode: GroupDetailPostViewMode = GroupDetailPostViewMode.POST,
+    postPagingItems: LazyPagingItems<Post>
 ) {
     var selectedViewMode by remember { mutableStateOf(initialViewMode) }
+    val loadState = postPagingItems.loadState.refresh
 
     Column(
         modifier = modifier
@@ -131,85 +135,106 @@ fun GroupDetailPostContainer(
                 )
             }
         }
-        when (selectedViewMode) {
-            GroupDetailPostViewMode.POST -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                ) {
-                    items(10) {
-                        PostCard(
-                            onClick = {
-                                // TODO: api 연동시 수정
-                                onClickPost(it)
-                            },
-                            userName = "userName",
-                            profileImgUrl = "https://picsum.photos/200",
-                            writeDateTime = LocalDateTime.now(),
-                            title = "title",
-                            content = "content",
-                            likeCount = 10,
-                            commentCount = 20,
-                            representImageUrl = "https://picsum.photos/200"
-                        )
-                    }
-                }
+        when (loadState) {
+            is LoadState.Error -> {
+                // TODO: 에러 처리
             }
 
-            GroupDetailPostViewMode.ALBUM -> {
-                LazyVerticalGrid(
+            LoadState.Loading -> {
+                Box(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth(),
-                    columns = GridCells.Fixed(3),
-                    verticalArrangement = Arrangement.spacedBy(3.dp),
-                    horizontalArrangement = Arrangement.spacedBy(3.dp)
+                    contentAlignment = Alignment.Center
                 ) {
-                    items(10) {
-                        val painter = rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(LocalContext.current).apply {
-                                data("https://picsum.photos/200")
-                            }.build()
-                        )
-                        val painterState by painter.state.collectAsStateWithLifecycle()
+                    CircularProgressIndicator()
+                }
+            }
 
-                        Box(
+            is LoadState.NotLoading -> {
+                when (selectedViewMode) {
+                    GroupDetailPostViewMode.POST -> {
+                        LazyColumn(
                             modifier = Modifier
-                                .clickable(
-                                    indication = null,
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    onClick = {
-                                        // TODO: api 연동시 수정
-                                        onClickPost(it)
-                                    }
-                                )
-                                .aspectRatio(1f)
+                                .weight(1f)
+                                .fillMaxWidth()
                         ) {
-                            when (painterState) {
-                                is AsyncImagePainter.State.Loading -> {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .shimmerBackground()
+                            items(postPagingItems.itemCount) { index ->
+                                postPagingItems[index]?.let {
+                                    PostCard(
+                                        onClick = {
+                                            onClickPost(it.id)
+                                        },
+                                        userName = it.name,
+                                        profileImgUrl = it.profileImageUrl,
+                                        writeDateTime = it.createdDate,
+                                        title = it.title,
+                                        content = it.content,
+                                        likeCount = it.likeCount,
+                                        commentCount = 0, // TODO: api 수정되면 확인
+                                        representImageUrl = it.imageUrls.firstOrNull()
                                     )
                                 }
+                            }
+                        }
+                    }
 
-                                is AsyncImagePainter.State.Success -> {
-                                    Image(
-                                        painter = painter,
-                                        contentDescription = null,
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
+                    GroupDetailPostViewMode.ALBUM -> {
+                        LazyVerticalGrid(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            columns = GridCells.Fixed(3),
+                            verticalArrangement = Arrangement.spacedBy(3.dp),
+                            horizontalArrangement = Arrangement.spacedBy(3.dp)
+                        ) {
+                            items(postPagingItems.itemCount) { index ->
+                                postPagingItems[index]?.let {
+                                    val painter = rememberAsyncImagePainter(
+                                        model = ImageRequest.Builder(LocalContext.current).apply {
+                                            data(it.imageUrls.firstOrNull())
+                                        }.build()
                                     )
-                                }
+                                    val painterState by painter.state.collectAsStateWithLifecycle()
 
-                                else -> {
                                     Box(
                                         modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(Color(0xFFA4A4A4))
-                                    )
+                                            .clickable(
+                                                indication = null,
+                                                interactionSource = remember { MutableInteractionSource() },
+                                                onClick = {
+                                                    onClickPost(it.id)
+                                                }
+                                            )
+                                            .aspectRatio(1f)
+                                    ) {
+                                        when (painterState) {
+                                            is AsyncImagePainter.State.Loading -> {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .matchParentSize()
+                                                        .shimmerBackground()
+                                                )
+                                            }
+
+                                            is AsyncImagePainter.State.Success -> {
+                                                Image(
+                                                    painter = painter,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.matchParentSize(),
+                                                    contentScale = ContentScale.Crop
+                                                )
+                                            }
+
+                                            else -> {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .matchParentSize()
+                                                        .background(Color(0xFFA4A4A4))
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
