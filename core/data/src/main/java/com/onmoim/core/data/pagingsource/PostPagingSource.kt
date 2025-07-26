@@ -6,7 +6,7 @@ import androidx.paging.PagingState
 import com.onmoim.core.data.constant.PostType
 import com.onmoim.core.data.model.Post
 import com.onmoim.core.network.api.PostApi
-import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneId
 
 class PostPagingSource(
@@ -36,10 +36,10 @@ class PostPagingSource(
             val data = resp.body()?.data
             val systemZoneId = ZoneId.systemDefault()
             val posts = data?.content?.map {
-                val createdInstant = Instant.parse(it.createdDate)
-                val modifiedInstant = Instant.parse(it.modifiedDate)
-                val createdZonedDateTime = createdInstant.atZone(systemZoneId)
-                val modifiedZonedDateTime = modifiedInstant.atZone(systemZoneId)
+                val createdLocalDateTimeUTC = LocalDateTime.parse(it.createdDate)
+                val modifiedLocalDateTimeUTC = LocalDateTime.parse(it.modifiedDate)
+                val createdZonedDateTime = createdLocalDateTimeUTC.atZone(systemZoneId)
+                val modifiedZonedDateTime = modifiedLocalDateTimeUTC.atZone(systemZoneId)
 
                 Post(
                     id = it.id,
