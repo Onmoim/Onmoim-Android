@@ -373,8 +373,6 @@ private fun GroupDetailScreen(
         val groupTitle = (groupDetailUiState as? GroupDetailUiState.Success)?.groupDetail?.title
         val isFavorite =
             (groupDetailUiState as? GroupDetailUiState.Success)?.groupDetail?.isFavorite
-        val memberStatus =
-            (groupDetailUiState as? GroupDetailUiState.Success)?.groupDetail?.memberStatus
 
         GroupDetailAppBar(
             title = groupTitle ?: "",
@@ -412,22 +410,26 @@ private fun GroupDetailScreen(
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            when (selectedTab) {
-                GroupDetailTab.HOME -> {
-                    when (groupDetailUiState) {
-                        is GroupDetailUiState.Error -> {
-                            // TODO: 에러 처리
-                        }
+            when (groupDetailUiState) {
+                is GroupDetailUiState.Error -> {
+                    Text(
+                        text = groupDetailUiState.t.message ?: "error",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
 
-                        GroupDetailUiState.Loading -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
+                GroupDetailUiState.Loading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
 
-                        is GroupDetailUiState.Success -> {
-                            val groupDetail = groupDetailUiState.groupDetail
+                is GroupDetailUiState.Success -> {
+                    val groupDetail = groupDetailUiState.groupDetail
+                    val memberStatus = groupDetail.memberStatus
 
+                    when (selectedTab) {
+                        GroupDetailTab.HOME -> {
                             GroupDetailHomeContainer(
                                 modifier = Modifier
                                     .verticalScroll(rememberScrollState())
@@ -466,42 +468,44 @@ private fun GroupDetailScreen(
                                 )
                             }
                         }
-                    }
-                }
 
-                GroupDetailTab.POST -> {
-                    GroupDetailPostContainer(
-                        onClickPost = onClickPost,
-                        modifier = Modifier.fillMaxSize(),
-                        selectedFilter = postFilter,
-                        onFilterChange = onPostFilterChange,
-                        postPagingItems = postPagingItems
-                    )
-                    if (memberStatus == MemberStatus.OWNER || memberStatus == MemberStatus.MEMBER) {
-                        Box(
-                            modifier = Modifier
-                                .padding(end = 15.dp, bottom = 40.dp)
-                                .align(Alignment.BottomEnd)
-                                .clickable {
-                                    onClickPostWrite(memberStatus == MemberStatus.OWNER)
-                                }
-                                .background(
-                                    color = OnmoimTheme.colors.primaryBlue,
-                                    shape = CircleShape
-                                )
-                                .size(60.dp)
-                                .clip(CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.ic_pencil),
-                                contentDescription = null
+                        GroupDetailTab.POST -> {
+                            GroupDetailPostContainer(
+                                onClickPost = onClickPost,
+                                modifier = Modifier.fillMaxSize(),
+                                selectedFilter = postFilter,
+                                onFilterChange = onPostFilterChange,
+                                postPagingItems = postPagingItems
                             )
+                            if (memberStatus == MemberStatus.OWNER || memberStatus == MemberStatus.MEMBER) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(end = 15.dp, bottom = 40.dp)
+                                        .align(Alignment.BottomEnd)
+                                        .clickable {
+                                            onClickPostWrite(memberStatus == MemberStatus.OWNER)
+                                        }
+                                        .background(
+                                            color = OnmoimTheme.colors.primaryBlue,
+                                            shape = CircleShape
+                                        )
+                                        .size(60.dp)
+                                        .clip(CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Image(
+                                        painter = painterResource(R.drawable.ic_pencil),
+                                        contentDescription = null
+                                    )
+                                }
+                            }
+                        }
+
+                        GroupDetailTab.CHAT -> {
+
                         }
                     }
                 }
-
-                GroupDetailTab.CHAT -> {}
             }
         }
     }
