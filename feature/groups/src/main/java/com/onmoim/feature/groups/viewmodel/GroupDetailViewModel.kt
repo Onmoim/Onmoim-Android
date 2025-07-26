@@ -11,6 +11,7 @@ import com.onmoim.core.data.constant.PostType
 import com.onmoim.core.data.repository.GroupRepository
 import com.onmoim.core.data.repository.MeetingRepository
 import com.onmoim.core.data.repository.PostRepository
+import com.onmoim.feature.groups.constant.BoardType
 import com.onmoim.feature.groups.constant.GroupDetailPostType
 import com.onmoim.feature.groups.state.GroupDetailEvent
 import com.onmoim.feature.groups.state.GroupDetailUiState
@@ -229,5 +230,11 @@ class GroupDetailViewModel @AssistedInject constructor(
 
     fun onPostFilterChange(value: GroupDetailPostType) {
         _postFilterState.value = value
+    }
+
+    fun sendRefreshBoardEvent(type: BoardType) {
+        viewModelScope.launch {
+            _event.send(GroupDetailEvent.RefreshBoard(type))
+        }
     }
 }

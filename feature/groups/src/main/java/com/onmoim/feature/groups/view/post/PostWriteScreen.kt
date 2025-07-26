@@ -1,5 +1,6 @@
 package com.onmoim.feature.groups.view.post
 
+import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -23,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,9 +49,11 @@ import com.onmoim.core.designsystem.component.CommonMenuItem
 import com.onmoim.core.designsystem.component.CommonTextField
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.theme.OnmoimTheme
+import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.core.util.FileUtil
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.BoardType
+import com.onmoim.feature.groups.state.PostWriteEvent
 import com.onmoim.feature.groups.state.PostWriteUiState
 import com.onmoim.feature.groups.viewmodel.PostWriteViewModel
 import kotlinx.coroutines.Dispatchers
@@ -139,25 +143,47 @@ fun PostWriteRoute(
         )
     }
 
-    PostWriteScreen(
-        onBack = {
-            onBackPressedDispatcher?.onBackPressed()
-        },
-        onClickConfirm = postWriteViewModel::writePost,
-        uiState = uiState,
-        onClickBoardType = {
-            showBoardTypeSelectDialog = true
-        },
-        onTitleChange = postWriteViewModel::onTitleChange,
-        onContentChange = postWriteViewModel::onContentChange,
-        onClickPhoto = {
-            pickMediaLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-        },
-        onClickDeleteImage = {
-            selectedDeleteImagePath = it
-            showImageDeleteDialog = true
+    LoadingOverlayBox(
+        loading = uiState.isLoading,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        PostWriteScreen(
+            onBack = {
+                onBackPressedDispatcher?.onBackPressed()
+            },
+            onClickConfirm = postWriteViewModel::createPost,
+            uiState = uiState,
+            onClickBoardType = {
+                showBoardTypeSelectDialog = true
+            },
+            onTitleChange = postWriteViewModel::onTitleChange,
+            onContentChange = postWriteViewModel::onContentChange,
+            onClickPhoto = {
+                pickMediaLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            },
+            onClickDeleteImage = {
+                selectedDeleteImagePath = it
+                showImageDeleteDialog = true
+            }
+        )
+    }
+
+    LaunchedEffect(Unit) {
+        postWriteViewModel.event.collect { event ->
+            when (event) {
+                is PostWriteEvent.CreatePostFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                PostWriteEvent.CreatePostSuccess -> {
+                    val boardType = requireNotNull(uiState.boardType) {
+                        "boardType must not be null"
+                    }
+                    onBackAndRefresh(boardType)
+                }
+            }
         }
-    )
+    }
 }
 
 @Composable

@@ -137,7 +137,7 @@ fun NavGraphBuilder.groupsGraph(
                 }
 
                 if (boardType != null) {
-                    // TODO: 게시판 새로고침
+                    groupDetailViewModel.sendRefreshBoardEvent(boardType)
                 }
 
                 savedStateHandle?.remove<Boolean>(GroupsNavigationBundleKey.GROUP_DETAIL_REFRESH)

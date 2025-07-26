@@ -52,12 +52,14 @@ import com.onmoim.core.designsystem.component.group.GroupDetailAppBar
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.feature.groups.R
+import com.onmoim.feature.groups.constant.BoardType
 import com.onmoim.feature.groups.constant.GroupDetailPostType
 import com.onmoim.feature.groups.constant.GroupDetailTab
 import com.onmoim.feature.groups.constant.GroupMemberRole
 import com.onmoim.feature.groups.state.GroupDetailEvent
 import com.onmoim.feature.groups.state.GroupDetailUiState
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.time.LocalDateTime
 
@@ -83,7 +85,6 @@ fun GroupDetailRoute(
     var showHostLeaveDialog by remember { mutableStateOf(false) }
     var showMemberLeaveDialog by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     val isLoading by groupDetailViewModel.isLoading.collectAsStateWithLifecycle()
 
     if (showMenuDialog) {
@@ -233,8 +234,33 @@ fun GroupDetailRoute(
         )
     }
 
+    GroupDetailEventHandler(
+        groupDetailEventFlow = groupDetailViewModel.event,
+        onBack = {
+            onBackPressedDispatcher?.onBackPressed()
+        },
+        onRefreshBoard = { type ->
+            allPostPagingItems.refresh()
+            when (type) {
+                BoardType.NOTICE -> noticePostPagingItems.refresh()
+                BoardType.INTRO -> introPostPagingItems.refresh()
+                BoardType.REVIEW -> reviewPostPagingItems.refresh()
+                BoardType.FREE -> freePostPagingItems.refresh()
+            }
+        }
+    )
+}
+
+@Composable
+private fun GroupDetailEventHandler(
+    groupDetailEventFlow: Flow<GroupDetailEvent>,
+    onBack: () -> Unit,
+    onRefreshBoard: (BoardType) -> Unit
+) {
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
-        groupDetailViewModel.event.collect { event ->
+        groupDetailEventFlow.collect { event ->
             when (event) {
                 is GroupDetailEvent.LeaveGroupFailure -> {
                     Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
@@ -246,7 +272,7 @@ fun GroupDetailRoute(
                         context.getString(R.string.group_detail_leave_success),
                         Toast.LENGTH_SHORT
                     ).show()
-                    onBackPressedDispatcher?.onBackPressed()
+                    onBack()
                 }
 
                 is GroupDetailEvent.DeleteGroupFailure -> {
@@ -259,7 +285,7 @@ fun GroupDetailRoute(
                         context.getString(R.string.group_detail_delete_success),
                         Toast.LENGTH_SHORT
                     ).show()
-                    onBackPressedDispatcher?.onBackPressed()
+                    onBack()
                 }
 
                 is GroupDetailEvent.FavoriteGroupFailure -> {
@@ -340,6 +366,10 @@ fun GroupDetailRoute(
                         context.getString(R.string.group_detail_group_join_success),
                         Toast.LENGTH_SHORT
                     ).show()
+                }
+
+                is GroupDetailEvent.RefreshBoard -> {
+                    onRefreshBoard(event.type)
                 }
             }
         }

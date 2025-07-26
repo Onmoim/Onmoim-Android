@@ -11,7 +11,7 @@ data class PostDto(
     @SerialName("authorName")
     val authorName: String,
     @SerialName("authorProfileImage")
-    val authorProfileImage: String,
+    val authorProfileImage: String?,
     @SerialName("content")
     val content: String,
     @SerialName("createdDate")

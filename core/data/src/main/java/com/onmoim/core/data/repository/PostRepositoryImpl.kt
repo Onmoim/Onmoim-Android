@@ -3,15 +3,24 @@ package com.onmoim.core.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.onmoim.core.data.constant.BoardCategory
 import com.onmoim.core.data.constant.PostType
 import com.onmoim.core.data.model.Post
 import com.onmoim.core.data.pagingsource.PostPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.PostApi
+import com.onmoim.core.network.model.post.CreatePostRequestDto
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(
@@ -30,5 +39,44 @@ class PostRepositoryImpl @Inject constructor(
             ),
             pagingSourceFactory = { PostPagingSource(postApi, groupId, type) }
         ).flow.flowOn(ioDispatcher)
+    }
+
+    override suspend fun createPost(
+        groupId: Int,
+        boardCategory: BoardCategory,
+        title: String,
+        content: String,
+        imagePaths: List<String>
+    ): Result<Unit> {
+        val createPostRequestDto = CreatePostRequestDto(
+            type = when (boardCategory) {
+                BoardCategory.NOTICE -> "NOTICE"
+                BoardCategory.INTRODUCTION -> "INTRODUCTION"
+                BoardCategory.REVIEW -> "REVIEW"
+                BoardCategory.FREE -> "FREE"
+            },
+            title = title,
+            content = content
+        )
+        val requestBody = Json.encodeToString(createPostRequestDto)
+            .toRequestBody("application/json".toMediaTypeOrNull())
+        val imageFileParts = imagePaths.map {
+            val file = File(it)
+            MultipartBody.Part.createFormData(
+                "files",
+                file.name,
+                file.asRequestBody("image/*".toMediaTypeOrNull())
+            )
+        }.ifEmpty { null }
+
+        val resp = withContext(ioDispatcher) {
+            postApi.createPost(groupId, requestBody, imageFileParts)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(Exception(resp.message()))
+        }
     }
 }
