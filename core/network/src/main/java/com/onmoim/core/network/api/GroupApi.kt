@@ -3,6 +3,7 @@ package com.onmoim.core.network.api
 import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.MemberDto
 import com.onmoim.core.network.model.MemberIdRequestDto
+import com.onmoim.core.network.model.RecommendCategoryDto
 import com.onmoim.core.network.model.group.BaseGroupPageDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
 import com.onmoim.core.network.model.group.CreatedGroupDto
@@ -36,6 +37,18 @@ interface GroupApi {
         @Query("requestSize") requestSize: Int = 10,
         @Query("memberCount") memberCount: Int? = null
     ): Response<BaseResponse<PopularGroupDto>>
+
+    @GET("api/v1/groups/recommend/category")
+    suspend fun getRecommendCategoryGroups(
+        @Query("cursorId") cursorId: Int? = null,
+        @Query("size") size: Int? = null
+    ): Response<BaseResponse<RecommendCategoryDto>>
+
+    @GET("api/v1/groups/recommend/location")
+    suspend fun getRecommendLocationGroups(
+        @Query("cursorId") cursorId: Int? = null,
+        @Query("size") size: Int? = null
+    ): Response<BaseResponse<RecommendCategoryDto>>
 
     @POST("api/v1/groups")
     suspend fun createGroup(

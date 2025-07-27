@@ -11,5 +11,6 @@ data class HomeGroup(
     val scheduleCount: Int,
     val categoryName: String,
     val memberStatus: MemberStatus,
-    val isFavorite: Boolean
+    val isFavorite: Boolean,
+    val isRecommend: Boolean
 )

@@ -2,6 +2,7 @@ package com.onmoim.core.data.repository
 
 import androidx.paging.PagingData
 import com.onmoim.core.data.constant.HomePopular
+import com.onmoim.core.data.constant.HomeRecommend
 import com.onmoim.core.data.constant.JoinGroupResult
 import com.onmoim.core.data.model.ActiveStatistics
 import com.onmoim.core.data.model.GroupDetail
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface GroupRepository {
     fun getHomePopularGroups(homePopular: HomePopular): Flow<List<HomeGroup>>
+    fun getHomeRecommendGroups(homeRecommend: HomeRecommend): Flow<List<HomeGroup>>
     fun createGroup(
         name: String,
         description: String,

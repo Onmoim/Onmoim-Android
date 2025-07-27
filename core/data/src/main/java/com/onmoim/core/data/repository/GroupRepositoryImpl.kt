@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.onmoim.core.data.constant.HomePopular
+import com.onmoim.core.data.constant.HomeRecommend
 import com.onmoim.core.data.constant.JoinGroupResult
 import com.onmoim.core.data.constant.MemberStatus
 import com.onmoim.core.data.model.ActiveStatistics
@@ -59,7 +60,8 @@ class GroupRepositoryImpl @Inject constructor(
                         it.status.contains("BAN") -> MemberStatus.BAN
                         else -> MemberStatus.NONE
                     },
-                    isFavorite = it.likeStatus.contains("LIKE")
+                    isFavorite = it.likeStatus.contains("LIKE"),
+                    isRecommend = false
                 )
             }
             emit(groups)
@@ -67,6 +69,40 @@ class GroupRepositoryImpl @Inject constructor(
             throw HttpException(resp)
         }
     }.flowOn(ioDispatcher)
+
+    override fun getHomeRecommendGroups(homeRecommend: HomeRecommend): Flow<List<HomeGroup>> =
+        flow {
+            val resp = when (homeRecommend) {
+                HomeRecommend.CATEGORY -> groupApi.getRecommendCategoryGroups()
+                HomeRecommend.LOCATION -> groupApi.getRecommendLocationGroups()
+            }
+            val data = resp.body()?.data?.content
+
+            if (resp.isSuccessful && data != null) {
+                val groups = data.map {
+                    HomeGroup(
+                        id = it.groupId,
+                        imageUrl = it.imgUrl,
+                        title = it.name,
+                        location = it.location,
+                        memberCount = it.memberCount,
+                        scheduleCount = it.upcomingMeetingCount,
+                        categoryName = it.category,
+                        memberStatus = when {
+                            it.status.contains("OWNER") -> MemberStatus.OWNER
+                            it.status.contains("MEMBER") -> MemberStatus.MEMBER
+                            it.status.contains("BAN") -> MemberStatus.BAN
+                            else -> MemberStatus.NONE
+                        },
+                        isFavorite = it.likeStatus.contains("LIKE"),
+                        isRecommend = false
+                    )
+                }
+                emit(groups)
+            } else {
+                throw HttpException(resp)
+            }
+        }.flowOn(ioDispatcher)
 
     override fun createGroup(
         name: String,

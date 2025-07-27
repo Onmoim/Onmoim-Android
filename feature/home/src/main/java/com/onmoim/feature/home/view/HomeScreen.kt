@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -105,7 +106,14 @@ private fun HomeScreen(
             HomeTab.RECOMMEND -> {
                 when (recommendGroupUiState) {
                     is HomeRecommendGroupUiState.Error -> {
-                        // TODO: 에러 처리
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(recommendGroupUiState.error.message.toString())
+                        }
                     }
 
                     HomeRecommendGroupUiState.Loading -> {
@@ -138,7 +146,14 @@ private fun HomeScreen(
             HomeTab.POPULARITY -> {
                 when (popularGroupUiState) {
                     is HomePopularGroupUiState.Error -> {
-                        // TODO: 에러 처리
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(popularGroupUiState.error.message.toString())
+                        }
                     }
 
                     HomePopularGroupUiState.Loading -> {
@@ -271,7 +286,7 @@ private fun RecommendContent(
                 memberCount = item.memberCount,
                 scheduleCount = item.scheduleCount,
                 categoryName = item.categoryName,
-                isRecommended = false,
+                isRecommended = item.isRecommend,
                 isSignUp = item.memberStatus == MemberStatus.MEMBER,
                 isOperating = item.memberStatus == MemberStatus.OWNER,
                 isFavorite = item.isFavorite
@@ -315,10 +330,10 @@ private fun PopularContent(
                 memberCount = item.memberCount,
                 scheduleCount = item.scheduleCount,
                 categoryName = item.categoryName,
-                isRecommended = true,
-                isSignUp = true,
-                isOperating = true,
-                isFavorite = true
+                isRecommended = item.isRecommend,
+                isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                isOperating = item.memberStatus == MemberStatus.OWNER,
+                isFavorite = item.isFavorite
             )
         }
         GroupPager(
@@ -341,10 +356,10 @@ private fun PopularContent(
                 memberCount = item.memberCount,
                 scheduleCount = item.scheduleCount,
                 categoryName = item.categoryName,
-                isRecommended = true,
-                isSignUp = true,
-                isOperating = true,
-                isFavorite = true
+                isRecommended = item.isRecommend,
+                isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                isOperating = item.memberStatus == MemberStatus.OWNER,
+                isFavorite = item.isFavorite
             )
         }
     }
@@ -363,6 +378,7 @@ private fun HomeScreenPreview() {
             5,
             "카테고리 $it",
             if (it % 2 == 0) MemberStatus.MEMBER else MemberStatus.OWNER,
+            it % 2 == 0,
             it % 2 == 0
         )
     }

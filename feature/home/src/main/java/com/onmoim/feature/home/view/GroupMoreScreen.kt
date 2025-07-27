@@ -166,7 +166,8 @@ private fun GroupMoreScreenPreview() {
         scheduleCount = 5,
         categoryName = "Sample Category",
         memberStatus = MemberStatus.MEMBER,
-        isFavorite = false
+        isFavorite = false,
+        isRecommend = false
     )
     val pagingData = PagingData.from(listOf(sampleGroup, sampleGroup, sampleGroup))
     val flow = MutableStateFlow(pagingData)

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onmoim.core.data.constant.HomePopular
+import com.onmoim.core.data.constant.HomeRecommend
 import com.onmoim.core.data.repository.GroupRepository
 import com.onmoim.feature.home.constant.HomeTab
 import com.onmoim.feature.home.state.HomePopularGroupUiState
@@ -20,11 +21,13 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val groupRepository: GroupRepository
-): ViewModel() {
-    private val _recommendGroupUiState = MutableStateFlow<HomeRecommendGroupUiState>(HomeRecommendGroupUiState.Loading)
+) : ViewModel() {
+    private val _recommendGroupUiState =
+        MutableStateFlow<HomeRecommendGroupUiState>(HomeRecommendGroupUiState.Loading)
     val recommendGroupUiState = _recommendGroupUiState.asStateFlow()
 
-    private val _popularGroupUiState = MutableStateFlow<HomePopularGroupUiState>(HomePopularGroupUiState.Loading)
+    private val _popularGroupUiState =
+        MutableStateFlow<HomePopularGroupUiState>(HomePopularGroupUiState.Loading)
     val popularGroupUiState = _popularGroupUiState.asStateFlow()
 
     private val _selectedTabState = MutableStateFlow(HomeTab.RECOMMEND)
@@ -37,7 +40,17 @@ class HomeViewModel @Inject constructor(
 
     fun fetchRecommendGroups() {
         viewModelScope.launch {
-            // TODO: 추천 모임 API 호출
+            combine(
+                groupRepository.getHomeRecommendGroups(HomeRecommend.CATEGORY),
+                groupRepository.getHomeRecommendGroups(HomeRecommend.LOCATION)
+            ) { categoryGroups, locationGroups ->
+                HomeRecommendGroupUiState.Success(categoryGroups, locationGroups)
+            }.catch {
+                Log.e("HomeViewModel", "fetchRecommendGroups error", it)
+                _recommendGroupUiState.value = HomeRecommendGroupUiState.Error(it)
+            }.collectLatest {
+                _recommendGroupUiState.value = it
+            }
         }
     }
 
