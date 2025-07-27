@@ -1,5 +1,6 @@
 package com.onmoim.feature.groups.view.post
 
+import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,6 +27,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -57,7 +59,8 @@ import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.BoardType
-import com.onmoim.feature.groups.viewmodel.PostDetailUiState
+import com.onmoim.feature.groups.state.PostDetailEvent
+import com.onmoim.feature.groups.state.PostDetailUiState
 import com.onmoim.feature.groups.viewmodel.PostDetailViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDateTime
@@ -70,6 +73,7 @@ fun PostDetailRoute(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val postDetailUiState by postDetailViewModel.postDetailUiState.collectAsStateWithLifecycle()
     val commentPagingItems = postDetailViewModel.commentPagingData.collectAsLazyPagingItems()
+    val context = LocalContext.current
 
     PostDetailScreen(
         onBack = {
@@ -88,6 +92,16 @@ fun PostDetailRoute(
         postDetailUiState = postDetailUiState,
         commentPagingItems = commentPagingItems
     )
+
+    LaunchedEffect(Unit) {
+        postDetailViewModel.event.collect { event ->
+            when (event) {
+                is PostDetailEvent.PostLikeFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 }
 
 @Composable

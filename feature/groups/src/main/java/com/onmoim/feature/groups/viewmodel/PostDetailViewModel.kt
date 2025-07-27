@@ -3,8 +3,9 @@ package com.onmoim.feature.groups.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.onmoim.core.data.model.Post
 import com.onmoim.core.data.repository.PostRepository
+import com.onmoim.feature.groups.state.PostDetailEvent
+import com.onmoim.feature.groups.state.PostDetailUiState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -67,20 +68,7 @@ class PostDetailViewModel @AssistedInject constructor(
             postRepository.likePost(groupId, postId).onFailure {
                 _postDetailUiState.value = PostDetailUiState.Success(post)
                 _event.send(PostDetailEvent.PostLikeFailure(it))
-            }.onSuccess {
-                _event.send(PostDetailEvent.PostLikeSuccess)
             }
         }
     }
-}
-
-sealed class PostDetailUiState {
-    data object Loading : PostDetailUiState()
-    data class Success(val post: Post) : PostDetailUiState()
-    data class Error(val t: Throwable) : PostDetailUiState()
-}
-
-sealed class PostDetailEvent {
-    data object PostLikeSuccess : PostDetailEvent()
-    data class PostLikeFailure(val t: Throwable) : PostDetailEvent()
 }
