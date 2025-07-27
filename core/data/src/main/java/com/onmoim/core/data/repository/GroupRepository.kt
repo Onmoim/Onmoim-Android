@@ -2,14 +2,28 @@ package com.onmoim.core.data.repository
 
 import androidx.paging.PagingData
 import com.onmoim.core.data.constant.HomePopular
+import com.onmoim.core.data.constant.HomeRecommend
+import com.onmoim.core.data.constant.JoinGroupResult
 import com.onmoim.core.data.model.ActiveStatistics
+import com.onmoim.core.data.model.Group
 import com.onmoim.core.data.model.GroupDetail
-import com.onmoim.core.data.model.HomeGroup
 import com.onmoim.core.data.model.Member
 import kotlinx.coroutines.flow.Flow
 
 interface GroupRepository {
-    fun getHomePopularGroups(homePopular: HomePopular): Flow<List<HomeGroup>>
+    fun getHomePopularGroups(homePopular: HomePopular): Flow<List<Group>>
+    fun getHomePopularGroupPagingData(
+        homePopular: HomePopular,
+        size: Int = 20
+    ): Flow<PagingData<Group>>
+
+    fun getHomeRecommendGroups(homeRecommend: HomeRecommend): Flow<List<Group>>
+    fun getHomeRecommendGroupPagingData(
+        homeRecommend: HomeRecommend,
+        size: Int = 20
+    ): Flow<PagingData<Group>>
+
+    fun getFavoriteGroupPagingData(size: Int = 20): Flow<PagingData<Group>>
     fun createGroup(
         name: String,
         description: String,
@@ -32,4 +46,8 @@ interface GroupRepository {
         capacity: Int,
         imageUrl: String? = null
     ): Result<Unit>
+
+    suspend fun joinGroup(groupId: Int): Result<JoinGroupResult>
+    fun getJoinedGroups(size: Int = 10): Flow<List<Group>>
+    fun getJoinedGroupPagingData(size: Int = 20): Flow<PagingData<Group>>
 }

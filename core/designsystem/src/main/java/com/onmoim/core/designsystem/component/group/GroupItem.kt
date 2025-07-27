@@ -1,6 +1,5 @@
 package com.onmoim.core.designsystem.component.group
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -47,7 +45,7 @@ import com.onmoim.core.ui.shimmerBackground
 @Composable
 fun GroupItem(
     onClick: () -> Unit,
-    imageUrl: String,
+    imageUrl: String?,
     title: String,
     location: String,
     memberCount: Int,
@@ -81,34 +79,30 @@ fun GroupItem(
                     .aspectRatio(1f)
                     .clip(RoundedCornerShape(16.dp))
             ) {
-                Crossfade(
-                    targetState = painterState
-                ) { state ->
-                    when (state) {
-                        is AsyncImagePainter.State.Loading -> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .shimmerBackground()
-                            )
-                        }
+                when (painterState) {
+                    is AsyncImagePainter.State.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .shimmerBackground()
+                        )
+                    }
 
-                        is AsyncImagePainter.State.Success -> {
-                            Image(
-                                painter = state.painter,
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
+                    is AsyncImagePainter.State.Success -> {
+                        Image(
+                            painter = painter,
+                            contentDescription = null,
+                            modifier = Modifier.matchParentSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
 
-                        else -> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color(0xFFA4A4A4))
-                            )
-                        }
+                    else -> {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .background(Color(0xFFA4A4A4))
+                        )
                     }
                 }
                 Image(

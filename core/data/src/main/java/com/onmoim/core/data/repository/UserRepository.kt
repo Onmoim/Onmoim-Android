@@ -1,6 +1,8 @@
 package com.onmoim.core.data.repository
 
+import androidx.paging.PagingData
 import com.onmoim.core.data.model.Account
+import com.onmoim.core.data.model.Group
 import com.onmoim.core.data.model.Profile
 import kotlinx.coroutines.flow.Flow
 
@@ -16,4 +18,5 @@ interface UserRepository {
 
     fun getMyProfile(): Flow<Profile>
     suspend fun withdrawal(id: Int): Result<Unit>
+    fun getRecentGroupPagingData(size: Int = 20): Flow<PagingData<Group>>
 }

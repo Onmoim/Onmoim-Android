@@ -48,10 +48,15 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 
+enum class ComingScheduleCardButtonType {
+    ATTEND, ATTEND_CANCEL, DELETE
+}
+
 @Composable
 fun ComingScheduleCard(
     modifier: Modifier = Modifier,
-    onClickAttend: () -> Unit,
+    onClickButton: () -> Unit,
+    buttonType: ComingScheduleCardButtonType,
     isLightning: Boolean,
     startDate: LocalDateTime,
     title: String,
@@ -60,7 +65,7 @@ fun ComingScheduleCard(
     joinCount: Int,
     capacity: Int,
     imageUrl: String?,
-    attendance: Boolean
+    onClickCard: () -> Unit = {},
 ) {
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current).apply {
@@ -72,6 +77,11 @@ fun ComingScheduleCard(
 
     Box(
         modifier = modifier
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = onClickCard
+            )
             .shadow2Block(16.dp)
             .background(
                 color = OnmoimTheme.colors.backgroundColor,
@@ -91,13 +101,21 @@ fun ComingScheduleCard(
                 .clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() },
-                    onClick = onClickAttend
+                    onClick = onClickButton
                 )
                 .background(
-                    color = if(attendance) {
-                        OnmoimTheme.colors.primaryPink
-                    } else {
-                        OnmoimTheme.colors.primaryBlue
+                    color = when (buttonType) {
+                        ComingScheduleCardButtonType.ATTEND -> {
+                            OnmoimTheme.colors.primaryBlue
+                        }
+
+                        ComingScheduleCardButtonType.ATTEND_CANCEL -> {
+                            OnmoimTheme.colors.primaryPink
+                        }
+
+                        ComingScheduleCardButtonType.DELETE -> {
+                            OnmoimTheme.colors.gray05
+                        }
                     },
                     shape = RoundedCornerShape(10.dp)
                 ),
@@ -105,10 +123,18 @@ fun ComingScheduleCard(
         ) {
             Text(
                 text = stringResource(
-                    id = if(attendance) {
-                        R.string.coming_schedule_attend_cancel
-                    } else {
-                        R.string.coming_schedule_attend
+                    id = when (buttonType) {
+                        ComingScheduleCardButtonType.ATTEND -> {
+                            R.string.coming_schedule_attend
+                        }
+
+                        ComingScheduleCardButtonType.ATTEND_CANCEL -> {
+                            R.string.coming_schedule_attend_cancel
+                        }
+
+                        ComingScheduleCardButtonType.DELETE -> {
+                            R.string.delete
+                        }
                     }
                 ),
                 style = OnmoimTheme.typography.body2SemiBold.copy(
@@ -287,7 +313,8 @@ private fun ComingScheduleCardPreview() {
     OnmoimTheme {
         ComingScheduleCard(
             modifier = Modifier.width(330.dp),
-            onClickAttend = {},
+            onClickButton = {},
+            buttonType = ComingScheduleCardButtonType.ATTEND,
             isLightning = false,
             startDate = LocalDateTime.now().plusDays(2),
             title = "퇴근 후 독서 정모: 각자 독서",
@@ -295,8 +322,7 @@ private fun ComingScheduleCardPreview() {
             cost = 1000,
             joinCount = 6,
             capacity = 8,
-            imageUrl = "https://picsum.photos/200",
-            attendance = false
+            imageUrl = "https://picsum.photos/200"
         )
     }
 }
@@ -307,7 +333,8 @@ private fun ComingScheduleCardForLightningPreview() {
     OnmoimTheme {
         ComingScheduleCard(
             modifier = Modifier.width(330.dp),
-            onClickAttend = {},
+            onClickButton = {},
+            buttonType = ComingScheduleCardButtonType.ATTEND_CANCEL,
             isLightning = true,
             startDate = LocalDateTime.now().plusDays(2),
             title = "퇴근 후 독서 정모: 각자 독서",
@@ -315,8 +342,27 @@ private fun ComingScheduleCardForLightningPreview() {
             cost = 1000,
             joinCount = 6,
             capacity = 8,
-            imageUrl = "https://picsum.photos/200",
-            attendance = false
+            imageUrl = "https://picsum.photos/200"
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ComingScheduleCardForDeletePreview() {
+    OnmoimTheme {
+        ComingScheduleCard(
+            modifier = Modifier.width(330.dp),
+            onClickButton = {},
+            buttonType = ComingScheduleCardButtonType.DELETE,
+            isLightning = true,
+            startDate = LocalDateTime.now().plusDays(2),
+            title = "퇴근 후 독서 정모: 각자 독서",
+            placeName = "카페 언노운",
+            cost = 1000,
+            joinCount = 6,
+            capacity = 8,
+            imageUrl = "https://picsum.photos/200"
         )
     }
 }

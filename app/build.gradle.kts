@@ -17,6 +17,7 @@ android {
         versionName = "1.0.0"
 
         manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = getLocalPropertyValue("kakao.native.app.key")
+        manifestPlaceholders["NAVER_MAP_CLIENT_ID"] = getLocalPropertyValue("naver.map.client.id")
 
         buildConfigField(
             "String",

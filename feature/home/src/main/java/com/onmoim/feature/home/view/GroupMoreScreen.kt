@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,7 +25,8 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.onmoim.core.data.model.HomeGroup
+import com.onmoim.core.data.constant.MemberStatus
+import com.onmoim.core.data.model.Group
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.component.group.GroupHeader
@@ -43,9 +43,7 @@ fun GroupMoreRoute(
     onNavigateToGroupDetail: (id: Int) -> Unit
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-    // TODO: api 연동하면 수정
-    val groupPagingItems =
-        MutableStateFlow(PagingData.empty<HomeGroup>()).collectAsLazyPagingItems()
+    val groupPagingItems = groupMoreViewModel.groupPagingData.collectAsLazyPagingItems()
 
     GroupMoreScreen(
         homeGroupType = groupMoreViewModel.homeGroupType,
@@ -62,7 +60,7 @@ private fun GroupMoreScreen(
     homeGroupType: HomeGroupType,
     onBack: () -> Unit,
     onClickGroup: (id: Int) -> Unit,
-    groupPagingItems: LazyPagingItems<HomeGroup>
+    groupPagingItems: LazyPagingItems<Group>
 ) {
     val loadState = groupPagingItems.loadState.refresh
 
@@ -109,7 +107,10 @@ private fun GroupMoreScreen(
         ) {
             when (loadState) {
                 is LoadState.Error -> {
-                    // TODO: 에러 처리
+                    Text(
+                        text = loadState.error.message.toString(),
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
 
                 LoadState.Loading -> {
@@ -140,10 +141,10 @@ private fun GroupMoreScreen(
                                     memberCount = item.memberCount,
                                     scheduleCount = item.scheduleCount,
                                     categoryName = item.categoryName,
-                                    isRecommended = true,
-                                    isSignUp = true,
-                                    isOperating = true,
-                                    isFavorite = true
+                                    isRecommended = item.isRecommend,
+                                    isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                                    isOperating = item.memberStatus == MemberStatus.OWNER,
+                                    isFavorite = item.isFavorite
                                 )
                             }
                         }
@@ -157,7 +158,7 @@ private fun GroupMoreScreen(
 @Preview(showBackground = true)
 @Composable
 private fun GroupMoreScreenPreview() {
-    val sampleGroup = HomeGroup(
+    val sampleGroup = Group(
         id = 1,
         imageUrl = "",
         title = "Sample Group",
@@ -165,6 +166,9 @@ private fun GroupMoreScreenPreview() {
         memberCount = 10,
         scheduleCount = 5,
         categoryName = "Sample Category",
+        memberStatus = MemberStatus.MEMBER,
+        isFavorite = false,
+        isRecommend = false
     )
     val pagingData = PagingData.from(listOf(sampleGroup, sampleGroup, sampleGroup))
     val flow = MutableStateFlow(pagingData)

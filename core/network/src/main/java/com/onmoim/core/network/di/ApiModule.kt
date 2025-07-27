@@ -1,9 +1,14 @@
 package com.onmoim.core.network.di
 
+import com.onmoim.core.network.ApiType
+import com.onmoim.core.network.OnmoimApiType
 import com.onmoim.core.network.api.AuthApi
 import com.onmoim.core.network.api.CategoryApi
 import com.onmoim.core.network.api.GroupApi
+import com.onmoim.core.network.api.KakaoApi
 import com.onmoim.core.network.api.LocationApi
+import com.onmoim.core.network.api.MeetingApi
+import com.onmoim.core.network.api.PostApi
 import com.onmoim.core.network.api.UserApi
 import dagger.Module
 import dagger.Provides
@@ -16,17 +21,34 @@ import retrofit2.Retrofit
 object ApiModule {
 
     @Provides
-    fun provideAuthApi(retrofit: Retrofit): AuthApi = retrofit.create(AuthApi::class.java)
+    fun provideAuthApi(@ApiType(OnmoimApiType.AUTH) retrofit: Retrofit): AuthApi =
+        retrofit.create(AuthApi::class.java)
 
     @Provides
-    fun provideLocationApi(retrofit: Retrofit): LocationApi = retrofit.create(LocationApi::class.java)
+    fun provideLocationApi(@ApiType(OnmoimApiType.AUTH) retrofit: Retrofit): LocationApi =
+        retrofit.create(LocationApi::class.java)
 
     @Provides
-    fun provideUserApi(retrofit: Retrofit): UserApi = retrofit.create(UserApi::class.java)
+    fun provideUserApi(@ApiType(OnmoimApiType.AUTH) retrofit: Retrofit): UserApi =
+        retrofit.create(UserApi::class.java)
 
     @Provides
-    fun provideCategoryApi(retrofit: Retrofit): CategoryApi = retrofit.create(CategoryApi::class.java)
+    fun provideCategoryApi(@ApiType(OnmoimApiType.AUTH) retrofit: Retrofit): CategoryApi =
+        retrofit.create(CategoryApi::class.java)
 
     @Provides
-    fun provideGroupApi(retrofit: Retrofit): GroupApi = retrofit.create(GroupApi::class.java)
+    fun provideGroupApi(@ApiType(OnmoimApiType.AUTH) retrofit: Retrofit): GroupApi =
+        retrofit.create(GroupApi::class.java)
+
+    @Provides
+    fun provideMeetingApi(@ApiType(OnmoimApiType.AUTH) retrofit: Retrofit): MeetingApi =
+        retrofit.create(MeetingApi::class.java)
+
+    @Provides
+    fun provideKakaoApi(@ApiType(OnmoimApiType.KAKAO) retrofit: Retrofit): KakaoApi =
+        retrofit.create(KakaoApi::class.java)
+
+    @Provides
+    fun providePostApi(@ApiType(OnmoimApiType.AUTH) retrofit: Retrofit): PostApi =
+        retrofit.create(PostApi::class.java)
 }

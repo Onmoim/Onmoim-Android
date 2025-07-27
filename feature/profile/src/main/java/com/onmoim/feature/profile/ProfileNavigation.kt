@@ -3,6 +3,7 @@ package com.onmoim.feature.profile
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -15,6 +16,7 @@ import com.onmoim.feature.profile.view.GroupListRoute
 import com.onmoim.feature.profile.view.NotificationSettingRoute
 import com.onmoim.feature.profile.view.ProfileEditRoute
 import com.onmoim.feature.profile.view.ProfileRoute
+import com.onmoim.feature.profile.viewmodel.GroupListViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -77,9 +79,12 @@ fun NavGraphBuilder.profileGraph(
         }
         composable<GroupListRoute> { backStackEntry ->
             val groupType = backStackEntry.toRoute<GroupListRoute>().groupType
+            val groupListViewModel = hiltViewModel<GroupListViewModel, GroupListViewModel.Factory> {
+                it.create(groupType)
+            }
 
             GroupListRoute(
-                groupType = groupType,
+                groupListViewModel = groupListViewModel,
                 onNavigateToGroupDetail = {
                     navController.navigateToGroupDetail(it)
                 }

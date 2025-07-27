@@ -24,14 +24,18 @@ import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.FilterChip
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.component.group.ComingScheduleCard
+import com.onmoim.core.designsystem.component.group.ComingScheduleCardButtonType
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.ComingScheduleFilter
+import com.onmoim.feature.groups.viewmodel.ComingScheduleViewModel
 import java.time.LocalDateTime
 
 @Composable
 fun ComingScheduleRoute(
-
+    comingScheduleViewModel: ComingScheduleViewModel,
+    onNavigateToCreateSchedule: () -> Unit,
+    onNavigateToMeetingLocation: (meetingId: Int) -> Unit
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -41,7 +45,10 @@ fun ComingScheduleRoute(
         },
         onClickReset = {},
         onClickFilter = {},
-        selectedFilters = emptySet()
+        selectedFilters = emptySet(),
+        showAddScheduleButton = comingScheduleViewModel.groupId != null,
+        onClickCreateSchedule = onNavigateToCreateSchedule,
+        onClickSchedule = onNavigateToMeetingLocation
     )
 }
 
@@ -50,7 +57,10 @@ private fun ComingScheduleScreen(
     onBack: () -> Unit,
     onClickReset: () -> Unit,
     onClickFilter: (ComingScheduleFilter) -> Unit,
-    selectedFilters: Set<ComingScheduleFilter>
+    selectedFilters: Set<ComingScheduleFilter>,
+    showAddScheduleButton: Boolean,
+    onClickCreateSchedule: () -> Unit,
+    onClickSchedule: (meetingId: Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -72,6 +82,18 @@ private fun ComingScheduleScreen(
                         painter = painterResource(R.drawable.ic_arrow_back),
                         contentDescription = null
                     )
+                }
+            },
+            actions = {
+                if (showAddScheduleButton) {
+                    NavigationIconButton(
+                        onClick = onClickCreateSchedule
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_add),
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         )
@@ -109,8 +131,8 @@ private fun ComingScheduleScreen(
                                 ComingScheduleFilter.WEEK -> R.string.coming_schedule_week
                                 ComingScheduleFilter.MONTH -> R.string.coming_schedule_month
                                 ComingScheduleFilter.ATTEND -> R.string.coming_schedule_attended
-                                ComingScheduleFilter.REGULAR_MEET -> R.string.coming_schedule_regular_meet
-                                ComingScheduleFilter.LIGHTNING -> R.string.coming_schedule_lightning
+                                ComingScheduleFilter.REGULAR_MEET -> R.string.regular_meet
+                                ComingScheduleFilter.LIGHTNING -> R.string.lightning
                             }
                         ),
                         selected = selectedFilters.contains(filter),
@@ -138,7 +160,8 @@ private fun ComingScheduleScreen(
                 items(2) {
                     ComingScheduleCard(
                         modifier = Modifier.fillMaxWidth(),
-                        onClickAttend = {},
+                        onClickButton = {},
+                        buttonType = ComingScheduleCardButtonType.ATTEND,
                         isLightning = false,
                         startDate = LocalDateTime.now().plusDays(2),
                         title = "퇴근 후 독서 정모: 각자 독서",
@@ -147,7 +170,7 @@ private fun ComingScheduleScreen(
                         joinCount = 6,
                         capacity = 8,
                         imageUrl = "https://picsum.photos/200",
-                        attendance = false
+                        onClickCard = {}
                     )
                 }
             }
@@ -163,7 +186,10 @@ private fun ComingScheduleScreenPreview() {
             onBack = {},
             onClickReset = {},
             onClickFilter = {},
-            selectedFilters = emptySet()
+            selectedFilters = emptySet(),
+            showAddScheduleButton = true,
+            onClickCreateSchedule = {},
+            onClickSchedule = {}
         )
     }
 }

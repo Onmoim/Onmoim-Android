@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.onmoim.android.library)
     alias(libs.plugins.onmoim.android.hilt)
@@ -9,7 +11,16 @@ android {
 
     defaultConfig {
         buildConfigField("String", "BASE_URL", "\"https://onmoim.store\"")
+        buildConfigField(
+            "String",
+            "KAKAO_REST_API_KEY",
+            "\"${getLocalPropertyValue("kakao.rest.api.key")}\""
+        )
     }
+}
+
+fun getLocalPropertyValue(key: String): String {
+    return gradleLocalProperties(rootDir, providers).getProperty(key)
 }
 
 dependencies {

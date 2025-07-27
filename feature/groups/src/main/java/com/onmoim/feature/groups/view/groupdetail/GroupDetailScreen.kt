@@ -2,14 +2,19 @@ package com.onmoim.feature.groups.view.groupdetail
 
 import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -21,14 +26,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.onmoim.core.data.constant.MemberStatus
+import com.onmoim.core.data.constant.PostType
 import com.onmoim.core.data.model.GroupDetail
 import com.onmoim.core.data.model.MeetingDetail
+import com.onmoim.core.data.model.Post
 import com.onmoim.core.designsystem.component.CommonButton
 import com.onmoim.core.designsystem.component.CommonDialog
 import com.onmoim.core.designsystem.component.CommonMenuDialog
@@ -40,29 +52,39 @@ import com.onmoim.core.designsystem.component.group.GroupDetailAppBar
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.feature.groups.R
-import com.onmoim.feature.groups.constant.GroupDetailPostFilter
+import com.onmoim.feature.groups.constant.BoardType
+import com.onmoim.feature.groups.constant.GroupDetailPostType
 import com.onmoim.feature.groups.constant.GroupDetailTab
+import com.onmoim.feature.groups.constant.GroupMemberRole
 import com.onmoim.feature.groups.state.GroupDetailEvent
 import com.onmoim.feature.groups.state.GroupDetailUiState
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import java.time.LocalDateTime
 
 @Composable
 fun GroupDetailRoute(
     groupDetailViewModel: GroupDetailViewModel,
-    onNavigateToComingSchedule: () -> Unit,
+    onNavigateToComingSchedule: (GroupMemberRole) -> Unit,
     onNavigateToPostDetail: (id: Int) -> Unit,
     onNavigateToGroupManagement: () -> Unit,
+    onNavigateToPostWrite: (isOwner: Boolean) -> Unit,
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var selectedTab by remember { mutableStateOf(GroupDetailTab.HOME) }
     val groupDetailUiState by groupDetailViewModel.groupDetailUiState.collectAsStateWithLifecycle()
     val groupDetail = (groupDetailUiState as? GroupDetailUiState.Success)?.groupDetail
+    val postFilter by groupDetailViewModel.postFilterState.collectAsStateWithLifecycle()
+    val allPostPagingItems = groupDetailViewModel.allPostPagingData.collectAsLazyPagingItems()
+    val noticePostPagingItems = groupDetailViewModel.noticePostPagingData.collectAsLazyPagingItems()
+    val introPostPagingItems = groupDetailViewModel.introPostPagingData.collectAsLazyPagingItems()
+    val reviewPostPagingItems = groupDetailViewModel.reviewPostPagingData.collectAsLazyPagingItems()
+    val freePostPagingItems = groupDetailViewModel.freePostPagingData.collectAsLazyPagingItems()
     var showMenuDialog by remember { mutableStateOf(false) }
     var showHostLeaveDialog by remember { mutableStateOf(false) }
     var showMemberLeaveDialog by remember { mutableStateOf(false) }
     var showReportDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     val isLoading by groupDetailViewModel.isLoading.collectAsStateWithLifecycle()
 
     if (showMenuDialog) {
@@ -197,12 +219,48 @@ fun GroupDetailRoute(
                 showMenuDialog = true
             },
             onClickFavorite = groupDetailViewModel::favoriteGroup,
-            onClickMeetAttend = groupDetailViewModel::attendMeeting
+            onClickMeetAttend = groupDetailViewModel::attendMeeting,
+            onClickMeetLeave = groupDetailViewModel::leaveMeeting,
+            postFilter = postFilter,
+            onPostFilterChange = groupDetailViewModel::onPostFilterChange,
+            postPagingItems = when (postFilter) {
+                GroupDetailPostType.ALL -> allPostPagingItems
+                GroupDetailPostType.NOTICE -> noticePostPagingItems
+                GroupDetailPostType.INTRO -> introPostPagingItems
+                GroupDetailPostType.REVIEW -> reviewPostPagingItems
+                GroupDetailPostType.FREE -> freePostPagingItems
+            },
+            onClickPostWrite = onNavigateToPostWrite
         )
     }
 
+    GroupDetailEventHandler(
+        groupDetailEventFlow = groupDetailViewModel.event,
+        onBack = {
+            onBackPressedDispatcher?.onBackPressed()
+        },
+        onRefreshBoard = { type ->
+            allPostPagingItems.refresh()
+            when (type) {
+                BoardType.NOTICE -> noticePostPagingItems.refresh()
+                BoardType.INTRO -> introPostPagingItems.refresh()
+                BoardType.REVIEW -> reviewPostPagingItems.refresh()
+                BoardType.FREE -> freePostPagingItems.refresh()
+            }
+        }
+    )
+}
+
+@Composable
+private fun GroupDetailEventHandler(
+    groupDetailEventFlow: Flow<GroupDetailEvent>,
+    onBack: () -> Unit,
+    onRefreshBoard: (BoardType) -> Unit
+) {
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
-        groupDetailViewModel.event.collect { event ->
+        groupDetailEventFlow.collect { event ->
             when (event) {
                 is GroupDetailEvent.LeaveGroupFailure -> {
                     Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
@@ -214,7 +272,7 @@ fun GroupDetailRoute(
                         context.getString(R.string.group_detail_leave_success),
                         Toast.LENGTH_SHORT
                     ).show()
-                    onBackPressedDispatcher?.onBackPressed()
+                    onBack()
                 }
 
                 is GroupDetailEvent.DeleteGroupFailure -> {
@@ -227,11 +285,91 @@ fun GroupDetailRoute(
                         context.getString(R.string.group_detail_delete_success),
                         Toast.LENGTH_SHORT
                     ).show()
-                    onBackPressedDispatcher?.onBackPressed()
+                    onBack()
                 }
 
                 is GroupDetailEvent.FavoriteGroupFailure -> {
                     Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is GroupDetailEvent.AttendMeetingFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                GroupDetailEvent.AttendMeetingOverCapacity -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_attend_meeting_over_capacity),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                GroupDetailEvent.AttendMeetingSuccess -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_attend_meeting_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is GroupDetailEvent.LeaveMeetingFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                GroupDetailEvent.LeaveMeetingSuccess -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_leave_meeting_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                GroupDetailEvent.MeetingNotFound -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_meeting_not_found),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                GroupDetailEvent.JoinGroupBanned -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_group_banned),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is GroupDetailEvent.JoinGroupFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                GroupDetailEvent.JoinGroupNotFound -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_group_not_found),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                GroupDetailEvent.JoinGroupOverCapacity -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_group_over_capacity),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                GroupDetailEvent.JoinGroupSuccess -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.group_detail_group_join_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is GroupDetailEvent.RefreshBoard -> {
+                    onRefreshBoard(event.type)
                 }
             }
         }
@@ -243,14 +381,19 @@ private fun GroupDetailScreen(
     onBack: () -> Unit,
     selectedTab: GroupDetailTab,
     onTabChange: (GroupDetailTab) -> Unit,
-    onClickComingSchedule: () -> Unit,
+    onClickComingSchedule: (GroupMemberRole) -> Unit,
     onClickPost: (id: Int) -> Unit,
     groupDetailUiState: GroupDetailUiState,
     onClickGroupJoin: () -> Unit,
     onClickGroupSetting: () -> Unit,
     onClickMenu: () -> Unit,
     onClickFavorite: (Boolean) -> Unit,
-    onClickMeetAttend: (meetingId: Int) -> Unit
+    onClickMeetAttend: (meetingId: Int) -> Unit,
+    onClickMeetLeave: (meetingId: Int) -> Unit,
+    postFilter: GroupDetailPostType,
+    onPostFilterChange: (GroupDetailPostType) -> Unit,
+    postPagingItems: LazyPagingItems<Post>,
+    onClickPostWrite: (isOwner: Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -297,26 +440,33 @@ private fun GroupDetailScreen(
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            when (selectedTab) {
-                GroupDetailTab.HOME -> {
-                    when (groupDetailUiState) {
-                        is GroupDetailUiState.Error -> {
-                            // TODO: 에러 처리
-                        }
+            when (groupDetailUiState) {
+                is GroupDetailUiState.Error -> {
+                    Text(
+                        text = groupDetailUiState.t.message ?: "error",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
 
-                        GroupDetailUiState.Loading -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
+                GroupDetailUiState.Loading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
 
-                        is GroupDetailUiState.Success -> {
-                            val groupDetail = groupDetailUiState.groupDetail
+                is GroupDetailUiState.Success -> {
+                    val groupDetail = groupDetailUiState.groupDetail
+                    val memberStatus = groupDetail.memberStatus
 
+                    when (selectedTab) {
+                        GroupDetailTab.HOME -> {
                             GroupDetailHomeContainer(
                                 modifier = Modifier
+                                    .verticalScroll(rememberScrollState())
+                                    .background(OnmoimTheme.colors.gray01)
                                     .fillMaxSize()
-                                    .verticalScroll(rememberScrollState()),
+                                    .padding(bottom = 20.dp)
+                                    .navigationBarsPadding(),
                                 title = groupDetail.title,
                                 imageUrl = groupDetail.imageUrl,
                                 location = groupDetail.location,
@@ -325,8 +475,16 @@ private fun GroupDetailScreen(
                                 description = groupDetail.description,
                                 meetings = groupDetail.meetingList,
                                 memberStatus = groupDetail.memberStatus,
-                                onClickComingSchedule = onClickComingSchedule,
+                                onClickComingSchedule = {
+                                    val role = when (groupDetail.memberStatus) {
+                                        MemberStatus.OWNER -> GroupMemberRole.OWNER
+                                        MemberStatus.MEMBER -> GroupMemberRole.MEMBER
+                                        else -> null
+                                    }
+                                    role?.let(onClickComingSchedule)
+                                },
                                 onClickMeetAttend = onClickMeetAttend,
+                                onClickMeetLeave = onClickMeetLeave,
                                 onClickGroupSetting = onClickGroupSetting
                             )
                             if (groupDetail.memberStatus == MemberStatus.NONE) {
@@ -340,19 +498,44 @@ private fun GroupDetailScreen(
                                 )
                             }
                         }
+
+                        GroupDetailTab.POST -> {
+                            GroupDetailPostContainer(
+                                onClickPost = onClickPost,
+                                modifier = Modifier.fillMaxSize(),
+                                selectedFilter = postFilter,
+                                onFilterChange = onPostFilterChange,
+                                postPagingItems = postPagingItems
+                            )
+                            if (memberStatus == MemberStatus.OWNER || memberStatus == MemberStatus.MEMBER) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(end = 15.dp, bottom = 40.dp)
+                                        .align(Alignment.BottomEnd)
+                                        .clickable {
+                                            onClickPostWrite(memberStatus == MemberStatus.OWNER)
+                                        }
+                                        .background(
+                                            color = OnmoimTheme.colors.primaryBlue,
+                                            shape = CircleShape
+                                        )
+                                        .size(60.dp)
+                                        .clip(CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Image(
+                                        painter = painterResource(R.drawable.ic_pencil),
+                                        contentDescription = null
+                                    )
+                                }
+                            }
+                        }
+
+                        GroupDetailTab.CHAT -> {
+
+                        }
                     }
                 }
-
-                GroupDetailTab.POST -> {
-                    GroupDetailPostContainer(
-                        onClickPost = onClickPost,
-                        modifier = Modifier.fillMaxSize(),
-                        selectedFilter = GroupDetailPostFilter.ALL,
-                        onFilterChange = {}
-                    )
-                }
-
-                GroupDetailTab.CHAT -> {}
             }
         }
     }
@@ -407,6 +590,39 @@ private fun GroupMenuDialog(
     }
 }
 
+private fun getFakePosts(): List<Post> {
+    return listOf(
+        Post(
+            id = 1,
+            title = "첫 번째 게시물",
+            content = "이것은 첫 번째 게시물의 내용입니다.",
+            name = "작성자1",
+            profileImageUrl = null,
+            type = PostType.NOTICE,
+            createdDate = LocalDateTime.now(),
+            modifiedDate = LocalDateTime.now(),
+            imageUrls = emptyList(),
+            likeCount = 10,
+            isLiked = false,
+            commentCount = 5
+        ),
+        Post(
+            id = 2,
+            title = "두 번째 게시물",
+            content = "이것은 두 번째 게시물의 내용입니다.",
+            name = "작성자2",
+            profileImageUrl = null,
+            type = PostType.FREE,
+            createdDate = LocalDateTime.now(),
+            modifiedDate = LocalDateTime.now(),
+            imageUrls = emptyList(),
+            likeCount = 5,
+            isLiked = true,
+            commentCount = 2
+        )
+    )
+}
+
 private fun getFakeGroupoDetail(memberStatus: MemberStatus): GroupDetail {
     return GroupDetail(
         id = 1,
@@ -430,8 +646,22 @@ private fun getFakeGroupoDetail(memberStatus: MemberStatus): GroupDetail {
                 attendance = false,
                 isLightning = false,
                 imgUrl = null,
-                latitude = 0,
-                longitude = 0
+                latitude = 0.0,
+                longitude = 0.0
+            ),
+            MeetingDetail(
+                id = 2,
+                title = "제목제목",
+                placeName = "장소장소",
+                startDate = LocalDateTime.now().plusDays(7),
+                cost = 10000,
+                joinCount = 6,
+                capacity = 8,
+                attendance = false,
+                isLightning = false,
+                imgUrl = null,
+                latitude = 0.0,
+                longitude = 0.0
             )
         ),
         memberStatus = memberStatus,
@@ -454,7 +684,12 @@ private fun GroupDetailScreenForHomePreview1() {
             onClickGroupSetting = {},
             onClickMenu = {},
             onClickFavorite = {},
-            onClickMeetAttend = {}
+            onClickMeetAttend = {},
+            onClickMeetLeave = {},
+            postFilter = GroupDetailPostType.ALL,
+            onPostFilterChange = {},
+            postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems(),
+            onClickPostWrite = {}
         )
     }
 }
@@ -474,7 +709,12 @@ private fun GroupDetailScreenForHomePreview2() {
             onClickGroupSetting = {},
             onClickMenu = {},
             onClickFavorite = {},
-            onClickMeetAttend = {}
+            onClickMeetAttend = {},
+            onClickMeetLeave = {},
+            postFilter = GroupDetailPostType.ALL,
+            onPostFilterChange = {},
+            postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems(),
+            onClickPostWrite = {}
         )
     }
 }
@@ -489,12 +729,17 @@ private fun GroupDetailScreenForPostPreview() {
             onTabChange = {},
             onClickComingSchedule = {},
             onClickPost = {},
-            groupDetailUiState = GroupDetailUiState.Loading,
+            groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.OWNER)),
             onClickGroupJoin = {},
             onClickGroupSetting = {},
             onClickMenu = {},
             onClickFavorite = {},
-            onClickMeetAttend = {}
+            onClickMeetAttend = {},
+            onClickMeetLeave = {},
+            postFilter = GroupDetailPostType.ALL,
+            onPostFilterChange = {},
+            postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems(),
+            onClickPostWrite = {}
         )
     }
 }

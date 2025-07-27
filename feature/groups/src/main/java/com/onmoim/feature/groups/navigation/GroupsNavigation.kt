@@ -1,31 +1,8 @@
 package com.onmoim.feature.groups.navigation
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
-import androidx.navigation.compose.composable
-import androidx.navigation.navOptions
-import androidx.navigation.navigation
-import androidx.navigation.toRoute
-import com.onmoim.feature.groups.view.ComingScheduleRoute
-import com.onmoim.feature.groups.view.GroupCategorySelectRoute
-import com.onmoim.feature.groups.view.GroupEditRoute
-import com.onmoim.feature.groups.view.GroupOpenCompleteRoute
-import com.onmoim.feature.groups.view.GroupOpenRoute
-import com.onmoim.feature.groups.view.MyGroupRoute
-import com.onmoim.feature.groups.view.groupdetail.GroupDetailRoute
-import com.onmoim.feature.groups.view.groupmanagement.GroupManagementRoute
-import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
-import com.onmoim.feature.groups.viewmodel.GroupEditViewModel
-import com.onmoim.feature.groups.viewmodel.GroupManagementViewModel
-import com.onmoim.feature.groups.viewmodel.GroupOpenViewModel
-import com.onmoim.feature.location.navigation.LocationNavigationBundleKey
-import com.onmoim.feature.location.navigation.navigateToLocationSearch
+import com.onmoim.feature.groups.constant.GroupMemberRole
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -41,7 +18,8 @@ data class GroupDetailRoute(
 
 @Serializable
 data class ComingScheduleRoute(
-    val id: Int? = null
+    val groupId: Int? = null,
+    val role: GroupMemberRole? = null
 )
 
 @Serializable
@@ -69,8 +47,38 @@ data class GroupEditRoute(
     val groupId: Int
 )
 
-fun NavController.navigateToComingSchedule(groupId: Int? = null, navOptions: NavOptions? = null) {
-    navigate(ComingScheduleRoute(groupId), navOptions)
+@Serializable
+data class ScheduleManagementRoute(
+    val groupId: Int
+)
+
+@Serializable
+data class CreateScheduleRoute(
+    val groupId: Int,
+    val groupMemberRole: GroupMemberRole
+)
+
+@Serializable
+object MeetingPlaceSearchRoute
+
+@Serializable
+data class PostWriteRoute(
+    val groupId: Int,
+    val isOwner: Boolean
+)
+
+@Serializable
+data class PostDetailRoute(
+    val groupId: Int,
+    val postId: Int
+)
+
+fun NavController.navigateToComingSchedule(
+    groupId: Int? = null,
+    groupMemberRole: GroupMemberRole? = null,
+    navOptions: NavOptions? = null
+) {
+    navigate(ComingScheduleRoute(groupId, groupMemberRole), navOptions)
 }
 
 fun NavController.navigateToGroupDetail(id: Int, navOptions: NavOptions? = null) {
@@ -102,150 +110,34 @@ fun NavController.navigateToGroupEdit(groupId: Int, navOptions: NavOptions? = nu
     navigate(GroupEditRoute(groupId), navOptions)
 }
 
-fun NavGraphBuilder.groupsGraph(
-    navController: NavController,
-    topBar: @Composable () -> Unit,
-    bottomBar: @Composable () -> Unit
+fun NavController.navigateToScheduleManagement(groupId: Int, navOptions: NavOptions? = null) {
+    navigate(ScheduleManagementRoute(groupId), navOptions)
+}
+
+fun NavController.navigateToCreateSchedule(
+    groupId: Int,
+    groupMemberRole: GroupMemberRole,
+    navOptions: NavOptions? = null
 ) {
-    navigation<GroupsNavigation>(
-        startDestination = MyGroupRoute
-    ) {
-        composable<MyGroupRoute>(
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
-            popEnterTransition = { EnterTransition.None },
-            popExitTransition = { ExitTransition.None }
-        ) {
-            MyGroupRoute(
-                topBar = topBar,
-                bottomBar = bottomBar,
-                onNavigateToGroupCategorySelect = {
-                    navController.navigateToGroupCategorySelect()
-                },
-                onNavigateToComingSchedule = {
-                    navController.navigateToComingSchedule()
-                }
-            )
-        }
-        composable<ComingScheduleRoute> { backStackEntry ->
-            val id = backStackEntry.toRoute<ComingScheduleRoute>().id
+    navigate(CreateScheduleRoute(groupId, groupMemberRole), navOptions)
+}
 
-            ComingScheduleRoute()
-        }
-        composable<GroupDetailRoute> { backStackEntry ->
-            val groupId = backStackEntry.toRoute<GroupDetailRoute>().id
-            val groupDetailViewModel =
-                hiltViewModel<GroupDetailViewModel, GroupDetailViewModel.Factory> {
-                    it.create(groupId)
-                }
+fun NavController.navigateToMeetingLocationSearch(navOptions: NavOptions? = null) {
+    navigate(MeetingPlaceSearchRoute, navOptions)
+}
 
-            val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
-            val isRefresh =
-                savedStateHandle?.get<Boolean>(GroupsNavigationBundleKey.GROUP_DETAIL_REFRESH) ?: false
-            savedStateHandle?.remove<Boolean>(GroupsNavigationBundleKey.GROUP_DETAIL_REFRESH)
+fun NavController.navigateToPostWrite(
+    groupId: Int,
+    isOwner: Boolean,
+    navOptions: NavOptions? = null
+) {
+    navigate(PostWriteRoute(groupId, isOwner), navOptions)
+}
 
-            GroupDetailRoute(
-                groupDetailViewModel = groupDetailViewModel,
-                onNavigateToComingSchedule = {
-                    navController.navigateToComingSchedule(groupId)
-                },
-                onNavigateToPostDetail = {},
-                onNavigateToGroupManagement = {
-                    navController.navigateToGroupManagement(groupId)
-                }
-            )
-
-            LaunchedEffect(Unit) {
-                if (isRefresh) {
-                    groupDetailViewModel.fetchGroupDetail(true)
-                }
-            }
-        }
-        composable<GroupCategorySelectRoute> {
-            GroupCategorySelectRoute(
-                onNavigateToGroupOpen = { categoryId, categoryName, categoryImageUrl ->
-                    navController.navigateToGroupOpen(categoryId, categoryName, categoryImageUrl)
-                }
-            )
-        }
-        composable<GroupOpenRoute> { backStackEntry ->
-            val groupOpenRoute = backStackEntry.toRoute<GroupOpenRoute>()
-            val groupOpenViewModel = hiltViewModel<GroupOpenViewModel, GroupOpenViewModel.Factory> {
-                it.create(groupOpenRoute.categoryId)
-            }
-
-            val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
-            val locationId =
-                savedStateHandle?.get<Int>(LocationNavigationBundleKey.LOCATION_ID) ?: 0
-            val locationName =
-                savedStateHandle?.get<String>(LocationNavigationBundleKey.LOCATION_NAME) ?: ""
-            savedStateHandle?.remove<String>(LocationNavigationBundleKey.LOCATION_NAME)
-            savedStateHandle?.remove<Int>(LocationNavigationBundleKey.LOCATION_ID)
-
-            GroupOpenRoute(
-                groupOpenViewModel = groupOpenViewModel,
-                categoryName = groupOpenRoute.categoryName,
-                categoryImageUrl = groupOpenRoute.categoryImageUrl,
-                onNavigateToLocationSearch = {
-                    navController.navigateToLocationSearch()
-                },
-                onNavigateToGroupOpenComplete = {
-                    navController.navigateToGroupOpenComplete(it, navOptions {
-                        popUpTo(MyGroupRoute)
-                    })
-                }
-            )
-
-            LaunchedEffect(Unit) {
-                groupOpenViewModel.onLocationChange(locationId, locationName)
-            }
-        }
-        composable<GroupOpenCompleteRoute> { backStackEntry ->
-            val groupId = backStackEntry.toRoute<GroupOpenCompleteRoute>().groupId
-
-            GroupOpenCompleteRoute(
-                onNavigateToGroupDetail = {
-                    navController.navigateToGroupDetail(groupId, navOptions {
-                        popUpTo(MyGroupRoute)
-                    })
-                }
-            )
-        }
-        composable<GroupManagementRoute> { backStackEntry ->
-            val groupId = backStackEntry.toRoute<GroupManagementRoute>().groupId
-            val groupManagementViewModel =
-                hiltViewModel<GroupManagementViewModel, GroupManagementViewModel.Factory> {
-                    it.create(groupId)
-                }
-
-            GroupManagementRoute(
-                groupManagementViewModel = groupManagementViewModel,
-                onBackAndRefresh = {
-                    navController.previousBackStackEntry?.savedStateHandle?.apply {
-                        set(GroupsNavigationBundleKey.GROUP_DETAIL_REFRESH, true)
-                    }
-                    navController.popBackStack()
-                },
-                onNavigateToGroupEdit = {
-                    navController.navigateToGroupEdit(groupId)
-                }
-            )
-        }
-        composable<GroupEditRoute> { backStackEntry ->
-            val groupId = backStackEntry.toRoute<GroupEditRoute>().groupId
-            val groupEditViewModel = hiltViewModel<GroupEditViewModel, GroupEditViewModel.Factory> {
-                it.create(groupId)
-            }
-
-            GroupEditRoute(
-                groupEditViewModel = groupEditViewModel,
-                onBackAndRefresh = {
-                    navController.previousBackStackEntry?.savedStateHandle?.apply {
-                        set(GroupsNavigationBundleKey.GROUP_DETAIL_REFRESH, true)
-                    }
-                    navController.popBackStack()
-                }
-            )
-        }
-    }
+fun NavController.navigateToPostDetail(
+    groupId: Int,
+    postId: Int,
+    navOptions: NavOptions? = null
+) {
+    navigate(PostDetailRoute(groupId, postId), navOptions)
 }

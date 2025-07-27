@@ -6,3 +6,8 @@ plugins {
 android {
     namespace = "com.onmoim.feature.category"
 }
+
+dependencies {
+    implementation(libs.androidx.paging.runtimeKtx)
+    implementation(libs.androidx.paging.compose)
+}

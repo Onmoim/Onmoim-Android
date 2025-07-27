@@ -1,6 +1,11 @@
 package com.onmoim.core.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.onmoim.core.data.model.Category
+import com.onmoim.core.data.model.Group
+import com.onmoim.core.data.pagingsource.GroupsByCategoryPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.CategoryApi
@@ -14,7 +19,7 @@ import javax.inject.Inject
 class CategoryRepositoryImpl @Inject constructor(
     private val categoryApi: CategoryApi,
     @Dispatcher(OnmoimDispatcher.IO) private val ioDispatcher: CoroutineDispatcher
-): CategoryRepository {
+) : CategoryRepository {
     override fun getCategories(): Flow<List<Category>> = flow {
         val resp = categoryApi.getCategories()
         val data = resp.body()?.data
@@ -32,4 +37,17 @@ class CategoryRepositoryImpl @Inject constructor(
             throw HttpException(resp)
         }
     }.flowOn(ioDispatcher)
+
+    override fun getGroupsByCategoryPagingData(
+        categoryId: Int,
+        size: Int
+    ): Flow<PagingData<Group>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { GroupsByCategoryPagingSource(categoryApi, categoryId) }
+        ).flow.flowOn(ioDispatcher)
+    }
 }

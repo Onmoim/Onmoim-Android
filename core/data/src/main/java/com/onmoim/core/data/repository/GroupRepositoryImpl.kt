@@ -4,18 +4,24 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.onmoim.core.data.constant.HomePopular
+import com.onmoim.core.data.constant.HomeRecommend
+import com.onmoim.core.data.constant.JoinGroupResult
 import com.onmoim.core.data.constant.MemberStatus
 import com.onmoim.core.data.model.ActiveStatistics
+import com.onmoim.core.data.model.Group
 import com.onmoim.core.data.model.GroupDetail
-import com.onmoim.core.data.model.HomeGroup
 import com.onmoim.core.data.model.MeetingDetail
 import com.onmoim.core.data.model.Member
 import com.onmoim.core.data.pagingsource.GroupMemberPagingSource
+import com.onmoim.core.data.pagingsource.JoinedGroupPagingSource
+import com.onmoim.core.data.pagingsource.LikedGroupPagingSource
+import com.onmoim.core.data.pagingsource.PopularGroupPagingSource
+import com.onmoim.core.data.pagingsource.RecommendGroupPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.GroupApi
-import com.onmoim.core.network.model.MemberIdRequestDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
+import com.onmoim.core.network.model.group.MemberIdRequestDto
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -35,7 +41,7 @@ class GroupRepositoryImpl @Inject constructor(
     private val groupApi: GroupApi,
     @Dispatcher(OnmoimDispatcher.IO) private val ioDispatcher: CoroutineDispatcher
 ) : GroupRepository {
-    override fun getHomePopularGroups(homePopular: HomePopular): Flow<List<HomeGroup>> = flow {
+    override fun getHomePopularGroups(homePopular: HomePopular): Flow<List<Group>> = flow {
         val resp = when (homePopular) {
             HomePopular.NEARBY -> groupApi.getPopularNearbyGroups()
             HomePopular.ACTIVE -> groupApi.getPopularActiveGroups()
@@ -44,14 +50,22 @@ class GroupRepositoryImpl @Inject constructor(
 
         if (resp.isSuccessful && data != null) {
             val groups = data.map {
-                HomeGroup(
+                Group(
                     id = it.groupId,
                     imageUrl = it.imageUrl,
                     title = it.name,
                     location = it.dong,
                     memberCount = it.memberCount,
                     scheduleCount = it.upcomingMeetingCount,
-                    categoryName = it.category
+                    categoryName = it.category,
+                    memberStatus = when {
+                        it.status.contains("OWNER") -> MemberStatus.OWNER
+                        it.status.contains("MEMBER") -> MemberStatus.MEMBER
+                        it.status.contains("BAN") -> MemberStatus.BAN
+                        else -> MemberStatus.NONE
+                    },
+                    isFavorite = it.likeStatus.contains("LIKE"),
+                    isRecommend = false
                 )
             }
             emit(groups)
@@ -59,6 +73,76 @@ class GroupRepositoryImpl @Inject constructor(
             throw HttpException(resp)
         }
     }.flowOn(ioDispatcher)
+
+    override fun getHomePopularGroupPagingData(
+        homePopular: HomePopular,
+        size: Int
+    ): Flow<PagingData<Group>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { PopularGroupPagingSource(groupApi, homePopular) }
+        ).flow.flowOn(ioDispatcher)
+    }
+
+    override fun getHomeRecommendGroups(homeRecommend: HomeRecommend): Flow<List<Group>> =
+        flow {
+            val resp = when (homeRecommend) {
+                HomeRecommend.CATEGORY -> groupApi.getRecommendCategoryGroups()
+                HomeRecommend.LOCATION -> groupApi.getRecommendLocationGroups()
+            }
+            val data = resp.body()?.data?.content
+
+            if (resp.isSuccessful && data != null) {
+                val groups = data.map {
+                    Group(
+                        id = it.groupId,
+                        imageUrl = it.imgUrl,
+                        title = it.name,
+                        location = it.location,
+                        memberCount = it.memberCount,
+                        scheduleCount = it.upcomingMeetingCount,
+                        categoryName = it.category,
+                        memberStatus = when {
+                            it.status.contains("OWNER") -> MemberStatus.OWNER
+                            it.status.contains("MEMBER") -> MemberStatus.MEMBER
+                            it.status.contains("BAN") -> MemberStatus.BAN
+                            else -> MemberStatus.NONE
+                        },
+                        isFavorite = it.likeStatus.contains("LIKE"),
+                        isRecommend = it.recommendStatus.contains("RECOMMEND")
+                    )
+                }
+                emit(groups)
+            } else {
+                throw HttpException(resp)
+            }
+        }.flowOn(ioDispatcher)
+
+    override fun getHomeRecommendGroupPagingData(
+        homeRecommend: HomeRecommend,
+        size: Int
+    ): Flow<PagingData<Group>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { RecommendGroupPagingSource(groupApi, homeRecommend) }
+        ).flow.flowOn(ioDispatcher)
+    }
+
+    override fun getFavoriteGroupPagingData(size: Int): Flow<PagingData<Group>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { LikedGroupPagingSource(groupApi) }
+        ).flow.flowOn(ioDispatcher)
+    }
 
     override fun createGroup(
         name: String,
@@ -257,5 +341,60 @@ class GroupRepositoryImpl @Inject constructor(
         } else {
             Result.failure(HttpException(resp))
         }
+    }
+
+    override suspend fun joinGroup(groupId: Int): Result<JoinGroupResult> {
+        val resp = withContext(ioDispatcher) {
+            groupApi.joinGroup(groupId)
+        }
+
+        return when {
+            resp.isSuccessful -> Result.success(JoinGroupResult.SUCCESS)
+            resp.code() == 400 -> Result.success(JoinGroupResult.BANNED)
+            resp.code() == 404 -> Result.success(JoinGroupResult.NOT_FOUND)
+            resp.code() == 409 -> Result.success(JoinGroupResult.OVER_CAPACITY)
+            else -> Result.failure(HttpException(resp))
+        }
+    }
+
+    override fun getJoinedGroups(size: Int): Flow<List<Group>> =
+        flow {
+            val resp = groupApi.getJoinedGroups()
+            val data = resp.body()?.data?.content
+
+            if (resp.isSuccessful && data != null) {
+                val groups = data.map {
+                    Group(
+                        id = it.groupId,
+                        imageUrl = it.imgUrl,
+                        title = it.name,
+                        location = it.location,
+                        memberCount = it.memberCount,
+                        scheduleCount = it.upcomingMeetingCount,
+                        categoryName = it.category,
+                        memberStatus = when {
+                            it.status.contains("OWNER") -> MemberStatus.OWNER
+                            it.status.contains("MEMBER") -> MemberStatus.MEMBER
+                            it.status.contains("BAN") -> MemberStatus.BAN
+                            else -> MemberStatus.NONE
+                        },
+                        isFavorite = it.likeStatus.contains("LIKE"),
+                        isRecommend = it.recommendStatus.contains("RECOMMEND")
+                    )
+                }
+                emit(groups)
+            } else {
+                throw HttpException(resp)
+            }
+        }.flowOn(ioDispatcher)
+
+    override fun getJoinedGroupPagingData(size: Int): Flow<PagingData<Group>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { JoinedGroupPagingSource(groupApi) }
+        ).flow.flowOn(ioDispatcher)
     }
 }

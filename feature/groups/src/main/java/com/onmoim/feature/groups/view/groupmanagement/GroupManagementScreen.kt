@@ -28,9 +28,9 @@ import com.onmoim.core.data.model.Member
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.CommonTab
 import com.onmoim.core.designsystem.component.CommonTabRow
-import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.theme.OnmoimTheme
+import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.GroupManagementTab
 import com.onmoim.feature.groups.state.GroupManagementEvent
@@ -42,6 +42,8 @@ fun GroupManagementRoute(
     groupManagementViewModel: GroupManagementViewModel,
     onBackAndRefresh: () -> Unit,
     onNavigateToGroupEdit: () -> Unit,
+    onNavigateToScheduleManagement: () -> Unit,
+    onNavigateCreateSchedule: () -> Unit,
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val selectedTab by groupManagementViewModel.selectedTabState.collectAsStateWithLifecycle()
@@ -68,10 +70,14 @@ fun GroupManagementRoute(
             onClickTransfer = groupManagementViewModel::transferOwner,
             onClickBan = groupManagementViewModel::banMember,
             onClickGroupEdit = onNavigateToGroupEdit,
-            onClickScheduleManagement = {},
-            onClickCreateMeet = {},
-            onClickWriteNotice = {},
-            onClickGroupDelete = {}
+            onClickScheduleManagement = onNavigateToScheduleManagement,
+            onClickCreateMeet = onNavigateCreateSchedule,
+            onClickWriteNotice = {
+                // TODO: 공지사항 작성 구현
+            },
+            onClickGroupDelete = {
+                // TODO: 그룹 삭제 구현
+            }
         )
     }
 

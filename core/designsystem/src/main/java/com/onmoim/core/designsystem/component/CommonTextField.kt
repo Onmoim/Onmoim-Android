@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,7 @@ fun CommonTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     textColor: Color = OnmoimTheme.colors.textColor,
+    textStyle: TextStyle = OnmoimTheme.typography.body2Regular,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -52,7 +54,7 @@ fun CommonTextField(
             .heightIn(min = 37.dp)
             .then(modifier),
         enabled = enabled,
-        textStyle = OnmoimTheme.typography.body2Regular.copy(
+        textStyle = textStyle.copy(
             color = textColor
         ),
         keyboardOptions = keyboardOptions,

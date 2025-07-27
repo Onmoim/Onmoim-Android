@@ -44,51 +44,46 @@ import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.R
 import java.time.LocalDate
 import java.time.YearMonth
-import kotlin.math.min
 
 @Composable
 fun CommonDatePickerDialog(
     onDismissRequest: () -> Unit,
     initialDate: LocalDate = LocalDate.now(),
+    minDate: LocalDate = LocalDate.of(1900, 1, 1),
+    maxDate: LocalDate = LocalDate.now(),
     onClickConfirm: (LocalDate) -> Unit,
     properties: DialogProperties = DialogProperties(),
 ) {
-    val today = remember { LocalDate.now() }
-    val currentYear = today.year
-    val currentMonth = today.monthValue
-    val currentDay = today.dayOfMonth
-    val effectiveInitialDate = remember(initialDate, today) {
-        if (initialDate.isAfter(today)) {
-            today
-        } else {
-            initialDate
-        }
+    val effectiveInitialDate = remember(initialDate, minDate, maxDate) {
+        initialDate.coerceIn(minDate, maxDate)
     }
+
     var selectedYear by remember { mutableIntStateOf(effectiveInitialDate.year) }
     var selectedMonth by remember { mutableIntStateOf(effectiveInitialDate.monthValue) }
     var selectedDay by remember { mutableIntStateOf(effectiveInitialDate.dayOfMonth) }
 
-    val availableYears = remember { (1900..currentYear).toList() }
-    val availableMonths = remember(selectedYear) {
-        if (selectedYear == currentYear) {
-            (1..currentMonth).toList()
-        } else {
-            (1..12).toList()
-        }
+    val availableYears = remember(minDate, maxDate) {
+        (minDate.year..maxDate.year).toList()
     }
-    val availableDays = remember(selectedYear, selectedMonth) {
-        val maxDaysInMonth = YearMonth.of(selectedYear, selectedMonth).lengthOfMonth()
-
-        if (selectedYear == currentYear && selectedMonth == currentMonth) {
-            (1..min(maxDaysInMonth, currentDay)).toList()
-        } else {
-            (1..maxDaysInMonth).toList()
-        }
+    val availableMonths = remember(selectedYear, minDate, maxDate) {
+        val startMonth = if (selectedYear == minDate.year) minDate.monthValue else 1
+        val endMonth = if (selectedYear == maxDate.year) maxDate.monthValue else 12
+        (startMonth..endMonth).toList()
+    }
+    val availableDays = remember(selectedYear, selectedMonth, minDate, maxDate) {
+        val startDay =
+            if (selectedYear == minDate.year && selectedMonth == minDate.monthValue) minDate.dayOfMonth else 1
+        val endDay =
+            if (selectedYear == maxDate.year && selectedMonth == maxDate.monthValue) maxDate.dayOfMonth else YearMonth.of(
+                selectedYear,
+                selectedMonth
+            ).lengthOfMonth()
+        (startDay..endDay).toList()
     }
 
     LaunchedEffect(selectedYear, availableMonths) {
         if (selectedMonth !in availableMonths) {
-            selectedMonth = availableMonths.lastOrNull() ?: currentMonth
+            selectedMonth = availableMonths.lastOrNull() ?: 1
         }
     }
 

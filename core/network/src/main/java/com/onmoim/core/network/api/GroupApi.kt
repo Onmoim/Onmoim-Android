@@ -1,14 +1,17 @@
 package com.onmoim.core.network.api
 
-import com.onmoim.core.network.model.BasePageDto
 import com.onmoim.core.network.model.BaseResponse
-import com.onmoim.core.network.model.MemberDto
-import com.onmoim.core.network.model.MemberIdRequestDto
+import com.onmoim.core.network.model.group.BaseGroupPageDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
 import com.onmoim.core.network.model.group.CreatedGroupDto
 import com.onmoim.core.network.model.group.GroupDetailDto
 import com.onmoim.core.network.model.group.GroupStatisticsDto
+import com.onmoim.core.network.model.group.JoinedGroupsDto
+import com.onmoim.core.network.model.group.LikedGroupDto
+import com.onmoim.core.network.model.group.MemberDto
+import com.onmoim.core.network.model.group.MemberIdRequestDto
 import com.onmoim.core.network.model.group.PopularGroupDto
+import com.onmoim.core.network.model.group.RecommendGroupDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -26,16 +29,34 @@ interface GroupApi {
     @GET("api/v1/groups/nearby/popular")
     suspend fun getPopularNearbyGroups(
         @Query("lastGroupIdx") lastGroupIdx: Int? = null,
-        @Query("requestSize") requestSize: Int = 10,
+        @Query("requestSize") requestSize: Int? = null,
         @Query("memberCount") memberCount: Int? = null
     ): Response<BaseResponse<PopularGroupDto>>
 
     @GET("api/v1/groups/active/popular")
     suspend fun getPopularActiveGroups(
         @Query("lastGroupIdx") lastGroupIdx: Int? = null,
-        @Query("requestSize") requestSize: Int = 10,
+        @Query("requestSize") requestSize: Int? = null,
         @Query("memberCount") memberCount: Int? = null
     ): Response<BaseResponse<PopularGroupDto>>
+
+    @GET("api/v1/groups/recommend/category")
+    suspend fun getRecommendCategoryGroups(
+        @Query("cursorId") cursorId: Int? = null,
+        @Query("size") size: Int? = null
+    ): Response<BaseResponse<RecommendGroupDto>>
+
+    @GET("api/v1/groups/recommend/location")
+    suspend fun getRecommendLocationGroups(
+        @Query("cursorId") cursorId: Int? = null,
+        @Query("size") size: Int? = null
+    ): Response<BaseResponse<RecommendGroupDto>>
+
+    @GET("api/v1/groups/liked")
+    suspend fun getLikedGroups(
+        @Query("cursorId") cursorId: Int? = null,
+        @Query("size") size: Int? = null
+    ): Response<BaseResponse<LikedGroupDto>>
 
     @POST("api/v1/groups")
     suspend fun createGroup(
@@ -72,7 +93,7 @@ interface GroupApi {
         @Path("groupId") groupId: Int,
         @Query("lastMemberId") lastMemberId: Int? = null,
         @Query("requestSize") requestSize: Int? = null
-    ): Response<BaseResponse<BasePageDto<MemberDto>>>
+    ): Response<BaseResponse<BaseGroupPageDto<MemberDto>>>
 
     @POST("api/v1/groups/{groupId}/ban")
     suspend fun banMember(
@@ -93,4 +114,15 @@ interface GroupApi {
         @Part("request") requestBody: RequestBody,
         @Part file: MultipartBody.Part? = null
     ): Response<BaseResponse<String>>
+
+    @POST("api/v1/groups/{groupId}/join")
+    suspend fun joinGroup(
+        @Path("groupId") groupId: Int
+    ): Response<BaseResponse<String>>
+
+    @GET("api/v1/groups/joined")
+    suspend fun getJoinedGroups(
+        @Query("cursorId") cursorId: Int? = null,
+        @Query("size") size: Int? = null
+    ): Response<BaseResponse<JoinedGroupsDto>>
 }

@@ -1,5 +1,6 @@
 package com.onmoim.feature.home.view
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,11 +13,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,7 +23,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.onmoim.core.data.model.HomeGroup
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.onmoim.core.data.constant.MemberStatus
+import com.onmoim.core.data.model.Group
 import com.onmoim.core.designsystem.component.CommonTab
 import com.onmoim.core.designsystem.component.CommonTabRow
 import com.onmoim.core.designsystem.component.group.GroupHeader
@@ -37,6 +41,7 @@ import com.onmoim.feature.home.constant.HomeTab
 import com.onmoim.feature.home.state.HomePopularGroupUiState
 import com.onmoim.feature.home.state.HomeRecommendGroupUiState
 import com.onmoim.feature.home.viewmodel.HomeViewModel
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun HomeRoute(
@@ -46,12 +51,15 @@ fun HomeRoute(
     onNavigateToGroupDetail: (id: Int) -> Unit,
     onNavigateToMoreGroup: (HomeGroupType) -> Unit
 ) {
-    var selectedTab by remember { mutableStateOf(HomeTab.RECOMMEND) }
+    val selectedTab by homeViewModel.selectedTabState.collectAsStateWithLifecycle()
     val recommendGroupUiState by homeViewModel.recommendGroupUiState.collectAsStateWithLifecycle()
     val popularGroupUiState by homeViewModel.popularGroupUiState.collectAsStateWithLifecycle()
+    val favoriteGroupPagingItems = homeViewModel.favoriteGroupPagingData.collectAsLazyPagingItems()
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(OnmoimTheme.colors.backgroundColor)
     ) {
         topBar()
         HomeScreen(
@@ -59,11 +67,12 @@ fun HomeRoute(
                 .weight(1f)
                 .fillMaxWidth(),
             selectedTab = selectedTab,
-            onTabChange = { selectedTab = it },
+            onTabChange = homeViewModel::onSelectedTabChange,
             onClickGroup = onNavigateToGroupDetail,
             onClickMore = onNavigateToMoreGroup,
             recommendGroupUiState = recommendGroupUiState,
-            popularGroupUiState = popularGroupUiState
+            popularGroupUiState = popularGroupUiState,
+            favoriteGroupPagingItems = favoriteGroupPagingItems
         )
         bottomBar()
     }
@@ -79,6 +88,7 @@ private fun HomeScreen(
     onClickMore: (HomeGroupType) -> Unit,
     recommendGroupUiState: HomeRecommendGroupUiState,
     popularGroupUiState: HomePopularGroupUiState,
+    favoriteGroupPagingItems: LazyPagingItems<Group>
 ) {
     val itemsPerPage = 4
 
@@ -104,7 +114,14 @@ private fun HomeScreen(
             HomeTab.RECOMMEND -> {
                 when (recommendGroupUiState) {
                     is HomeRecommendGroupUiState.Error -> {
-                        // TODO: 에러 처리
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(recommendGroupUiState.error.message.toString())
+                        }
                     }
 
                     HomeRecommendGroupUiState.Loading -> {
@@ -137,7 +154,14 @@ private fun HomeScreen(
             HomeTab.POPULARITY -> {
                 when (popularGroupUiState) {
                     is HomePopularGroupUiState.Error -> {
-                        // TODO: 에러 처리
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(popularGroupUiState.error.message.toString())
+                        }
                     }
 
                     HomePopularGroupUiState.Loading -> {
@@ -168,39 +192,69 @@ private fun HomeScreen(
             }
 
             HomeTab.FAVORITE -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = 15.dp)
-                ) {
-                    item {
-                        GroupHeader(
-                            title = stringResource(R.string.home_my_favorite_meet)
-                        )
-                    }
-                    items(10) { index ->
-                        Column(
-                            modifier = Modifier.fillMaxWidth()
+                val loadState = favoriteGroupPagingItems.loadState.refresh
+
+                when (loadState) {
+                    is LoadState.Error -> {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            if (index > 0) {
-                                Spacer(Modifier.height(16.dp))
+                            Text(loadState.error.message.toString())
+                        }
+                    }
+
+                    LoadState.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+
+                    is LoadState.NotLoading -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentPadding = PaddingValues(horizontal = 15.dp)
+                        ) {
+                            item {
+                                GroupHeader(
+                                    title = stringResource(R.string.home_my_favorite_meet)
+                                )
                             }
-                            GroupItem(
-                                onClick = {
-                                    // TODO: 모임 상세 화면으로 이동
-                                },
-                                imageUrl = "https://picsum.photos/200",
-                                title = "title",
-                                location = "location",
-                                memberCount = 123,
-                                scheduleCount = 123,
-                                categoryName = "categoryName",
-                                isRecommended = true,
-                                isSignUp = true,
-                                isOperating = true,
-                                isFavorite = true
-                            )
+                            items(favoriteGroupPagingItems.itemCount) { index ->
+                                favoriteGroupPagingItems[index]?.let { item ->
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        if (index > 0) {
+                                            Spacer(Modifier.height(16.dp))
+                                        }
+                                        GroupItem(
+                                            onClick = {
+                                                onClickGroup(item.id)
+                                            },
+                                            imageUrl = item.imageUrl,
+                                            title = item.title,
+                                            location = item.location,
+                                            memberCount = item.memberCount,
+                                            scheduleCount = item.scheduleCount,
+                                            categoryName = item.categoryName,
+                                            isRecommended = item.isRecommend,
+                                            isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                                            isOperating = item.memberStatus == MemberStatus.OWNER,
+                                            isFavorite = item.isFavorite
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -215,8 +269,8 @@ private fun RecommendContent(
     onClickDetail: (id: Int) -> Unit,
     onClickMore: (HomeGroupType) -> Unit,
     itemsPerPage: Int,
-    similarGroups: List<HomeGroup>,
-    nearbyGroups: List<HomeGroup>
+    similarGroups: List<Group>,
+    nearbyGroups: List<Group>
 ) {
     val similarGroupsForPage = similarGroups.chunked(itemsPerPage)
     val nearbyGroupsForPage = nearbyGroups.chunked(itemsPerPage)
@@ -244,10 +298,10 @@ private fun RecommendContent(
                 memberCount = item.memberCount,
                 scheduleCount = item.scheduleCount,
                 categoryName = item.categoryName,
-                isRecommended = true,
-                isSignUp = true,
-                isOperating = true,
-                isFavorite = true
+                isRecommended = item.isRecommend,
+                isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                isOperating = item.memberStatus == MemberStatus.OWNER,
+                isFavorite = item.isFavorite
             )
         }
         GroupPager(
@@ -270,10 +324,10 @@ private fun RecommendContent(
                 memberCount = item.memberCount,
                 scheduleCount = item.scheduleCount,
                 categoryName = item.categoryName,
-                isRecommended = true,
-                isSignUp = true,
-                isOperating = true,
-                isFavorite = true
+                isRecommended = item.isRecommend,
+                isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                isOperating = item.memberStatus == MemberStatus.OWNER,
+                isFavorite = item.isFavorite
             )
         }
     }
@@ -285,8 +339,8 @@ private fun PopularContent(
     onClickDetail: (id: Int) -> Unit,
     onClickMore: (HomeGroupType) -> Unit,
     itemsPerPage: Int,
-    nearbyGroups: List<HomeGroup>,
-    activeGroups: List<HomeGroup>
+    nearbyGroups: List<Group>,
+    activeGroups: List<Group>
 ) {
     val nearbyGroupsForPage = nearbyGroups.chunked(itemsPerPage)
     val activeGroupsForPage = activeGroups.chunked(itemsPerPage)
@@ -314,10 +368,10 @@ private fun PopularContent(
                 memberCount = item.memberCount,
                 scheduleCount = item.scheduleCount,
                 categoryName = item.categoryName,
-                isRecommended = true,
-                isSignUp = true,
-                isOperating = true,
-                isFavorite = true
+                isRecommended = item.isRecommend,
+                isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                isOperating = item.memberStatus == MemberStatus.OWNER,
+                isFavorite = item.isFavorite
             )
         }
         GroupPager(
@@ -340,10 +394,10 @@ private fun PopularContent(
                 memberCount = item.memberCount,
                 scheduleCount = item.scheduleCount,
                 categoryName = item.categoryName,
-                isRecommended = true,
-                isSignUp = true,
-                isOperating = true,
-                isFavorite = true
+                isRecommended = item.isRecommend,
+                isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                isOperating = item.memberStatus == MemberStatus.OWNER,
+                isFavorite = item.isFavorite
             )
         }
     }
@@ -352,6 +406,21 @@ private fun PopularContent(
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
+    val fakeGroups = List(20) {
+        Group(
+            it + 1,
+            "https://picsum.photos/200",
+            "제목 제목 $it",
+            "지역 $it",
+            10,
+            5,
+            "카테고리 $it",
+            if (it % 2 == 0) MemberStatus.MEMBER else MemberStatus.OWNER,
+            it % 2 == 0,
+            it % 2 == 0
+        )
+    }
+
     OnmoimTheme {
         HomeScreen(
             selectedTab = HomeTab.RECOMMEND,
@@ -359,33 +428,14 @@ private fun HomeScreenPreview() {
             onClickGroup = {},
             onClickMore = {},
             recommendGroupUiState = HomeRecommendGroupUiState.Success(
-                similarGroups = listOf(
-                    HomeGroup(0, "https://picsum.photos/200", "축구 동호회", "서울시 강남구", 10, 5, "스포츠"),
-                    HomeGroup(1, "https://picsum.photos/201", "농구 동호회", "서울시 서초구", 15, 3, "스포츠"),
-                    HomeGroup(2, "https://picsum.photos/202", "야구 동호회", "서울시 송파구", 20, 2, "스포츠"),
-                    HomeGroup(3, "https://picsum.photos/203", "배구 동호회", "서울시 강동구", 12, 4, "스포츠"),
-                ),
-                nearbyGroups = listOf(
-                    HomeGroup(4, "https://picsum.photos/204", "독서 모임", "서울시 강남구", 5, 1, "문화"),
-                    HomeGroup(5, "https://picsum.photos/205", "영화 모임", "서울시 서초구", 8, 2, "문화"),
-                    HomeGroup(6, "https://picsum.photos/206", "음악 모임", "서울시 송파구", 7, 3, "문화"),
-                    HomeGroup(7, "https://picsum.photos/207", "미술 모임", "서울시 강동구", 6, 1, "문화"),
-                )
+                similarGroups = fakeGroups,
+                nearbyGroups = fakeGroups
             ),
             popularGroupUiState = HomePopularGroupUiState.Success(
-                nearbyGroups = listOf(
-                    HomeGroup(8, "https://picsum.photos/208", "코딩 스터디", "서울시 강남구", 10, 5, "IT"),
-                    HomeGroup(9, "https://picsum.photos/209", "알고리즘 스터디", "서울시 서초구", 15, 3, "IT"),
-                    HomeGroup(10, "https://picsum.photos/210", "CS 스터디", "서울시 송파구", 20, 2, "IT"),
-                    HomeGroup(11, "https://picsum.photos/211", "프론트엔드 스터디", "서울시 강동구", 12, 4, "IT"),
-                ),
-                activeGroups = listOf(
-                    HomeGroup(12, "https://picsum.photos/212", "백엔드 스터디", "서울시 강남구", 5, 1, "IT"),
-                    HomeGroup(13, "https://picsum.photos/213", "안드로이드 스터디", "서울시 서초구", 8, 2, "IT"),
-                    HomeGroup(14, "https://picsum.photos/214", "iOS 스터디", "서울시 송파구", 7, 3, "IT"),
-                    HomeGroup(15, "https://picsum.photos/215", "데브옵스 스터디", "서울시 강동구", 6, 1, "IT"),
-                )
-            )
+                nearbyGroups = fakeGroups,
+                activeGroups = fakeGroups
+            ),
+            favoriteGroupPagingItems = flowOf(PagingData.from(fakeGroups)).collectAsLazyPagingItems()
         )
     }
 }
