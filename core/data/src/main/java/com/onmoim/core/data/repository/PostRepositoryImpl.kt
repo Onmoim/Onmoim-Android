@@ -5,7 +5,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.onmoim.core.data.constant.BoardCategory
 import com.onmoim.core.data.constant.PostType
+import com.onmoim.core.data.model.Comment
 import com.onmoim.core.data.model.Post
+import com.onmoim.core.data.pagingsource.CommentPagingSource
 import com.onmoim.core.data.pagingsource.PostPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
@@ -13,6 +15,7 @@ import com.onmoim.core.network.api.PostApi
 import com.onmoim.core.network.model.post.CreatePostRequestDto
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -21,6 +24,8 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.inject.Inject
 
 class PostRepositoryImpl @Inject constructor(
@@ -75,6 +80,70 @@ class PostRepositoryImpl @Inject constructor(
 
         return if (resp.isSuccessful) {
             Result.success(Unit)
+        } else {
+            Result.failure(Exception(resp.message()))
+        }
+    }
+
+    override fun getPost(
+        groupId: Int,
+        postId: Int
+    ): Flow<Post> = flow {
+        val resp = postApi.getPost(groupId, postId)
+        val data = resp.body()?.data
+
+        if (resp.isSuccessful && data != null) {
+            val systemZoneId = ZoneId.systemDefault()
+            val createdLocalDateTimeUTC = LocalDateTime.parse(data.createdDate)
+            val modifiedLocalDateTimeUTC = LocalDateTime.parse(data.modifiedDate)
+            val createdZonedDateTime = createdLocalDateTimeUTC.atZone(systemZoneId)
+            val modifiedZonedDateTime = modifiedLocalDateTimeUTC.atZone(systemZoneId)
+
+            val post = Post(
+                id = data.id,
+                title = data.title,
+                content = data.content,
+                name = data.authorName,
+                profileImageUrl = data.authorProfileImage,
+                type = PostType.valueOf(data.type),
+                createdDate = createdZonedDateTime.toLocalDateTime(),
+                modifiedDate = modifiedZonedDateTime.toLocalDateTime(),
+                imageUrls = data.imageUrls,
+                likeCount = data.likeCount,
+                isLiked = data.isLiked,
+                commentCount = 0 // FIXME: api 수정되면 확인
+            )
+            emit(post)
+        } else {
+            throw Exception(resp.message())
+        }
+    }.flowOn(ioDispatcher)
+
+    override fun getCommentPagingData(
+        groupId: Int,
+        postId: Int,
+        size: Int
+    ): Flow<PagingData<Comment>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { CommentPagingSource(postApi, groupId, postId) }
+        ).flow.flowOn(ioDispatcher)
+    }
+
+    override suspend fun likePost(
+        groupId: Int,
+        postId: Int
+    ): Result<Boolean> {
+        val resp = withContext(ioDispatcher) {
+            postApi.likePost(groupId, postId)
+        }
+        val data = resp.body()?.data
+
+        return if (resp.isSuccessful && data != null) {
+            Result.success(data.isLiked)
         } else {
             Result.failure(Exception(resp.message()))
         }

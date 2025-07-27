@@ -113,8 +113,8 @@ fun NavGraphBuilder.groupsGraph(
                 onNavigateToComingSchedule = { role ->
                     navController.navigateToComingSchedule(groupId, role)
                 },
-                onNavigateToPostDetail = {
-                    navController.navigateToPostDetail(it)
+                onNavigateToPostDetail = { postId ->
+                    navController.navigateToPostDetail(groupId, postId)
                 },
                 onNavigateToGroupManagement = {
                     navController.navigateToGroupManagement(groupId)
@@ -330,10 +330,10 @@ fun NavGraphBuilder.groupsGraph(
             )
         }
         composable<PostDetailRoute> { backStackEntry ->
-            val postId = backStackEntry.toRoute<PostDetailRoute>().postId
+            val postDetailRoute = backStackEntry.toRoute<PostDetailRoute>()
             val postDetailViewModel =
                 hiltViewModel<PostDetailViewModel, PostDetailViewModel.Factory> {
-                    it.create(postId)
+                    it.create(postDetailRoute.groupId, postDetailRoute.postId)
                 }
 
             PostDetailRoute(

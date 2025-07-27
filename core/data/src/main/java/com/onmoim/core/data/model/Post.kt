@@ -15,4 +15,5 @@ data class Post(
     val imageUrls: List<String>,
     val likeCount: Int,
     val isLiked: Boolean,
+    val commentCount: Int
 )

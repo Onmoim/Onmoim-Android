@@ -69,6 +69,7 @@ data class PostWriteRoute(
 
 @Serializable
 data class PostDetailRoute(
+    val groupId: Int,
     val postId: Int
 )
 
@@ -134,8 +135,9 @@ fun NavController.navigateToPostWrite(
 }
 
 fun NavController.navigateToPostDetail(
+    groupId: Int,
     postId: Int,
     navOptions: NavOptions? = null
 ) {
-    navigate(PostDetailRoute(postId), navOptions)
+    navigate(PostDetailRoute(groupId, postId), navOptions)
 }

@@ -603,7 +603,8 @@ private fun getFakePosts(): List<Post> {
             modifiedDate = LocalDateTime.now(),
             imageUrls = emptyList(),
             likeCount = 10,
-            isLiked = false
+            isLiked = false,
+            commentCount = 5
         ),
         Post(
             id = 2,
@@ -616,7 +617,8 @@ private fun getFakePosts(): List<Post> {
             modifiedDate = LocalDateTime.now(),
             imageUrls = emptyList(),
             likeCount = 5,
-            isLiked = true
+            isLiked = true,
+            commentCount = 2
         )
     )
 }

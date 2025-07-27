@@ -52,7 +52,8 @@ class PostPagingSource(
                     modifiedDate = modifiedZonedDateTime.toLocalDateTime(),
                     imageUrls = it.imageUrls,
                     likeCount = it.likeCount,
-                    isLiked = it.isLiked
+                    isLiked = it.isLiked,
+                    commentCount = 0 // FIXME: api 수정되면 확인
                 )
             } ?: emptyList()
             val nextCursorId = data?.nextCursorId

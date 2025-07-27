@@ -171,7 +171,7 @@ fun GroupDetailPostContainer(
                                         title = it.title,
                                         content = it.content,
                                         likeCount = it.likeCount,
-                                        commentCount = 0, // TODO: api 수정되면 확인
+                                        commentCount = it.commentCount,
                                         representImageUrl = it.imageUrls.firstOrNull()
                                     )
                                 }

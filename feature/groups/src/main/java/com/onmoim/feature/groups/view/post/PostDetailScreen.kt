@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -39,9 +40,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
+import com.onmoim.core.data.constant.PostType
+import com.onmoim.core.data.model.Comment
+import com.onmoim.core.data.model.Post
 import com.onmoim.core.designsystem.component.CommentTextField
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.NavigationIconButton
@@ -49,7 +57,9 @@ import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.BoardType
+import com.onmoim.feature.groups.viewmodel.PostDetailUiState
 import com.onmoim.feature.groups.viewmodel.PostDetailViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -58,6 +68,8 @@ fun PostDetailRoute(
     postDetailViewModel: PostDetailViewModel
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    val postDetailUiState by postDetailViewModel.postDetailUiState.collectAsStateWithLifecycle()
+    val commentPagingItems = postDetailViewModel.commentPagingData.collectAsLazyPagingItems()
 
     PostDetailScreen(
         onBack = {
@@ -66,9 +78,15 @@ fun PostDetailRoute(
         onClickPostMenu = {
 
         },
+        onClickLike = postDetailViewModel::likePostToggle,
         onClickCommentMenu = {
 
-        }
+        },
+        onClickReply = {
+
+        },
+        postDetailUiState = postDetailUiState,
+        commentPagingItems = commentPagingItems
     )
 }
 
@@ -76,7 +94,11 @@ fun PostDetailRoute(
 private fun PostDetailScreen(
     onBack: () -> Unit,
     onClickPostMenu: () -> Unit,
-    onClickCommentMenu: () -> Unit
+    onClickLike: () -> Unit,
+    onClickCommentMenu: () -> Unit,
+    onClickReply: () -> Unit,
+    postDetailUiState: PostDetailUiState,
+    commentPagingItems: LazyPagingItems<Comment>
 ) {
     Column(
         modifier = Modifier
@@ -112,45 +134,99 @@ private fun PostDetailScreen(
                 }
             }
         )
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(vertical = 10.dp)
-        ) {
-            item {
-                PostContent(
-                    userName = "username",
-                    profileImageUrl = "https://picsum.photos/200",
-                    boardType = BoardType.REVIEW,
-                    writeDateTime = LocalDateTime.now(),
-                    title = "title",
-                    content = "content",
-                    imageUrls = listOf("https://picsum.photos/200"),
-                    likeCount = 10,
-                    isLike = false,
-                    onClickLike = {},
-                    commentCount = 20
-                )
+        when (postDetailUiState) {
+            is PostDetailUiState.Error -> {
+                Text(postDetailUiState.t.message.toString())
             }
-            items(5) {
-                CommentItem(
-                    onClickMenu = {},
-                    onClickReply = {},
-                    userName = "username",
-                    profileImageUrl = "https://picsum.photos/200",
-                    content = "content",
-                    commentCount = it
+
+            PostDetailUiState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is PostDetailUiState.Success -> {
+                val post = postDetailUiState.post
+                val loadState = commentPagingItems.loadState.refresh
+
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentPadding = PaddingValues(vertical = 10.dp)
+                ) {
+                    item {
+                        PostContent(
+                            userName = post.name,
+                            profileImageUrl = post.profileImageUrl,
+                            boardType = when (post.type) {
+                                PostType.ALL -> null
+                                PostType.NOTICE -> BoardType.NOTICE
+                                PostType.INTRODUCTION -> BoardType.INTRO
+                                PostType.REVIEW -> BoardType.REVIEW
+                                PostType.FREE -> BoardType.FREE
+                            },
+                            writeDateTime = post.createdDate,
+                            title = post.title,
+                            content = post.content,
+                            imageUrls = post.imageUrls,
+                            likeCount = post.likeCount,
+                            isLike = post.isLiked,
+                            onClickLike = onClickLike,
+                            commentCount = post.commentCount
+                        )
+                    }
+                    when (loadState) {
+                        is LoadState.Error -> {
+                            item {
+                                Text(loadState.error.message.toString())
+                            }
+                        }
+
+                        LoadState.Loading -> {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.padding(vertical = 30.dp)
+                                    )
+                                }
+                            }
+
+                        }
+
+                        is LoadState.NotLoading -> {
+                            items(commentPagingItems.itemCount) { index ->
+                                commentPagingItems[index]?.let {
+                                    CommentItem(
+                                        onClickMenu = onClickCommentMenu,
+                                        onClickReply = onClickReply,
+                                        userName = it.userName,
+                                        profileImageUrl = it.profileImageUrl,
+                                        content = it.content,
+                                        replyCount = it.replyCount
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                CommentTextField(
+                    value = "",
+                    onValueChange = {},
+                    onClickSend = {},
+                    modifier = Modifier.fillMaxWidth(),
+                    onSend = {}
                 )
             }
         }
-        CommentTextField(
-            value = "",
-            onValueChange = {},
-            onClickSend = {},
-            modifier = Modifier.fillMaxWidth(),
-            onSend = {}
-        )
     }
 }
 
@@ -158,7 +234,7 @@ private fun PostDetailScreen(
 private fun PostContent(
     userName: String,
     profileImageUrl: String?,
-    boardType: BoardType,
+    boardType: BoardType?,
     writeDateTime: LocalDateTime,
     title: String,
     content: String,
@@ -229,14 +305,13 @@ private fun PostContent(
                 )
             }
             Text(
-                text = stringResource(
-                    id = when (boardType) {
-                        BoardType.NOTICE -> R.string.notice_board
-                        BoardType.INTRO -> R.string.intro_board
-                        BoardType.REVIEW -> R.string.review_board
-                        BoardType.FREE -> R.string.free_board
-                    }
-                ),
+                text = when (boardType) {
+                    BoardType.NOTICE -> stringResource(R.string.notice_board)
+                    BoardType.INTRO -> stringResource(R.string.intro_board)
+                    BoardType.REVIEW -> stringResource(R.string.review_board)
+                    BoardType.FREE -> stringResource(R.string.free_board)
+                    else -> ""
+                },
                 modifier = Modifier
                     .padding(start = 8.dp)
                     .width(80.dp),
@@ -380,7 +455,7 @@ private fun CommentItem(
     userName: String,
     profileImageUrl: String?,
     content: String,
-    commentCount: Int
+    replyCount: Int
 ) {
     Row(
         modifier = Modifier
@@ -449,8 +524,8 @@ private fun CommentItem(
                     )
                 )
                 Text(
-                    text = if (commentCount > 0) {
-                        stringResource(R.string.post_detail_more_reply, commentCount)
+                    text = if (replyCount > 0) {
+                        stringResource(R.string.post_detail_more_reply, replyCount)
                     } else {
                         stringResource(R.string.post_detail_write_reply)
                     },
@@ -487,14 +562,53 @@ private fun CommentItem(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun PostDetailScreenPreview() {
+    val sampleComment = Comment(
+        id = 1,
+        authorId = 1,
+        content = "This is a sample comment.",
+        createdDate = LocalDateTime.now(),
+        modifiedDate = LocalDateTime.now(),
+        profileImageUrl = null,
+        replyCount = 0,
+        userName = "user"
+    )
+    val commentPagingItems = MutableStateFlow(
+        PagingData.from(
+            listOf(
+                sampleComment,
+                sampleComment,
+                sampleComment
+            )
+        )
+    ).collectAsLazyPagingItems()
+
     OnmoimTheme {
         PostDetailScreen(
             onBack = {},
             onClickPostMenu = {},
-            onClickCommentMenu = {}
+            onClickLike = {},
+            onClickCommentMenu = {},
+            onClickReply = {},
+            postDetailUiState = PostDetailUiState.Success(
+                post = Post(
+                    id = 1,
+                    commentCount = 3,
+                    content = "This is a sample post content.",
+                    createdDate = LocalDateTime.now(),
+                    modifiedDate = LocalDateTime.now(),
+                    imageUrls = emptyList(),
+                    isLiked = false,
+                    likeCount = 5,
+                    name = "John Doe",
+                    profileImageUrl = null,
+                    title = "Sample Post",
+                    type = PostType.FREE
+                )
+            ),
+            commentPagingItems = commentPagingItems
         )
     }
 }
