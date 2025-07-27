@@ -8,11 +8,12 @@ import com.onmoim.core.data.constant.HomeRecommend
 import com.onmoim.core.data.constant.JoinGroupResult
 import com.onmoim.core.data.constant.MemberStatus
 import com.onmoim.core.data.model.ActiveStatistics
+import com.onmoim.core.data.model.Group
 import com.onmoim.core.data.model.GroupDetail
-import com.onmoim.core.data.model.HomeGroup
 import com.onmoim.core.data.model.MeetingDetail
 import com.onmoim.core.data.model.Member
 import com.onmoim.core.data.pagingsource.GroupMemberPagingSource
+import com.onmoim.core.data.pagingsource.LikedGroupPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.GroupApi
@@ -37,7 +38,7 @@ class GroupRepositoryImpl @Inject constructor(
     private val groupApi: GroupApi,
     @Dispatcher(OnmoimDispatcher.IO) private val ioDispatcher: CoroutineDispatcher
 ) : GroupRepository {
-    override fun getHomePopularGroups(homePopular: HomePopular): Flow<List<HomeGroup>> = flow {
+    override fun getHomePopularGroups(homePopular: HomePopular): Flow<List<Group>> = flow {
         val resp = when (homePopular) {
             HomePopular.NEARBY -> groupApi.getPopularNearbyGroups()
             HomePopular.ACTIVE -> groupApi.getPopularActiveGroups()
@@ -46,7 +47,7 @@ class GroupRepositoryImpl @Inject constructor(
 
         if (resp.isSuccessful && data != null) {
             val groups = data.map {
-                HomeGroup(
+                Group(
                     id = it.groupId,
                     imageUrl = it.imageUrl,
                     title = it.name,
@@ -70,7 +71,7 @@ class GroupRepositoryImpl @Inject constructor(
         }
     }.flowOn(ioDispatcher)
 
-    override fun getHomeRecommendGroups(homeRecommend: HomeRecommend): Flow<List<HomeGroup>> =
+    override fun getHomeRecommendGroups(homeRecommend: HomeRecommend): Flow<List<Group>> =
         flow {
             val resp = when (homeRecommend) {
                 HomeRecommend.CATEGORY -> groupApi.getRecommendCategoryGroups()
@@ -80,7 +81,7 @@ class GroupRepositoryImpl @Inject constructor(
 
             if (resp.isSuccessful && data != null) {
                 val groups = data.map {
-                    HomeGroup(
+                    Group(
                         id = it.groupId,
                         imageUrl = it.imgUrl,
                         title = it.name,
@@ -95,7 +96,7 @@ class GroupRepositoryImpl @Inject constructor(
                             else -> MemberStatus.NONE
                         },
                         isFavorite = it.likeStatus.contains("LIKE"),
-                        isRecommend = false
+                        isRecommend = it.recommendStatus.contains("RECOMMEND")
                     )
                 }
                 emit(groups)
@@ -103,6 +104,16 @@ class GroupRepositoryImpl @Inject constructor(
                 throw HttpException(resp)
             }
         }.flowOn(ioDispatcher)
+
+    override fun getFavoriteGroupPagingData(size: Int): Flow<PagingData<Group>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { LikedGroupPagingSource(groupApi) }
+        ).flow.flowOn(ioDispatcher)
+    }
 
     override fun createGroup(
         name: String,

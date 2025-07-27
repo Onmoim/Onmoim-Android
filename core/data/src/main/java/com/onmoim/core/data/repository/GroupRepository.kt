@@ -5,14 +5,15 @@ import com.onmoim.core.data.constant.HomePopular
 import com.onmoim.core.data.constant.HomeRecommend
 import com.onmoim.core.data.constant.JoinGroupResult
 import com.onmoim.core.data.model.ActiveStatistics
+import com.onmoim.core.data.model.Group
 import com.onmoim.core.data.model.GroupDetail
-import com.onmoim.core.data.model.HomeGroup
 import com.onmoim.core.data.model.Member
 import kotlinx.coroutines.flow.Flow
 
 interface GroupRepository {
-    fun getHomePopularGroups(homePopular: HomePopular): Flow<List<HomeGroup>>
-    fun getHomeRecommendGroups(homeRecommend: HomeRecommend): Flow<List<HomeGroup>>
+    fun getHomePopularGroups(homePopular: HomePopular): Flow<List<Group>>
+    fun getHomeRecommendGroups(homeRecommend: HomeRecommend): Flow<List<Group>>
+    fun getFavoriteGroupPagingData(size: Int = 20): Flow<PagingData<Group>>
     fun createGroup(
         name: String,
         description: String,

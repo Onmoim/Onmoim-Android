@@ -3,6 +3,7 @@ package com.onmoim.feature.home.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.onmoim.core.data.constant.HomePopular
 import com.onmoim.core.data.constant.HomeRecommend
 import com.onmoim.core.data.repository.GroupRepository
@@ -29,6 +30,9 @@ class HomeViewModel @Inject constructor(
     private val _popularGroupUiState =
         MutableStateFlow<HomePopularGroupUiState>(HomePopularGroupUiState.Loading)
     val popularGroupUiState = _popularGroupUiState.asStateFlow()
+
+    val favoriteGroupPagingData =
+        groupRepository.getFavoriteGroupPagingData().cachedIn(viewModelScope)
 
     private val _selectedTabState = MutableStateFlow(HomeTab.RECOMMEND)
     val selectedTabState = _selectedTabState.asStateFlow()

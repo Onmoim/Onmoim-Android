@@ -2,7 +2,7 @@ package com.onmoim.core.data.model
 
 import com.onmoim.core.data.constant.MemberStatus
 
-data class HomeGroup(
+data class Group(
     val id: Int,
     val imageUrl: String?,
     val title: String,

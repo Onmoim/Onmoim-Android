@@ -1,6 +1,7 @@
 package com.onmoim.core.network.api
 
 import com.onmoim.core.network.model.BaseResponse
+import com.onmoim.core.network.model.LikedGroupDto
 import com.onmoim.core.network.model.MemberDto
 import com.onmoim.core.network.model.MemberIdRequestDto
 import com.onmoim.core.network.model.RecommendCategoryDto
@@ -49,6 +50,12 @@ interface GroupApi {
         @Query("cursorId") cursorId: Int? = null,
         @Query("size") size: Int? = null
     ): Response<BaseResponse<RecommendCategoryDto>>
+
+    @GET("api/v1/groups/liked")
+    suspend fun getLikedGroups(
+        @Query("cursorId") cursorId: Int? = null,
+        @Query("size") size: Int? = null
+    ): Response<BaseResponse<LikedGroupDto>>
 
     @POST("api/v1/groups")
     suspend fun createGroup(

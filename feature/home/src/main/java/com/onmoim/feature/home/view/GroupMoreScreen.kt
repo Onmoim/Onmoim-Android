@@ -26,7 +26,7 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.onmoim.core.data.constant.MemberStatus
-import com.onmoim.core.data.model.HomeGroup
+import com.onmoim.core.data.model.Group
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.component.group.GroupHeader
@@ -45,7 +45,7 @@ fun GroupMoreRoute(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     // TODO: api 연동하면 수정
     val groupPagingItems =
-        MutableStateFlow(PagingData.empty<HomeGroup>()).collectAsLazyPagingItems()
+        MutableStateFlow(PagingData.empty<Group>()).collectAsLazyPagingItems()
 
     GroupMoreScreen(
         homeGroupType = groupMoreViewModel.homeGroupType,
@@ -62,7 +62,7 @@ private fun GroupMoreScreen(
     homeGroupType: HomeGroupType,
     onBack: () -> Unit,
     onClickGroup: (id: Int) -> Unit,
-    groupPagingItems: LazyPagingItems<HomeGroup>
+    groupPagingItems: LazyPagingItems<Group>
 ) {
     val loadState = groupPagingItems.loadState.refresh
 
@@ -157,7 +157,7 @@ private fun GroupMoreScreen(
 @Preview(showBackground = true)
 @Composable
 private fun GroupMoreScreenPreview() {
-    val sampleGroup = HomeGroup(
+    val sampleGroup = Group(
         id = 1,
         imageUrl = "",
         title = "Sample Group",

@@ -23,8 +23,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.onmoim.core.data.constant.MemberStatus
-import com.onmoim.core.data.model.HomeGroup
+import com.onmoim.core.data.model.Group
 import com.onmoim.core.designsystem.component.CommonTab
 import com.onmoim.core.designsystem.component.CommonTabRow
 import com.onmoim.core.designsystem.component.group.GroupHeader
@@ -37,6 +41,7 @@ import com.onmoim.feature.home.constant.HomeTab
 import com.onmoim.feature.home.state.HomePopularGroupUiState
 import com.onmoim.feature.home.state.HomeRecommendGroupUiState
 import com.onmoim.feature.home.viewmodel.HomeViewModel
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun HomeRoute(
@@ -49,6 +54,7 @@ fun HomeRoute(
     val selectedTab by homeViewModel.selectedTabState.collectAsStateWithLifecycle()
     val recommendGroupUiState by homeViewModel.recommendGroupUiState.collectAsStateWithLifecycle()
     val popularGroupUiState by homeViewModel.popularGroupUiState.collectAsStateWithLifecycle()
+    val favoriteGroupPagingItems = homeViewModel.favoriteGroupPagingData.collectAsLazyPagingItems()
 
     Column(
         modifier = Modifier
@@ -65,7 +71,8 @@ fun HomeRoute(
             onClickGroup = onNavigateToGroupDetail,
             onClickMore = onNavigateToMoreGroup,
             recommendGroupUiState = recommendGroupUiState,
-            popularGroupUiState = popularGroupUiState
+            popularGroupUiState = popularGroupUiState,
+            favoriteGroupPagingItems = favoriteGroupPagingItems
         )
         bottomBar()
     }
@@ -81,6 +88,7 @@ private fun HomeScreen(
     onClickMore: (HomeGroupType) -> Unit,
     recommendGroupUiState: HomeRecommendGroupUiState,
     popularGroupUiState: HomePopularGroupUiState,
+    favoriteGroupPagingItems: LazyPagingItems<Group>
 ) {
     val itemsPerPage = 4
 
@@ -184,39 +192,69 @@ private fun HomeScreen(
             }
 
             HomeTab.FAVORITE -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = 15.dp)
-                ) {
-                    item {
-                        GroupHeader(
-                            title = stringResource(R.string.home_my_favorite_meet)
-                        )
-                    }
-                    items(10) { index ->
-                        Column(
-                            modifier = Modifier.fillMaxWidth()
+                val loadState = favoriteGroupPagingItems.loadState.refresh
+
+                when (loadState) {
+                    is LoadState.Error -> {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            if (index > 0) {
-                                Spacer(Modifier.height(16.dp))
+                            Text(loadState.error.message.toString())
+                        }
+                    }
+
+                    LoadState.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+
+                    is LoadState.NotLoading -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentPadding = PaddingValues(horizontal = 15.dp)
+                        ) {
+                            item {
+                                GroupHeader(
+                                    title = stringResource(R.string.home_my_favorite_meet)
+                                )
                             }
-                            GroupItem(
-                                onClick = {
-                                    // TODO: 모임 상세 화면으로 이동
-                                },
-                                imageUrl = "https://picsum.photos/200",
-                                title = "title",
-                                location = "location",
-                                memberCount = 123,
-                                scheduleCount = 123,
-                                categoryName = "categoryName",
-                                isRecommended = true,
-                                isSignUp = true,
-                                isOperating = true,
-                                isFavorite = true
-                            )
+                            items(favoriteGroupPagingItems.itemCount) { index ->
+                                favoriteGroupPagingItems[index]?.let { item ->
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        if (index > 0) {
+                                            Spacer(Modifier.height(16.dp))
+                                        }
+                                        GroupItem(
+                                            onClick = {
+                                                onClickGroup(item.id)
+                                            },
+                                            imageUrl = item.imageUrl,
+                                            title = item.title,
+                                            location = item.location,
+                                            memberCount = item.memberCount,
+                                            scheduleCount = item.scheduleCount,
+                                            categoryName = item.categoryName,
+                                            isRecommended = item.isRecommend,
+                                            isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                                            isOperating = item.memberStatus == MemberStatus.OWNER,
+                                            isFavorite = item.isFavorite
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -231,8 +269,8 @@ private fun RecommendContent(
     onClickDetail: (id: Int) -> Unit,
     onClickMore: (HomeGroupType) -> Unit,
     itemsPerPage: Int,
-    similarGroups: List<HomeGroup>,
-    nearbyGroups: List<HomeGroup>
+    similarGroups: List<Group>,
+    nearbyGroups: List<Group>
 ) {
     val similarGroupsForPage = similarGroups.chunked(itemsPerPage)
     val nearbyGroupsForPage = nearbyGroups.chunked(itemsPerPage)
@@ -260,10 +298,10 @@ private fun RecommendContent(
                 memberCount = item.memberCount,
                 scheduleCount = item.scheduleCount,
                 categoryName = item.categoryName,
-                isRecommended = true,
-                isSignUp = true,
-                isOperating = true,
-                isFavorite = true
+                isRecommended = item.isRecommend,
+                isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                isOperating = item.memberStatus == MemberStatus.OWNER,
+                isFavorite = item.isFavorite
             )
         }
         GroupPager(
@@ -301,8 +339,8 @@ private fun PopularContent(
     onClickDetail: (id: Int) -> Unit,
     onClickMore: (HomeGroupType) -> Unit,
     itemsPerPage: Int,
-    nearbyGroups: List<HomeGroup>,
-    activeGroups: List<HomeGroup>
+    nearbyGroups: List<Group>,
+    activeGroups: List<Group>
 ) {
     val nearbyGroupsForPage = nearbyGroups.chunked(itemsPerPage)
     val activeGroupsForPage = activeGroups.chunked(itemsPerPage)
@@ -369,7 +407,7 @@ private fun PopularContent(
 @Composable
 private fun HomeScreenPreview() {
     val fakeGroups = List(20) {
-        HomeGroup(
+        Group(
             it + 1,
             "https://picsum.photos/200",
             "제목 제목 $it",
@@ -396,7 +434,8 @@ private fun HomeScreenPreview() {
             popularGroupUiState = HomePopularGroupUiState.Success(
                 nearbyGroups = fakeGroups,
                 activeGroups = fakeGroups
-            )
+            ),
+            favoriteGroupPagingItems = flowOf(PagingData.from(fakeGroups)).collectAsLazyPagingItems()
         )
     }
 }
