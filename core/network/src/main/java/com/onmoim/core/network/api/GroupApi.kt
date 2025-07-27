@@ -1,10 +1,10 @@
 package com.onmoim.core.network.api
 
 import com.onmoim.core.network.model.BaseResponse
-import com.onmoim.core.network.model.LikedGroupDto
-import com.onmoim.core.network.model.MemberDto
-import com.onmoim.core.network.model.MemberIdRequestDto
-import com.onmoim.core.network.model.RecommendGroupDto
+import com.onmoim.core.network.model.group.LikedGroupDto
+import com.onmoim.core.network.model.group.MemberDto
+import com.onmoim.core.network.model.group.MemberIdRequestDto
+import com.onmoim.core.network.model.group.RecommendGroupDto
 import com.onmoim.core.network.model.group.BaseGroupPageDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
 import com.onmoim.core.network.model.group.CreatedGroupDto

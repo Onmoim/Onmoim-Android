@@ -19,7 +19,7 @@ import com.onmoim.core.data.pagingsource.RecommendGroupPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.GroupApi
-import com.onmoim.core.network.model.MemberIdRequestDto
+import com.onmoim.core.network.model.group.MemberIdRequestDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow

@@ -1,7 +1,7 @@
 package com.onmoim.core.network.api
 
 import com.onmoim.core.network.model.BaseResponse
-import com.onmoim.core.network.model.CategoryDto
+import com.onmoim.core.network.model.category.CategoryDto
 import retrofit2.Response
 import retrofit2.http.GET
 

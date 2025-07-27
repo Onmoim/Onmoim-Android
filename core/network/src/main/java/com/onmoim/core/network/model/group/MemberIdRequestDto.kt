@@ -1,4 +1,4 @@
-package com.onmoim.core.network.model
+package com.onmoim.core.network.model.group
 
 
 import kotlinx.serialization.SerialName

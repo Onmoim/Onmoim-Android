@@ -1,7 +1,7 @@
 package com.onmoim.core.network.model.group
 
 
-import com.onmoim.core.network.model.MeetingDetailDto
+import com.onmoim.core.network.model.group.MeetingDetailDto
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
