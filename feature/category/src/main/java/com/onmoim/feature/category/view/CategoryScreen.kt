@@ -2,6 +2,7 @@ package com.onmoim.feature.category.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -13,19 +14,29 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.onmoim.core.data.constant.MemberStatus
 import com.onmoim.core.data.model.Category
+import com.onmoim.core.data.model.Group
 import com.onmoim.core.designsystem.component.CategoryItem
 import com.onmoim.core.designsystem.component.group.GroupItem
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.category.viewmodel.CategoryViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun CategoryRoute(
@@ -36,9 +47,12 @@ fun CategoryRoute(
 ) {
     val categories by categoryViewModel.categories.collectAsStateWithLifecycle()
     val selectedCategoryId by categoryViewModel.selectedCategoryIdState.collectAsStateWithLifecycle()
+    val groupsByCategoryPagingDataMap by categoryViewModel.groupsByCategoryPagingDataMapState.collectAsStateWithLifecycle()
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(OnmoimTheme.colors.backgroundColor)
     ) {
         topBar()
         CategoryScreen(
@@ -47,8 +61,10 @@ fun CategoryRoute(
                 .fillMaxWidth(),
             categories = categories,
             selectedCategoryId = selectedCategoryId,
-            onCategorySelect = categoryViewModel::onCategorySelected,
-            onClickGroup = onNavigateToGroupDetail
+            onCategorySelect = categoryViewModel::onSelectedCategoryChange,
+            onClickGroup = onNavigateToGroupDetail,
+            groupsByCategoryPagingItems = groupsByCategoryPagingDataMap[selectedCategoryId]?.collectAsLazyPagingItems()
+                ?: flowOf(PagingData.empty<Group>()).collectAsLazyPagingItems()
         )
         bottomBar()
     }
@@ -60,8 +76,11 @@ private fun CategoryScreen(
     categories: List<Category>,
     selectedCategoryId: Int,
     onCategorySelect: (id: Int) -> Unit,
-    onClickGroup: (id: Int) -> Unit
+    onClickGroup: (id: Int) -> Unit,
+    groupsByCategoryPagingItems: LazyPagingItems<Group>
 ) {
+    val loadState = groupsByCategoryPagingItems.loadState.refresh
+
     LazyColumn(
         modifier = modifier
     ) {
@@ -97,27 +116,56 @@ private fun CategoryScreen(
                 )
             )
         }
-        // TODO: api 연동시 수정
-        items(20) {
-            Column(
-                modifier = Modifier.padding(horizontal = 15.dp)
-            ) {
-                GroupItem(
-                    onClick = {
-                        onClickGroup(4)
-                    },
-                    imageUrl = "",
-                    title = "title",
-                    location = "location",
-                    memberCount = 123,
-                    scheduleCount = 123,
-                    categoryName = "categoryName",
-                    isRecommended = true,
-                    isSignUp = false,
-                    isOperating = false,
-                    isFavorite = false
-                )
-                Spacer(Modifier.height(16.dp))
+        when (loadState) {
+            is LoadState.Error -> {
+                item {
+                    Text(
+                        text = loadState.error.message.toString(),
+                        modifier = Modifier.padding(top = 20.dp)
+                    )
+                }
+            }
+
+            LoadState.Loading -> {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 20.dp)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+
+            is LoadState.NotLoading -> {
+                items(groupsByCategoryPagingItems.itemCount) { index ->
+                    groupsByCategoryPagingItems[index]?.let { item ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 15.dp)
+                        ) {
+                            GroupItem(
+                                onClick = {
+                                    onClickGroup(item.id)
+                                },
+                                imageUrl = item.imageUrl,
+                                title = item.title,
+                                location = item.location,
+                                memberCount = item.memberCount,
+                                scheduleCount = item.scheduleCount,
+                                categoryName = item.categoryName,
+                                isRecommended = item.isRecommend,
+                                isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                                isOperating = item.memberStatus == MemberStatus.OWNER,
+                                isFavorite = item.isFavorite
+                            )
+                            Spacer(Modifier.height(16.dp))
+                        }
+                    }
+                }
             }
         }
     }
@@ -126,6 +174,22 @@ private fun CategoryScreen(
 @Preview
 @Composable
 private fun CategoryScreenPreview() {
+    val sampleGroup = Group(
+        id = 1,
+        imageUrl = "",
+        title = "Sample Group",
+        location = "Sample Location",
+        memberCount = 10,
+        scheduleCount = 5,
+        categoryName = "Sample Category",
+        memberStatus = MemberStatus.MEMBER,
+        isFavorite = false,
+        isRecommend = false
+    )
+    val pagingData = PagingData.from(listOf(sampleGroup, sampleGroup, sampleGroup))
+    val flow = MutableStateFlow(pagingData)
+    val lazyPagingItems = flow.collectAsLazyPagingItems()
+
     OnmoimTheme {
         CategoryScreen(
             modifier = Modifier
@@ -140,7 +204,8 @@ private fun CategoryScreenPreview() {
             },
             selectedCategoryId = 1,
             onCategorySelect = {},
-            onClickGroup = {}
+            onClickGroup = {},
+            groupsByCategoryPagingItems = lazyPagingItems
         )
     }
 }
