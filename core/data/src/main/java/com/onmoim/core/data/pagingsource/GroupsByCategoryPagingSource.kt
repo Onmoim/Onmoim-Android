@@ -24,7 +24,7 @@ class GroupsByCategoryPagingSource(
                 size = params.loadSize
             )
             val data = resp.body()?.data
-            val members = data?.content?.map {
+            val groups = data?.content?.map {
                 Group(
                     id = it.groupId,
                     imageUrl = it.imgUrl,
@@ -40,7 +40,7 @@ class GroupsByCategoryPagingSource(
             } ?: emptyList()
             val nextCursorId = data?.nextCursorId
             val nextKey = if (data?.hasNext == true) nextCursorId else null
-            LoadResult.Page(data = members, nextKey = nextKey, prevKey = null)
+            LoadResult.Page(data = groups, nextKey = nextKey, prevKey = null)
         } catch (e: Exception) {
             Log.e("GroupsByCategoryPagingSource", "load error", e)
             LoadResult.Error(e)

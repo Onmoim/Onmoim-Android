@@ -31,7 +31,7 @@ class MeetingPagingSource(
                 }
             )
             val data = resp.body()?.data
-            val members = data?.content?.map {
+            val meetings = data?.content?.map {
                 Meeting(
                     id = it.id,
                     title = it.title,
@@ -52,7 +52,7 @@ class MeetingPagingSource(
             } ?: emptyList()
             val nextCursorId = data?.nextCursorId
             val nextKey = if (data?.hasNext == true) nextCursorId else null
-            LoadResult.Page(data = members, nextKey = nextKey, prevKey = null)
+            LoadResult.Page(data = meetings, nextKey = nextKey, prevKey = null)
         } catch (e: Exception) {
             Log.e("MeetingPagingSource", "load error", e)
             LoadResult.Error(e)

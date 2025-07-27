@@ -22,7 +22,7 @@ class JoinedGroupPagingSource(
                 size = params.loadSize
             )
             val data = resp.body()?.data
-            val members = data?.content?.map {
+            val groups = data?.content?.map {
                 Group(
                     id = it.groupId,
                     imageUrl = it.imgUrl,
@@ -43,7 +43,7 @@ class JoinedGroupPagingSource(
             } ?: emptyList()
             val nextCursorId = data?.nextCursorId
             val nextKey = if (data?.hasNext == true) nextCursorId else null
-            LoadResult.Page(data = members, nextKey = nextKey, prevKey = null)
+            LoadResult.Page(data = groups, nextKey = nextKey, prevKey = null)
         } catch (e: Exception) {
             Log.e("JoinedGroupPagingSource", "load error", e)
             LoadResult.Error(e)

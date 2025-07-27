@@ -28,7 +28,7 @@ class RecentGroupPagingSource(
                 size = params.loadSize
             )
             val data = resp.body()?.data
-            val members = data?.content?.map {
+            val groups = data?.content?.map {
                 Group(
                     id = it.groupId,
                     imageUrl = it.imgUrl,
@@ -57,7 +57,7 @@ class RecentGroupPagingSource(
             } else {
                 null
             }
-            LoadResult.Page(data = members, nextKey = nextKey, prevKey = null)
+            LoadResult.Page(data = groups, nextKey = nextKey, prevKey = null)
         } catch (e: Exception) {
             Log.e("RecentGroupPagingSource", "load error", e)
             LoadResult.Error(e)

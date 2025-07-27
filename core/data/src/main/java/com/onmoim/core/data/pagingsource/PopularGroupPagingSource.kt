@@ -31,7 +31,7 @@ class PopularGroupPagingSource(
                 )
             }
             val data = resp.body()?.data
-            val members = data?.content?.map {
+            val groups = data?.content?.map {
                 Group(
                     id = it.groupId,
                     imageUrl = it.imageUrl,
@@ -52,7 +52,7 @@ class PopularGroupPagingSource(
             } ?: emptyList()
             val lastGroupId = data?.extraInfo?.lastGroupId
             val nextKey = if (data?.extraInfo?.hasNext == true) lastGroupId else null
-            LoadResult.Page(data = members, nextKey = nextKey, prevKey = null)
+            LoadResult.Page(data = groups, nextKey = nextKey, prevKey = null)
         } catch (e: Exception) {
             Log.e("PopularGroupPagingSource", "load error", e)
             LoadResult.Error(e)
