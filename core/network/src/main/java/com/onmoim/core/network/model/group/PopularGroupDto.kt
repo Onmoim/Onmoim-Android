@@ -20,7 +20,7 @@ data class PopularGroupDto(
         @SerialName("groupId")
         val groupId: Int,
         @SerialName("imageUrl")
-        val imageUrl: String,
+        val imageUrl: String?,
         @SerialName("memberCount")
         val memberCount: Int,
         @SerialName("name")
@@ -28,7 +28,9 @@ data class PopularGroupDto(
         @SerialName("status")
         val status: String,
         @SerialName("upcomingMeetingCount")
-        val upcomingMeetingCount: Int
+        val upcomingMeetingCount: Int,
+        @SerialName("likeStatus")
+        val likeStatus: String
     )
 
     @Serializable
@@ -36,8 +38,6 @@ data class PopularGroupDto(
         @SerialName("hasNext")
         val hasNext: Boolean,
         @SerialName("lastGroupId")
-        val lastGroupId: Int,
-        @SerialName("memberCount")
-        val memberCount: Int
+        val lastGroupId: Int?
     )
 }

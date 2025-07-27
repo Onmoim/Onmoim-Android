@@ -1,5 +1,6 @@
 package com.onmoim.feature.home.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onmoim.core.data.constant.HomePopular
@@ -44,6 +45,7 @@ class HomeViewModel @Inject constructor(
             ) { nearbyGroups, activeGroups ->
                 HomePopularGroupUiState.Success(nearbyGroups, activeGroups)
             }.catch {
+                Log.e("HomeViewModel", "fetchPopularGroups error", it)
                 _popularGroupUiState.value = HomePopularGroupUiState.Error(it)
             }.collectLatest {
                 _popularGroupUiState.value = it

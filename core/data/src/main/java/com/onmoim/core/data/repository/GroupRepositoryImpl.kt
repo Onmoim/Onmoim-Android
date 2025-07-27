@@ -52,7 +52,14 @@ class GroupRepositoryImpl @Inject constructor(
                     location = it.dong,
                     memberCount = it.memberCount,
                     scheduleCount = it.upcomingMeetingCount,
-                    categoryName = it.category
+                    categoryName = it.category,
+                    memberStatus = when {
+                        it.status.contains("OWNER") -> MemberStatus.OWNER
+                        it.status.contains("MEMBER") -> MemberStatus.MEMBER
+                        it.status.contains("BAN") -> MemberStatus.BAN
+                        else -> MemberStatus.NONE
+                    },
+                    isFavorite = it.likeStatus.contains("LIKE")
                 )
             }
             emit(groups)

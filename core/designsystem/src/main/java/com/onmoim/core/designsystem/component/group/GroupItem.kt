@@ -47,7 +47,7 @@ import com.onmoim.core.ui.shimmerBackground
 @Composable
 fun GroupItem(
     onClick: () -> Unit,
-    imageUrl: String,
+    imageUrl: String?,
     title: String,
     location: String,
     memberCount: Int,

@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.onmoim.core.data.constant.MemberStatus
 import com.onmoim.core.data.model.HomeGroup
 import com.onmoim.core.designsystem.component.CommonTab
 import com.onmoim.core.designsystem.component.CommonTabRow
@@ -270,10 +271,10 @@ private fun RecommendContent(
                 memberCount = item.memberCount,
                 scheduleCount = item.scheduleCount,
                 categoryName = item.categoryName,
-                isRecommended = true,
-                isSignUp = true,
-                isOperating = true,
-                isFavorite = true
+                isRecommended = false,
+                isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                isOperating = item.memberStatus == MemberStatus.OWNER,
+                isFavorite = item.isFavorite
             )
         }
     }
@@ -352,6 +353,20 @@ private fun PopularContent(
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
+    val fakeGroups = List(20) {
+        HomeGroup(
+            it + 1,
+            "https://picsum.photos/200",
+            "제목 제목 $it",
+            "지역 $it",
+            10,
+            5,
+            "카테고리 $it",
+            if (it % 2 == 0) MemberStatus.MEMBER else MemberStatus.OWNER,
+            it % 2 == 0
+        )
+    }
+
     OnmoimTheme {
         HomeScreen(
             selectedTab = HomeTab.RECOMMEND,
@@ -359,32 +374,12 @@ private fun HomeScreenPreview() {
             onClickGroup = {},
             onClickMore = {},
             recommendGroupUiState = HomeRecommendGroupUiState.Success(
-                similarGroups = listOf(
-                    HomeGroup(0, "https://picsum.photos/200", "축구 동호회", "서울시 강남구", 10, 5, "스포츠"),
-                    HomeGroup(1, "https://picsum.photos/201", "농구 동호회", "서울시 서초구", 15, 3, "스포츠"),
-                    HomeGroup(2, "https://picsum.photos/202", "야구 동호회", "서울시 송파구", 20, 2, "스포츠"),
-                    HomeGroup(3, "https://picsum.photos/203", "배구 동호회", "서울시 강동구", 12, 4, "스포츠"),
-                ),
-                nearbyGroups = listOf(
-                    HomeGroup(4, "https://picsum.photos/204", "독서 모임", "서울시 강남구", 5, 1, "문화"),
-                    HomeGroup(5, "https://picsum.photos/205", "영화 모임", "서울시 서초구", 8, 2, "문화"),
-                    HomeGroup(6, "https://picsum.photos/206", "음악 모임", "서울시 송파구", 7, 3, "문화"),
-                    HomeGroup(7, "https://picsum.photos/207", "미술 모임", "서울시 강동구", 6, 1, "문화"),
-                )
+                similarGroups = fakeGroups,
+                nearbyGroups = fakeGroups
             ),
             popularGroupUiState = HomePopularGroupUiState.Success(
-                nearbyGroups = listOf(
-                    HomeGroup(8, "https://picsum.photos/208", "코딩 스터디", "서울시 강남구", 10, 5, "IT"),
-                    HomeGroup(9, "https://picsum.photos/209", "알고리즘 스터디", "서울시 서초구", 15, 3, "IT"),
-                    HomeGroup(10, "https://picsum.photos/210", "CS 스터디", "서울시 송파구", 20, 2, "IT"),
-                    HomeGroup(11, "https://picsum.photos/211", "프론트엔드 스터디", "서울시 강동구", 12, 4, "IT"),
-                ),
-                activeGroups = listOf(
-                    HomeGroup(12, "https://picsum.photos/212", "백엔드 스터디", "서울시 강남구", 5, 1, "IT"),
-                    HomeGroup(13, "https://picsum.photos/213", "안드로이드 스터디", "서울시 서초구", 8, 2, "IT"),
-                    HomeGroup(14, "https://picsum.photos/214", "iOS 스터디", "서울시 송파구", 7, 3, "IT"),
-                    HomeGroup(15, "https://picsum.photos/215", "데브옵스 스터디", "서울시 강동구", 6, 1, "IT"),
-                )
+                nearbyGroups = fakeGroups,
+                activeGroups = fakeGroups
             )
         )
     }

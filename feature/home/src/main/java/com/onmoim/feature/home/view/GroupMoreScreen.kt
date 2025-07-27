@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,6 +25,7 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.onmoim.core.data.constant.MemberStatus
 import com.onmoim.core.data.model.HomeGroup
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.NavigationIconButton
@@ -140,10 +140,10 @@ private fun GroupMoreScreen(
                                     memberCount = item.memberCount,
                                     scheduleCount = item.scheduleCount,
                                     categoryName = item.categoryName,
-                                    isRecommended = true,
-                                    isSignUp = true,
-                                    isOperating = true,
-                                    isFavorite = true
+                                    isRecommended = false,
+                                    isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                                    isOperating = item.memberStatus == MemberStatus.OWNER,
+                                    isFavorite = item.isFavorite
                                 )
                             }
                         }
@@ -165,6 +165,8 @@ private fun GroupMoreScreenPreview() {
         memberCount = 10,
         scheduleCount = 5,
         categoryName = "Sample Category",
+        memberStatus = MemberStatus.MEMBER,
+        isFavorite = false
     )
     val pagingData = PagingData.from(listOf(sampleGroup, sampleGroup, sampleGroup))
     val flow = MutableStateFlow(pagingData)
