@@ -2,6 +2,8 @@ package com.onmoim.core.network.api
 
 import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.post.BasePostPageDto
+import com.onmoim.core.network.model.post.CommentDto
+import com.onmoim.core.network.model.post.LikePostDto
 import com.onmoim.core.network.model.post.PostDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -29,4 +31,23 @@ interface PostApi {
         @Part("request") requestBody: RequestBody,
         @Part files: List<MultipartBody.Part>? = null,
     ): Response<BaseResponse<PostDto>>
+
+    @GET("api/v1/groups/{groupId}/posts/{postId}")
+    suspend fun getPost(
+        @Path("groupId") groupId: Int,
+        @Path("postId") postId: Int,
+    ): Response<BaseResponse<PostDto>>
+
+    @GET("api/v1/groups/{groupId}/posts/{postId}/comments")
+    suspend fun getComments(
+        @Path("groupId") groupId: Int,
+        @Path("postId") postId: Int,
+        @Query("cursor") cursor: Int? = null
+    ): Response<BaseResponse<BasePostPageDto<CommentDto>>>
+
+    @POST("api/v1/groups/{groupId}/posts/{postId}/like")
+    suspend fun likePost(
+        @Path("groupId") groupId: Int,
+        @Path("postId") postId: Int,
+    ): Response<BaseResponse<LikePostDto>>
 }
