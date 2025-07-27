@@ -4,7 +4,7 @@ import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.LikedGroupDto
 import com.onmoim.core.network.model.MemberDto
 import com.onmoim.core.network.model.MemberIdRequestDto
-import com.onmoim.core.network.model.RecommendCategoryDto
+import com.onmoim.core.network.model.RecommendGroupDto
 import com.onmoim.core.network.model.group.BaseGroupPageDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
 import com.onmoim.core.network.model.group.CreatedGroupDto
@@ -28,14 +28,14 @@ interface GroupApi {
     @GET("api/v1/groups/nearby/popular")
     suspend fun getPopularNearbyGroups(
         @Query("lastGroupIdx") lastGroupIdx: Int? = null,
-        @Query("requestSize") requestSize: Int = 10,
+        @Query("requestSize") requestSize: Int? = null,
         @Query("memberCount") memberCount: Int? = null
     ): Response<BaseResponse<PopularGroupDto>>
 
     @GET("api/v1/groups/active/popular")
     suspend fun getPopularActiveGroups(
         @Query("lastGroupIdx") lastGroupIdx: Int? = null,
-        @Query("requestSize") requestSize: Int = 10,
+        @Query("requestSize") requestSize: Int? = null,
         @Query("memberCount") memberCount: Int? = null
     ): Response<BaseResponse<PopularGroupDto>>
 
@@ -43,13 +43,13 @@ interface GroupApi {
     suspend fun getRecommendCategoryGroups(
         @Query("cursorId") cursorId: Int? = null,
         @Query("size") size: Int? = null
-    ): Response<BaseResponse<RecommendCategoryDto>>
+    ): Response<BaseResponse<RecommendGroupDto>>
 
     @GET("api/v1/groups/recommend/location")
     suspend fun getRecommendLocationGroups(
         @Query("cursorId") cursorId: Int? = null,
         @Query("size") size: Int? = null
-    ): Response<BaseResponse<RecommendCategoryDto>>
+    ): Response<BaseResponse<RecommendGroupDto>>
 
     @GET("api/v1/groups/liked")
     suspend fun getLikedGroups(

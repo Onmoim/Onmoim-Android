@@ -43,9 +43,7 @@ fun GroupMoreRoute(
     onNavigateToGroupDetail: (id: Int) -> Unit
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-    // TODO: api 연동하면 수정
-    val groupPagingItems =
-        MutableStateFlow(PagingData.empty<Group>()).collectAsLazyPagingItems()
+    val groupPagingItems = groupMoreViewModel.groupPagingData.collectAsLazyPagingItems()
 
     GroupMoreScreen(
         homeGroupType = groupMoreViewModel.homeGroupType,
@@ -109,7 +107,10 @@ private fun GroupMoreScreen(
         ) {
             when (loadState) {
                 is LoadState.Error -> {
-                    // TODO: 에러 처리
+                    Text(
+                        text = loadState.error.message.toString(),
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
 
                 LoadState.Loading -> {
@@ -140,7 +141,7 @@ private fun GroupMoreScreen(
                                     memberCount = item.memberCount,
                                     scheduleCount = item.scheduleCount,
                                     categoryName = item.categoryName,
-                                    isRecommended = false,
+                                    isRecommended = item.isRecommend,
                                     isSignUp = item.memberStatus == MemberStatus.MEMBER,
                                     isOperating = item.memberStatus == MemberStatus.OWNER,
                                     isFavorite = item.isFavorite

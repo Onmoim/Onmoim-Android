@@ -12,7 +12,17 @@ import kotlinx.coroutines.flow.Flow
 
 interface GroupRepository {
     fun getHomePopularGroups(homePopular: HomePopular): Flow<List<Group>>
+    fun getHomePopularGroupPagingData(
+        homePopular: HomePopular,
+        size: Int = 20
+    ): Flow<PagingData<Group>>
+
     fun getHomeRecommendGroups(homeRecommend: HomeRecommend): Flow<List<Group>>
+    fun getHomeRecommendGroupPagingData(
+        homeRecommend: HomeRecommend,
+        size: Int = 20
+    ): Flow<PagingData<Group>>
+
     fun getFavoriteGroupPagingData(size: Int = 20): Flow<PagingData<Group>>
     fun createGroup(
         name: String,
@@ -36,5 +46,6 @@ interface GroupRepository {
         capacity: Int,
         imageUrl: String? = null
     ): Result<Unit>
+
     suspend fun joinGroup(groupId: Int): Result<JoinGroupResult>
 }

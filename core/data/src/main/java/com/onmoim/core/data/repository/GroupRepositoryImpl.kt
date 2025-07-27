@@ -14,6 +14,8 @@ import com.onmoim.core.data.model.MeetingDetail
 import com.onmoim.core.data.model.Member
 import com.onmoim.core.data.pagingsource.GroupMemberPagingSource
 import com.onmoim.core.data.pagingsource.LikedGroupPagingSource
+import com.onmoim.core.data.pagingsource.PopularGroupPagingSource
+import com.onmoim.core.data.pagingsource.RecommendGroupPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.GroupApi
@@ -71,6 +73,19 @@ class GroupRepositoryImpl @Inject constructor(
         }
     }.flowOn(ioDispatcher)
 
+    override fun getHomePopularGroupPagingData(
+        homePopular: HomePopular,
+        size: Int
+    ): Flow<PagingData<Group>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { PopularGroupPagingSource(groupApi, homePopular) }
+        ).flow.flowOn(ioDispatcher)
+    }
+
     override fun getHomeRecommendGroups(homeRecommend: HomeRecommend): Flow<List<Group>> =
         flow {
             val resp = when (homeRecommend) {
@@ -104,6 +119,19 @@ class GroupRepositoryImpl @Inject constructor(
                 throw HttpException(resp)
             }
         }.flowOn(ioDispatcher)
+
+    override fun getHomeRecommendGroupPagingData(
+        homeRecommend: HomeRecommend,
+        size: Int
+    ): Flow<PagingData<Group>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { RecommendGroupPagingSource(groupApi, homeRecommend) }
+        ).flow.flowOn(ioDispatcher)
+    }
 
     override fun getFavoriteGroupPagingData(size: Int): Flow<PagingData<Group>> {
         return Pager(

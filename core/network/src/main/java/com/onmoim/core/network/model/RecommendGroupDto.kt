@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RecommendLocationDto(
+data class RecommendGroupDto(
     @SerialName("content")
     val content: List<Content>,
     @SerialName("hasNext")
