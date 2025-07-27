@@ -1,7 +1,12 @@
 package com.onmoim.core.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.onmoim.core.data.model.Account
+import com.onmoim.core.data.model.Group
 import com.onmoim.core.data.model.Profile
+import com.onmoim.core.data.pagingsource.RecentGroupPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.UserApi
@@ -101,5 +106,15 @@ class UserRepositoryImpl @Inject constructor(
         } else {
             Result.failure(HttpException(resp))
         }
+    }
+
+    override fun getRecentGroupPagingData(size: Int): Flow<PagingData<Group>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { RecentGroupPagingSource(userApi) }
+        ).flow.flowOn(ioDispatcher)
     }
 }

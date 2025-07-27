@@ -13,6 +13,7 @@ import com.onmoim.core.data.model.GroupDetail
 import com.onmoim.core.data.model.MeetingDetail
 import com.onmoim.core.data.model.Member
 import com.onmoim.core.data.pagingsource.GroupMemberPagingSource
+import com.onmoim.core.data.pagingsource.JoinedGroupPagingSource
 import com.onmoim.core.data.pagingsource.LikedGroupPagingSource
 import com.onmoim.core.data.pagingsource.PopularGroupPagingSource
 import com.onmoim.core.data.pagingsource.RecommendGroupPagingSource
@@ -386,4 +387,14 @@ class GroupRepositoryImpl @Inject constructor(
                 throw HttpException(resp)
             }
         }.flowOn(ioDispatcher)
+
+    override fun getJoinedGroupPagingData(size: Int): Flow<PagingData<Group>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { JoinedGroupPagingSource(groupApi) }
+        ).flow.flowOn(ioDispatcher)
+    }
 }

@@ -2,6 +2,7 @@ package com.onmoim.core.network.api
 
 import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.user.ProfileDto
+import com.onmoim.core.network.model.user.RecentGroupDto
 import com.onmoim.core.network.model.user.SetCategoryRequest
 import com.onmoim.core.network.model.user.SignUpDto
 import com.onmoim.core.network.model.user.SignUpRequest
@@ -11,6 +12,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface UserApi {
     @POST("api/v1/user/signup")
@@ -30,4 +32,11 @@ interface UserApi {
     suspend fun withdrawal(
         @Path("id") id: Int
     ): Response<BaseResponse<String>>
+
+    @GET("api/v1/user/recent/groups")
+    suspend fun getRecentGroups(
+        @Query("cursorViewedAt") cursorViewedAt: String? = null,
+        @Query("cursorId") cursorId: Int? = null,
+        @Query("size") size: Int? = null
+    ): Response<BaseResponse<RecentGroupDto>>
 }

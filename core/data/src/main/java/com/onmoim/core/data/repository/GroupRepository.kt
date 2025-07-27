@@ -49,4 +49,5 @@ interface GroupRepository {
 
     suspend fun joinGroup(groupId: Int): Result<JoinGroupResult>
     fun getJoinedGroups(size: Int = 10): Flow<List<Group>>
+    fun getJoinedGroupPagingData(size: Int = 20): Flow<PagingData<Group>>
 }
