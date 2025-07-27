@@ -24,6 +24,7 @@ import com.onmoim.feature.groups.view.groupdetail.GroupDetailRoute
 import com.onmoim.feature.groups.view.groupmanagement.GroupManagementRoute
 import com.onmoim.feature.groups.view.meetingplacesearch.MeetingPlaceSearchRoute
 import com.onmoim.feature.groups.view.mygroup.MyGroupRoute
+import com.onmoim.feature.groups.view.post.PostDetailRoute
 import com.onmoim.feature.groups.view.post.PostWriteRoute
 import com.onmoim.feature.groups.viewmodel.ComingScheduleViewModel
 import com.onmoim.feature.groups.viewmodel.CreateScheduleViewModel
@@ -31,6 +32,7 @@ import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
 import com.onmoim.feature.groups.viewmodel.GroupEditViewModel
 import com.onmoim.feature.groups.viewmodel.GroupManagementViewModel
 import com.onmoim.feature.groups.viewmodel.GroupOpenViewModel
+import com.onmoim.feature.groups.viewmodel.PostDetailViewModel
 import com.onmoim.feature.groups.viewmodel.PostWriteViewModel
 import com.onmoim.feature.groups.viewmodel.ScheduleManagementViewModel
 import com.onmoim.feature.location.navigation.LocationNavigationBundleKey
@@ -111,7 +113,9 @@ fun NavGraphBuilder.groupsGraph(
                 onNavigateToComingSchedule = { role ->
                     navController.navigateToComingSchedule(groupId, role)
                 },
-                onNavigateToPostDetail = {},
+                onNavigateToPostDetail = {
+                    navController.navigateToPostDetail(it)
+                },
                 onNavigateToGroupManagement = {
                     navController.navigateToGroupManagement(groupId)
                 },
@@ -323,6 +327,17 @@ fun NavGraphBuilder.groupsGraph(
                     }
                     navController.popBackStack()
                 }
+            )
+        }
+        composable<PostDetailRoute> { backStackEntry ->
+            val postId = backStackEntry.toRoute<PostDetailRoute>().postId
+            val postDetailViewModel =
+                hiltViewModel<PostDetailViewModel, PostDetailViewModel.Factory> {
+                    it.create(postId)
+                }
+
+            PostDetailRoute(
+                postDetailViewModel = postDetailViewModel
             )
         }
     }

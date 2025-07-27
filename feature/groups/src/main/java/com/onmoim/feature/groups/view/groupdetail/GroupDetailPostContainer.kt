@@ -125,7 +125,7 @@ fun GroupDetailPostContainer(
                 Text(
                     text = stringResource(
                         id = when (selectedViewMode) {
-                            GroupDetailPostViewMode.POST -> R.string.group_detail_post_view_mode_post
+                            GroupDetailPostViewMode.POST -> R.string.post
                             GroupDetailPostViewMode.ALBUM -> R.string.group_detail_post_view_mode_album
                         }
                     ),

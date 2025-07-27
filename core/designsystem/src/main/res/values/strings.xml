@@ -6,6 +6,7 @@
     <string name="image_not_reg_guide">대표 사진을 등록해 주세요</string>
     <string name="am">오전</string>
     <string name="pm">오후</string>
+    <string name="send">전송</string>
 
     <!-- MeetItem -->
     <string name="meet_item_recommend">추천</string>
@@ -33,4 +34,7 @@
 
     <!-- CommonTimePickerDialog -->
     <string name="common_time_picker_dialog">시간 선택</string>
+
+    <!-- CommentTextField -->
+    <string name="comment_text_field_hint">텍스트 입력</string>
 </resources>

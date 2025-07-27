@@ -67,6 +67,11 @@ data class PostWriteRoute(
     val isOwner: Boolean
 )
 
+@Serializable
+data class PostDetailRoute(
+    val postId: Int
+)
+
 fun NavController.navigateToComingSchedule(
     groupId: Int? = null,
     groupMemberRole: GroupMemberRole? = null,
@@ -126,4 +131,11 @@ fun NavController.navigateToPostWrite(
     navOptions: NavOptions? = null
 ) {
     navigate(PostWriteRoute(groupId, isOwner), navOptions)
+}
+
+fun NavController.navigateToPostDetail(
+    postId: Int,
+    navOptions: NavOptions? = null
+) {
+    navigate(PostDetailRoute(postId), navOptions)
 }
