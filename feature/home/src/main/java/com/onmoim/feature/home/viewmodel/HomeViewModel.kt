@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onmoim.core.data.constant.HomePopular
 import com.onmoim.core.data.repository.GroupRepository
+import com.onmoim.feature.home.constant.HomeTab
 import com.onmoim.feature.home.state.HomePopularGroupUiState
 import com.onmoim.feature.home.state.HomeRecommendGroupUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,9 @@ class HomeViewModel @Inject constructor(
 
     private val _popularGroupUiState = MutableStateFlow<HomePopularGroupUiState>(HomePopularGroupUiState.Loading)
     val popularGroupUiState = _popularGroupUiState.asStateFlow()
+
+    private val _selectedTabState = MutableStateFlow(HomeTab.RECOMMEND)
+    val selectedTabState = _selectedTabState.asStateFlow()
 
     init {
         fetchRecommendGroups()
@@ -51,5 +55,9 @@ class HomeViewModel @Inject constructor(
                 _popularGroupUiState.value = it
             }
         }
+    }
+
+    fun onSelectedTabChange(value: HomeTab) {
+        _selectedTabState.value = value
     }
 }
