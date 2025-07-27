@@ -19,8 +19,8 @@ import com.onmoim.core.data.pagingsource.RecommendGroupPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.GroupApi
-import com.onmoim.core.network.model.group.MemberIdRequestDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
+import com.onmoim.core.network.model.group.MemberIdRequestDto
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -355,4 +355,35 @@ class GroupRepositoryImpl @Inject constructor(
             else -> Result.failure(HttpException(resp))
         }
     }
+
+    override fun getJoinedGroups(size: Int): Flow<List<Group>> =
+        flow {
+            val resp = groupApi.getJoinedGroups()
+            val data = resp.body()?.data?.content
+
+            if (resp.isSuccessful && data != null) {
+                val groups = data.map {
+                    Group(
+                        id = it.groupId,
+                        imageUrl = it.imgUrl,
+                        title = it.name,
+                        location = it.location,
+                        memberCount = it.memberCount,
+                        scheduleCount = it.upcomingMeetingCount,
+                        categoryName = it.category,
+                        memberStatus = when {
+                            it.status.contains("OWNER") -> MemberStatus.OWNER
+                            it.status.contains("MEMBER") -> MemberStatus.MEMBER
+                            it.status.contains("BAN") -> MemberStatus.BAN
+                            else -> MemberStatus.NONE
+                        },
+                        isFavorite = it.likeStatus.contains("LIKE"),
+                        isRecommend = it.recommendStatus.contains("RECOMMEND")
+                    )
+                }
+                emit(groups)
+            } else {
+                throw HttpException(resp)
+            }
+        }.flowOn(ioDispatcher)
 }

@@ -1,16 +1,17 @@
 package com.onmoim.core.network.api
 
 import com.onmoim.core.network.model.BaseResponse
-import com.onmoim.core.network.model.group.LikedGroupDto
-import com.onmoim.core.network.model.group.MemberDto
-import com.onmoim.core.network.model.group.MemberIdRequestDto
-import com.onmoim.core.network.model.group.RecommendGroupDto
 import com.onmoim.core.network.model.group.BaseGroupPageDto
 import com.onmoim.core.network.model.group.CreateGroupRequest
 import com.onmoim.core.network.model.group.CreatedGroupDto
 import com.onmoim.core.network.model.group.GroupDetailDto
 import com.onmoim.core.network.model.group.GroupStatisticsDto
+import com.onmoim.core.network.model.group.JoinedGroupsDto
+import com.onmoim.core.network.model.group.LikedGroupDto
+import com.onmoim.core.network.model.group.MemberDto
+import com.onmoim.core.network.model.group.MemberIdRequestDto
 import com.onmoim.core.network.model.group.PopularGroupDto
+import com.onmoim.core.network.model.group.RecommendGroupDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -118,4 +119,10 @@ interface GroupApi {
     suspend fun joinGroup(
         @Path("groupId") groupId: Int
     ): Response<BaseResponse<String>>
+
+    @GET("api/v1/groups/joined")
+    suspend fun getJoinedGroups(
+        @Query("cursorId") cursorId: Int? = null,
+        @Query("size") size: Int? = null
+    ): Response<BaseResponse<JoinedGroupsDto>>
 }

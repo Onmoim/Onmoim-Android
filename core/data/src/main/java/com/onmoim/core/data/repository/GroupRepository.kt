@@ -48,4 +48,5 @@ interface GroupRepository {
     ): Result<Unit>
 
     suspend fun joinGroup(groupId: Int): Result<JoinGroupResult>
+    fun getJoinedGroups(size: Int = 10): Flow<List<Group>>
 }

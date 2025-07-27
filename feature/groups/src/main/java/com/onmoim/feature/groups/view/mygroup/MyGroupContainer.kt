@@ -1,4 +1,4 @@
-package com.onmoim.feature.groups.view
+package com.onmoim.feature.groups.view.mygroup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,126 +8,41 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.onmoim.core.designsystem.component.CommonTab
-import com.onmoim.core.designsystem.component.CommonTabRow
+import com.onmoim.core.data.constant.MemberStatus
 import com.onmoim.core.designsystem.component.DayCard
 import com.onmoim.core.designsystem.component.group.ComingScheduleCard
 import com.onmoim.core.designsystem.component.group.ComingScheduleCardButtonType
 import com.onmoim.core.designsystem.component.group.GroupItem
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
-import com.onmoim.feature.groups.constant.MyGroupTab
+import com.onmoim.feature.groups.state.JoinedGroupUiState
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Composable
-fun MyGroupRoute(
-    topBar: @Composable () -> Unit,
-    bottomBar: @Composable () -> Unit,
-    onNavigateToGroupCategorySelect: () -> Unit,
-    onNavigateToComingSchedule: () -> Unit
-) {
-    var selectedTab by remember { mutableStateOf(MyGroupTab.MY_GROUP) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(OnmoimTheme.colors.backgroundColor)
-    ) {
-        topBar()
-        MyGroupScreen(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            selectedTab = selectedTab,
-            onTabChange = {
-                selectedTab = it
-            },
-            onClickCreateGroup = onNavigateToGroupCategorySelect,
-            onClickComingSchedule = onNavigateToComingSchedule
-        )
-        bottomBar()
-    }
-}
-
-@Composable
-private fun MyGroupScreen(
-    modifier: Modifier = Modifier,
-    selectedTab: MyGroupTab,
-    onTabChange: (MyGroupTab) -> Unit,
-    onClickCreateGroup: () -> Unit,
-    onClickComingSchedule: () -> Unit
-) {
-    Column(
-        modifier = modifier
-    ) {
-        CommonTabRow(
-            selectedTabIndex = MyGroupTab.entries.indexOf(selectedTab),
-            modifier = Modifier.height(40.dp),
-        ) {
-            MyGroupTab.entries.forEach { tab ->
-                CommonTab(
-                    selected = selectedTab == tab,
-                    onClick = {
-                        onTabChange(tab)
-                    },
-                    modifier = Modifier.height(40.dp),
-                    text = stringResource(
-                        id = when (tab) {
-                            MyGroupTab.MY_GROUP -> R.string.my_group
-                            MyGroupTab.GROUP_CHAT -> R.string.group_chat
-                        }
-                    )
-                )
-            }
-        }
-        when (selectedTab) {
-            MyGroupTab.MY_GROUP -> {
-                MyGroupContainer(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState()),
-                    onClickCreateGroup = onClickCreateGroup,
-                    onClickComingSchedule = onClickComingSchedule
-                )
-            }
-
-            MyGroupTab.GROUP_CHAT -> {
-
-            }
-        }
-    }
-}
-
-@Composable
-private fun MyGroupContainer(
+fun MyGroupContainer(
     modifier: Modifier = Modifier,
     onClickCreateGroup: () -> Unit,
     onClickComingSchedule: () -> Unit,
+    joinedGroupUiState: JoinedGroupUiState,
+    onClickGroup: (groupId: Int) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -139,26 +54,62 @@ private fun MyGroupContainer(
                 color = OnmoimTheme.colors.textColor
             )
         )
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            List(2) {
-                GroupItem(
-                    onClick = {},
-                    imageUrl = "https://picsum.photos/200",
-                    title = "title",
-                    location = "location",
-                    memberCount = 123,
-                    scheduleCount = 123,
-                    categoryName = "categoryName",
-                    isRecommended = true,
-                    isSignUp = false,
-                    isOperating = false,
-                    isFavorite = false
-                )
+        when (joinedGroupUiState) {
+            is JoinedGroupUiState.Error -> {
+                Text(joinedGroupUiState.t.message.toString())
+            }
+
+            JoinedGroupUiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            is JoinedGroupUiState.Success -> {
+                val groups = joinedGroupUiState.data
+
+                if (groups.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.my_group_joined_group_empty),
+                            modifier = Modifier.padding(top = 60.dp, bottom = 80.dp),
+                            style = OnmoimTheme.typography.body2Regular.copy(
+                                color = OnmoimTheme.colors.gray04
+                            )
+                        )
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 15.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        groups.forEach { item ->
+                            GroupItem(
+                                onClick = {
+                                    onClickGroup(item.id)
+                                },
+                                imageUrl = item.imageUrl,
+                                title = item.title,
+                                location = item.location,
+                                memberCount = item.memberCount,
+                                scheduleCount = item.scheduleCount,
+                                categoryName = item.categoryName,
+                                isRecommended = item.isRecommend,
+                                isSignUp = item.memberStatus == MemberStatus.MEMBER,
+                                isOperating = item.memberStatus == MemberStatus.OWNER,
+                                isFavorite = item.isFavorite
+                            )
+                        }
+                    }
+                }
             }
         }
         Box(
@@ -260,37 +211,5 @@ private fun MyGroupContainer(
                 )
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun MyGroupScreenForMyGroupPreview() {
-    OnmoimTheme {
-        MyGroupScreen(
-            modifier = Modifier
-                .background(OnmoimTheme.colors.backgroundColor)
-                .fillMaxSize(),
-            selectedTab = MyGroupTab.MY_GROUP,
-            onTabChange = {},
-            onClickCreateGroup = {},
-            onClickComingSchedule = {}
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun MyGroupScreenForGroupChatPreview() {
-    OnmoimTheme {
-        MyGroupScreen(
-            modifier = Modifier
-                .background(OnmoimTheme.colors.backgroundColor)
-                .fillMaxSize(),
-            selectedTab = MyGroupTab.GROUP_CHAT,
-            onTabChange = {},
-            onClickCreateGroup = {},
-            onClickComingSchedule = {}
-        )
     }
 }

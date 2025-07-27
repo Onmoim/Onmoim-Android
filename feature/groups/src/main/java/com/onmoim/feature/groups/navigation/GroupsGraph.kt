@@ -19,11 +19,11 @@ import com.onmoim.feature.groups.view.GroupCategorySelectRoute
 import com.onmoim.feature.groups.view.GroupEditRoute
 import com.onmoim.feature.groups.view.GroupOpenCompleteRoute
 import com.onmoim.feature.groups.view.GroupOpenRoute
-import com.onmoim.feature.groups.view.MyGroupRoute
 import com.onmoim.feature.groups.view.ScheduleManagementRoute
 import com.onmoim.feature.groups.view.groupdetail.GroupDetailRoute
 import com.onmoim.feature.groups.view.groupmanagement.GroupManagementRoute
 import com.onmoim.feature.groups.view.meetingplacesearch.MeetingPlaceSearchRoute
+import com.onmoim.feature.groups.view.mygroup.MyGroupRoute
 import com.onmoim.feature.groups.view.post.PostWriteRoute
 import com.onmoim.feature.groups.viewmodel.ComingScheduleViewModel
 import com.onmoim.feature.groups.viewmodel.CreateScheduleViewModel
@@ -58,6 +58,9 @@ fun NavGraphBuilder.groupsGraph(
                 },
                 onNavigateToComingSchedule = {
                     navController.navigateToComingSchedule()
+                },
+                onNavigateToGroupDetail = {
+                    navController.navigateToGroupDetail(it)
                 }
             )
         }

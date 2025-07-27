@@ -22,6 +22,7 @@
     <!-- 내 모임 -->
     <string name="my_group_create_group">+ 새로운 모임 개설하기</string>
     <string name="my_group_joined_group">가입한 모임</string>
+    <string name="my_group_joined_group_empty">가입한 모임이 없습니다.</string>
 
     <!-- 다가오는 일정 -->
     <string name="coming_schedule_reset">초기화</string>
