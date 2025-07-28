@@ -19,4 +19,15 @@ interface UserRepository {
     fun getMyProfile(): Flow<Profile>
     suspend fun withdrawal(id: Int): Result<Unit>
     fun getRecentGroupPagingData(size: Int = 20): Flow<PagingData<Group>>
+    suspend fun updateProfile(
+        id: Int,
+        name: String,
+        birth: String,
+        gender: String,
+        locationId: Int,
+        introduction: String,
+        categoryIds: List<Int>,
+        originImageUrl: String?,
+        imagePath: String?
+    ): Result<Unit>
 }

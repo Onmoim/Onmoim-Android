@@ -8,9 +8,12 @@ android {
 }
 
 dependencies {
-    implementation(projects.feature.groups)
     implementation(projects.core.domain)
     implementation(projects.core.event)
+    implementation(projects.core.util)
+
+    implementation(projects.feature.groups)
+    implementation(projects.feature.location)
 
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)

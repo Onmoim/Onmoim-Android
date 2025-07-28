@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.retryWhen
@@ -37,12 +38,24 @@ class ProfileViewModel @Inject constructor(
         fetchProfile()
     }
 
-    fun fetchProfile() {
+    fun fetchProfile(refresh: Boolean = false) {
+        if (refresh) {
+            _isLoading.value = true
+        }
+
         viewModelScope.launch {
             userRepository.getMyProfile().retryWhen { cause, attempt ->
                 Log.e("ProfileViewModel", "fetchProfile error", cause)
                 attempt < 3
+            }.catch {
+                Log.e("ProfileViewModel", "fetchProfile error", it)
+                if (refresh) {
+                    _isLoading.value = false
+                }
             }.collectLatest {
+                if (refresh) {
+                    _isLoading.value = false
+                }
                 _profileState.value = it
             }
         }

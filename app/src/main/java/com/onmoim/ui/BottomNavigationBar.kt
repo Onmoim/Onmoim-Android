@@ -31,7 +31,7 @@ import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.category.CategoryRoute
 import com.onmoim.feature.groups.navigation.MyGroupRoute
 import com.onmoim.feature.home.HomeRoute
-import com.onmoim.feature.profile.ProfileRoute
+import com.onmoim.feature.profile.navigation.ProfileRoute
 import com.onmoim.navigation.topLevelRoutes
 
 @Composable

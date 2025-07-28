@@ -21,7 +21,7 @@ import com.onmoim.feature.home.homeGraph
 import com.onmoim.feature.location.navigation.locationGraph
 import com.onmoim.feature.login.navigation.LoginNavigation
 import com.onmoim.feature.login.navigation.loginGraph
-import com.onmoim.feature.profile.profileGraph
+import com.onmoim.feature.profile.navigation.profileGraph
 
 private const val PAGE_TURN_DURATION_MS = 450
 

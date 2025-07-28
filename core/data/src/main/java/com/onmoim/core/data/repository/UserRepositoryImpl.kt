@@ -12,12 +12,19 @@ import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.UserApi
 import com.onmoim.core.network.model.user.SetCategoryRequest
 import com.onmoim.core.network.model.user.SignUpRequest
+import com.onmoim.core.network.model.user.UpdateProfileRequestDto
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
+import java.io.File
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -83,9 +90,12 @@ class UserRepositoryImpl @Inject constructor(
             val profile = Profile(
                 id = data.id,
                 name = data.name,
+                gender = "MALE", // FIXME: api 수정되면 확인
                 birth = birthDateTime.toLocalDate(),
                 introduction = data.introduction,
                 interestCategories = data.categoryList,
+                interestCategoryIds = emptyList(), // FIXME: api 수정되면 확인
+                locationId = data.locationId,
                 location = data.locationName,
                 profileImgUrl = data.profileImgUrl
             )
@@ -116,5 +126,53 @@ class UserRepositoryImpl @Inject constructor(
             ),
             pagingSourceFactory = { RecentGroupPagingSource(userApi) }
         ).flow.flowOn(ioDispatcher)
+    }
+
+    override suspend fun updateProfile(
+        id: Int,
+        name: String,
+        birth: String,
+        gender: String,
+        locationId: Int,
+        introduction: String,
+        categoryIds: List<Int>,
+        originImageUrl: String?,
+        imagePath: String?
+    ): Result<Unit> {
+        val updateProfileRequestDto = UpdateProfileRequestDto(
+            name = name,
+            birth = birth,
+            gender = gender,
+            locationId = locationId,
+            introduction = introduction,
+            categoryIdList = categoryIds,
+            profileImgUrl = when {
+                originImageUrl != null && imagePath == null -> originImageUrl
+                originImageUrl != null && imagePath != null -> originImageUrl
+                originImageUrl == null && imagePath != null -> null
+                else -> null
+            }
+        )
+        val requestBodyJson = Json.encodeToString(updateProfileRequestDto)
+        val requestBody = requestBodyJson.toRequestBody("application/json".toMediaTypeOrNull())
+
+        val imageFile = imagePath?.let { File(it) }
+        val imageFilePart = imageFile?.let {
+            MultipartBody.Part.createFormData(
+                "image",
+                it.name,
+                it.asRequestBody("image/*".toMediaTypeOrNull())
+            )
+        }
+
+        val resp = withContext(ioDispatcher) {
+            userApi.updateProfile(id, requestBody, imageFilePart)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(HttpException(resp))
+        }
     }
 }

@@ -4,7 +4,7 @@ import com.onmoim.core.ui.R
 import com.onmoim.feature.category.CategoryRoute
 import com.onmoim.feature.groups.navigation.MyGroupRoute
 import com.onmoim.feature.home.HomeRoute
-import com.onmoim.feature.profile.ProfileRoute
+import com.onmoim.feature.profile.navigation.ProfileRoute
 
 data class TopLevelRoute<T : Any>(
     val labelId: Int,

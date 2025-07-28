@@ -1,5 +1,6 @@
 package com.onmoim.feature.profile.view
 
+import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -29,9 +30,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,21 +60,40 @@ import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.constant.Gender
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.designsystem.theme.shadow1
+import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.core.ui.shimmerBackground
+import com.onmoim.core.util.FileUtil
 import com.onmoim.feature.profile.R
+import com.onmoim.feature.profile.state.ProfileEditEvent
+import com.onmoim.feature.profile.state.ProfileEditUiState
+import com.onmoim.feature.profile.viewmodel.ProfileEditViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun ProfileEditRoute(
-
+    profileEditViewModel: ProfileEditViewModel,
+    onBackAndRefresh: () -> Unit,
+    onNavigateToLocationSearch: () -> Unit
 ) {
+    val uiState by profileEditViewModel.uiState.collectAsStateWithLifecycle()
+    val isLoading by profileEditViewModel.isLoadingState.collectAsStateWithLifecycle()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var showDatePicker by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val pickMediaLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
 
+        scope.launch(Dispatchers.IO) {
+            FileUtil.createTempImageFile(context, uri)?.let {
+                profileEditViewModel.onProfileImageChange(it.absolutePath)
+            }
+        }
     }
 
     if (showDatePicker) {
@@ -79,28 +101,54 @@ fun ProfileEditRoute(
             onDismissRequest = {
                 showDatePicker = false
             },
-            initialDate = LocalDate.now(),
+            initialDate = uiState.birth ?: LocalDate.now(),
             onClickConfirm = { localDate ->
                 showDatePicker = false
-
+                profileEditViewModel.onBirthChange(localDate)
             }
         )
     }
 
-    ProfileEditScreen(
-        onBack = {
-            onBackPressedDispatcher?.onBackPressed()
-        },
-        onClickComplete = {},
-        onClickCamera = {
-            pickMediaLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-        },
-        onClickBirthField = {
-            showDatePicker = true
-        },
-        onClickLocationField = {},
-        onClickInterestEdit = {}
-    )
+    LoadingOverlayBox(
+        loading = isLoading,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        ProfileEditScreen(
+            onBack = {
+                onBackPressedDispatcher?.onBackPressed()
+            },
+            onClickComplete = profileEditViewModel::updateProfile,
+            onClickCamera = {
+                pickMediaLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            },
+            onClickBirthField = {
+                showDatePicker = true
+            },
+            onClickLocationField = onNavigateToLocationSearch,
+            onClickInterestEdit = {},
+            uiState = uiState,
+            onNameChange = profileEditViewModel::onNameChange,
+            onGenderChange = profileEditViewModel::onGenderChange,
+            onIntroductionChange = profileEditViewModel::onIntroductionChange
+        )
+    }
+
+    LaunchedEffect(Unit) {
+        profileEditViewModel.event.collect { event ->
+            when (event) {
+                is ProfileEditEvent.UpdateFailure -> {
+                    Toast.makeText(context, event.t.message.toString(), Toast.LENGTH_SHORT).show()
+                }
+
+                ProfileEditEvent.UpdateSuccess -> {
+                    scope.launch(Dispatchers.IO) {
+                        FileUtil.removeTempImagesDir(context)
+                    }
+                    onBackAndRefresh()
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -110,7 +158,11 @@ private fun ProfileEditScreen(
     onClickCamera: () -> Unit,
     onClickBirthField: () -> Unit,
     onClickLocationField: () -> Unit,
-    onClickInterestEdit: () -> Unit
+    onClickInterestEdit: () -> Unit,
+    uiState: ProfileEditUiState,
+    onNameChange: (String) -> Unit,
+    onGenderChange: (Gender) -> Unit,
+    onIntroductionChange: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -155,7 +207,7 @@ private fun ProfileEditScreen(
             modifier = Modifier
                 .padding(vertical = 20.dp)
                 .align(Alignment.CenterHorizontally),
-            imageUrl = "https://picsum.photos/200"
+            imageUrl = uiState.newImagePath ?: uiState.originImageUrl
         )
         Text(
             text = stringResource(R.string.profile_edit_name),
@@ -170,8 +222,8 @@ private fun ProfileEditScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             CommonTextField(
-                value = "",
-                onValueChange = {},
+                value = uiState.name,
+                onValueChange = onNameChange,
                 modifier = Modifier.weight(1f),
                 placeholder = {
                     Text(
@@ -183,13 +235,13 @@ private fun ProfileEditScreen(
                 }
             )
             GenderToggle(
-                value = Gender.MALE,
-                onValueChange = {},
+                value = uiState.gender,
+                onValueChange = onGenderChange,
                 modifier = Modifier.width(100.dp)
             )
         }
         AnimatedVisibility(
-            visible = true,
+            visible = !uiState.isValidKoreanNameFormat(),
             modifier = Modifier.padding(start = 15.dp, end = 15.dp, top = 8.dp)
         ) {
             Text(
@@ -207,7 +259,7 @@ private fun ProfileEditScreen(
             )
         )
         CommonTextField(
-            value = LocalDate.now().let {
+            value = uiState.birth?.let {
                 DateTimeFormatter.ofPattern("yyyyMMdd").format(it)
             } ?: "",
             onValueChange = {},
@@ -240,7 +292,7 @@ private fun ProfileEditScreen(
             )
         )
         CommonTextField(
-            value = "",
+            value = uiState.locationName,
             onValueChange = {},
             modifier = Modifier
                 .padding(horizontal = 15.dp)
@@ -268,8 +320,8 @@ private fun ProfileEditScreen(
             )
         )
         CommonTextField(
-            value = "",
-            onValueChange = {},
+            value = uiState.introduction,
+            onValueChange = onIntroductionChange,
             modifier = Modifier
                 .padding(horizontal = 15.dp)
                 .fillMaxWidth()
@@ -282,6 +334,7 @@ private fun ProfileEditScreen(
                     )
                 )
             },
+            singleLine = false,
             innerFieldAlignment = Alignment.TopStart
         )
         Row(
@@ -318,9 +371,9 @@ private fun ProfileEditScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            List(5) {
+            uiState.categoryNames.forEach {
                 CommonChip(
-                    label = "카테고리$it",
+                    label = it,
                     textColor = OnmoimTheme.colors.gray05,
                     shape = RoundedCornerShape(20.dp)
                 )
@@ -412,7 +465,11 @@ private fun ProfileEditScreenPreview() {
             onClickCamera = {},
             onClickBirthField = {},
             onClickLocationField = {},
-            onClickInterestEdit = {}
+            onClickInterestEdit = {},
+            uiState = ProfileEditUiState(),
+            onNameChange = {},
+            onGenderChange = {},
+            onIntroductionChange = {}
         )
     }
 }
