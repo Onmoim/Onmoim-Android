@@ -37,4 +37,8 @@
 
     <!-- CommentTextField -->
     <string name="comment_text_field_hint">텍스트 입력</string>
+
+    <!-- CommentItem -->
+    <string name="comment_write_reply">답글 달기</string>
+    <string name="comment_more_reply">답글 %d개 더보기</string>
 </resources>

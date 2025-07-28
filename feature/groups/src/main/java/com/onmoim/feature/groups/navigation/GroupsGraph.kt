@@ -26,6 +26,7 @@ import com.onmoim.feature.groups.view.meetingplacesearch.MeetingPlaceSearchRoute
 import com.onmoim.feature.groups.view.mygroup.MyGroupRoute
 import com.onmoim.feature.groups.view.post.PostDetailRoute
 import com.onmoim.feature.groups.view.post.PostWriteRoute
+import com.onmoim.feature.groups.view.post.ReplyRoute
 import com.onmoim.feature.groups.viewmodel.ComingScheduleViewModel
 import com.onmoim.feature.groups.viewmodel.CreateScheduleViewModel
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
@@ -34,6 +35,7 @@ import com.onmoim.feature.groups.viewmodel.GroupManagementViewModel
 import com.onmoim.feature.groups.viewmodel.GroupOpenViewModel
 import com.onmoim.feature.groups.viewmodel.PostDetailViewModel
 import com.onmoim.feature.groups.viewmodel.PostWriteViewModel
+import com.onmoim.feature.groups.viewmodel.ReplyViewModel
 import com.onmoim.feature.groups.viewmodel.ScheduleManagementViewModel
 import com.onmoim.feature.location.navigation.LocationNavigationBundleKey
 import com.onmoim.feature.location.navigation.navigateToLocationSearch
@@ -337,7 +339,28 @@ fun NavGraphBuilder.groupsGraph(
                 }
 
             PostDetailRoute(
-                postDetailViewModel = postDetailViewModel
+                postDetailViewModel = postDetailViewModel,
+                onNavigateToReply = {
+                    navController.navigateToReply(
+                        postDetailRoute.groupId,
+                        postDetailRoute.postId,
+                        it
+                    )
+                }
+            )
+        }
+        composable<ReplyRoute> { backStackEntry ->
+            val replyRoute = backStackEntry.toRoute<ReplyRoute>()
+            val replyViewModel = hiltViewModel<ReplyViewModel, ReplyViewModel.Factory> {
+                it.create(
+                    replyRoute.groupId,
+                    replyRoute.postId,
+                    replyRoute.commentId
+                )
+            }
+
+            ReplyRoute(
+                replyViewModel = replyViewModel
             )
         }
     }

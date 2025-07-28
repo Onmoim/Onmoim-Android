@@ -1,4 +1,4 @@
-package com.onmoim.core.designsystem.component.group
+package com.onmoim.core.designsystem.component.post
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image

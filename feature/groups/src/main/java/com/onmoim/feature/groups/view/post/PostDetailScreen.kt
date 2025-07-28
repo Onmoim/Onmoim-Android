@@ -55,6 +55,7 @@ import com.onmoim.core.data.model.Post
 import com.onmoim.core.designsystem.component.CommentTextField
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.NavigationIconButton
+import com.onmoim.core.designsystem.component.post.CommentItem
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.groups.R
@@ -68,7 +69,8 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun PostDetailRoute(
-    postDetailViewModel: PostDetailViewModel
+    postDetailViewModel: PostDetailViewModel,
+    onNavigateToReply: (commentId: Int) -> Unit
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val postDetailUiState by postDetailViewModel.postDetailUiState.collectAsStateWithLifecycle()
@@ -87,9 +89,7 @@ fun PostDetailRoute(
         onClickCommentMenu = {
 
         },
-        onClickReply = {
-
-        },
+        onClickReply = onNavigateToReply,
         postDetailUiState = postDetailUiState,
         commentPagingItems = commentPagingItems,
         comment = comment,
@@ -122,7 +122,7 @@ private fun PostDetailScreen(
     onClickPostMenu: () -> Unit,
     onClickLike: () -> Unit,
     onClickCommentMenu: () -> Unit,
-    onClickReply: () -> Unit,
+    onClickReply: (commentId: Int) -> Unit,
     postDetailUiState: PostDetailUiState,
     commentPagingItems: LazyPagingItems<Comment>,
     comment: String,
@@ -228,7 +228,6 @@ private fun PostDetailScreen(
                                     )
                                 }
                             }
-
                         }
 
                         is LoadState.NotLoading -> {
@@ -236,7 +235,9 @@ private fun PostDetailScreen(
                                 commentPagingItems[index]?.let {
                                     CommentItem(
                                         onClickMenu = onClickCommentMenu,
-                                        onClickReply = onClickReply,
+                                        onClickReply = {
+                                            onClickReply(it.id)
+                                        },
                                         userName = it.userName,
                                         profileImageUrl = it.profileImageUrl,
                                         content = it.content,
@@ -473,120 +474,6 @@ private fun PostContent(
             thickness = 1.dp,
             color = OnmoimTheme.colors.gray02
         )
-    }
-}
-
-@Composable
-private fun CommentItem(
-    onClickMenu: () -> Unit,
-    onClickReply: () -> Unit,
-    userName: String,
-    profileImageUrl: String?,
-    content: String,
-    replyCount: Int
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 8.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .weight(1f)
-        ) {
-            Box(
-                modifier = Modifier.size(40.dp)
-            ) {
-                val profilePainter = rememberAsyncImagePainter(
-                    model = ImageRequest.Builder(LocalContext.current).apply {
-                        data(profileImageUrl)
-                    }.build()
-                )
-                val profilePainterState by profilePainter.state.collectAsStateWithLifecycle()
-
-                when (profilePainterState) {
-                    is AsyncImagePainter.State.Loading -> {
-                        Box(
-                            modifier = Modifier
-                                .matchParentSize()
-                                .shimmerBackground()
-                        )
-                    }
-
-                    is AsyncImagePainter.State.Success -> {
-                        Image(
-                            painter = profilePainter,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .matchParentSize()
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-
-                    else -> {
-                        Image(
-                            painter = painterResource(R.drawable.ic_user),
-                            contentDescription = null,
-                            modifier = Modifier.matchParentSize()
-                        )
-                    }
-                }
-            }
-            Spacer(Modifier.width(12.dp))
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = userName,
-                    style = OnmoimTheme.typography.caption1Regular.copy(
-                        color = OnmoimTheme.colors.textColor
-                    )
-                )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = content,
-                    style = OnmoimTheme.typography.caption1Regular.copy(
-                        color = OnmoimTheme.colors.textColor
-                    )
-                )
-                Text(
-                    text = if (replyCount > 0) {
-                        stringResource(R.string.post_detail_more_reply, replyCount)
-                    } else {
-                        stringResource(R.string.post_detail_write_reply)
-                    },
-                    modifier = Modifier
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() },
-                            onClick = onClickReply
-                        )
-                        .padding(vertical = 8.dp),
-                    style = OnmoimTheme.typography.caption2Regular.copy(
-                        color = OnmoimTheme.colors.gray05
-                    )
-                )
-                Spacer(Modifier.height(8.dp))
-            }
-        }
-        Box(
-            modifier = Modifier.clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() },
-                onClick = onClickMenu
-            ),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(R.drawable.ic_more_vertical_16),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(16.dp)
-            )
-        }
     }
 }
 

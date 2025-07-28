@@ -73,6 +73,13 @@ data class PostDetailRoute(
     val postId: Int
 )
 
+@Serializable
+data class ReplyRoute(
+    val groupId: Int,
+    val postId: Int,
+    val commentId: Int
+)
+
 fun NavController.navigateToComingSchedule(
     groupId: Int? = null,
     groupMemberRole: GroupMemberRole? = null,
@@ -140,4 +147,13 @@ fun NavController.navigateToPostDetail(
     navOptions: NavOptions? = null
 ) {
     navigate(PostDetailRoute(groupId, postId), navOptions)
+}
+
+fun NavController.navigateToReply(
+    groupId: Int,
+    postId: Int,
+    commentId: Int,
+    navOptions: NavOptions? = null
+) {
+    navigate(ReplyRoute(groupId, postId, commentId), navOptions)
 }

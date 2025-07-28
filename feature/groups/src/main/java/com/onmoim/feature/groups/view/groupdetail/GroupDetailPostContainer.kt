@@ -38,7 +38,7 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import com.onmoim.core.data.model.Post
-import com.onmoim.core.designsystem.component.group.PostCard
+import com.onmoim.core.designsystem.component.post.PostCard
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.groups.R
