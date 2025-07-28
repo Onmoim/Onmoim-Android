@@ -6,8 +6,10 @@ import androidx.paging.PagingData
 import com.onmoim.core.data.constant.BoardCategory
 import com.onmoim.core.data.constant.PostType
 import com.onmoim.core.data.model.Comment
+import com.onmoim.core.data.model.CommentThread
 import com.onmoim.core.data.model.Post
 import com.onmoim.core.data.pagingsource.CommentPagingSource
+import com.onmoim.core.data.pagingsource.CommentThreadPagingSource
 import com.onmoim.core.data.pagingsource.PostPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
@@ -165,5 +167,20 @@ class PostRepositoryImpl @Inject constructor(
         } else {
             Result.failure(Exception(resp.message()))
         }
+    }
+
+    override fun getCommentThreadPagingData(
+        groupId: Int,
+        postId: Int,
+        commentId: Int,
+        size: Int
+    ): Flow<PagingData<CommentThread>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { CommentThreadPagingSource(postApi, groupId, postId, commentId) }
+        ).flow.flowOn(ioDispatcher)
     }
 }

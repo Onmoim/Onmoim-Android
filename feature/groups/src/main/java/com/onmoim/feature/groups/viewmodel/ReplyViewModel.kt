@@ -1,6 +1,8 @@
 package com.onmoim.feature.groups.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.onmoim.core.data.repository.PostRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -28,6 +30,12 @@ class ReplyViewModel @AssistedInject constructor(
 
     private val _replyState = MutableStateFlow("")
     val replyState = _replyState.asStateFlow()
+
+    val commentThreadPagingData = postRepository.getCommentThreadPagingData(
+        groupId = groupId,
+        postId = postId,
+        commentId = commentId
+    ).cachedIn(viewModelScope)
 
     fun onReplyChange(value: String) {
         _replyState.value = value

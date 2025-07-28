@@ -3,6 +3,7 @@ package com.onmoim.core.network.api
 import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.post.BasePostPageDto
 import com.onmoim.core.network.model.post.CommentDto
+import com.onmoim.core.network.model.post.CommentThreadDto
 import com.onmoim.core.network.model.post.LikePostDto
 import com.onmoim.core.network.model.post.PostDto
 import com.onmoim.core.network.model.post.WriteCommentRequestDto
@@ -59,4 +60,12 @@ interface PostApi {
         @Path("postId") postId: Int,
         @Body writeCommentRequestDto: WriteCommentRequestDto
     ): Response<BaseResponse<Int>>
+
+    @GET("api/v1/groups/{groupId}/posts/{postId}/comments/{commentId}/thread")
+    suspend fun getCommentThread(
+        @Path("groupId") groupId: Int,
+        @Path("postId") postId: Int,
+        @Path("commentId") commentId: Int,
+        @Query("cursor") cursor: Int? = null
+    ): Response<BaseResponse<CommentThreadDto>>
 }

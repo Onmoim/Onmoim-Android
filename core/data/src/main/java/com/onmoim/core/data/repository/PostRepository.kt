@@ -4,6 +4,7 @@ import androidx.paging.PagingData
 import com.onmoim.core.data.constant.BoardCategory
 import com.onmoim.core.data.constant.PostType
 import com.onmoim.core.data.model.Comment
+import com.onmoim.core.data.model.CommentThread
 import com.onmoim.core.data.model.Post
 import kotlinx.coroutines.flow.Flow
 
@@ -21,4 +22,10 @@ interface PostRepository {
     fun getCommentPagingData(groupId: Int, postId: Int, size: Int = 20): Flow<PagingData<Comment>>
     suspend fun likePost(groupId: Int, postId: Int): Result<Boolean>
     suspend fun writeComment(groupId: Int, postId: Int, content: String): Result<Unit>
+    fun getCommentThreadPagingData(
+        groupId: Int,
+        postId: Int,
+        commentId: Int,
+        size: Int = 20
+    ): Flow<PagingData<CommentThread>>
 }
