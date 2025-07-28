@@ -1,5 +1,6 @@
 package com.onmoim.feature.groups.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
@@ -42,6 +43,9 @@ class PostDetailViewModel @AssistedInject constructor(
     private val _event = Channel<PostDetailEvent>(Channel.BUFFERED)
     val event = _event.receiveAsFlow()
 
+    private val _commentState = MutableStateFlow("")
+    val commentState = _commentState.asStateFlow()
+
     init {
         fetchPostDetail()
     }
@@ -68,6 +72,24 @@ class PostDetailViewModel @AssistedInject constructor(
             postRepository.likePost(groupId, postId).onFailure {
                 _postDetailUiState.value = PostDetailUiState.Success(post)
                 _event.send(PostDetailEvent.PostLikeFailure(it))
+            }
+        }
+    }
+
+    fun onCommentChange(value: String) {
+        _commentState.value = value
+    }
+
+    fun writeComment() {
+        val comment = _commentState.value
+        if (comment.isBlank()) return
+
+        viewModelScope.launch {
+            postRepository.writeComment(groupId, postId, comment).onFailure {
+                Log.e("PostDetailViewModel", "writeComment error", it)
+                _event.send(PostDetailEvent.CommentWriteFailure(it))
+            }.onSuccess {
+                _event.send(PostDetailEvent.CommentWriteSuccess)
             }
         }
     }

@@ -13,18 +13,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActionScope
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.onmoim.core.designsystem.R
@@ -35,10 +32,10 @@ fun CommentTextField(
     value: String,
     onValueChange: (String) -> Unit,
     onClickSend: () -> Unit,
-    modifier: Modifier = Modifier,
-    onSend: KeyboardActionScope.() -> Unit
+    modifier: Modifier = Modifier
 ) {
     val borderColor = OnmoimTheme.colors.gray04
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -63,13 +60,7 @@ fun CommentTextField(
             textStyle = OnmoimTheme.typography.body2Regular.copy(
                 color = OnmoimTheme.colors.textColor
             ),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Send
-            ),
-            keyboardActions = KeyboardActions(
-                onSend = onSend
-            )
+            singleLine = false
         ) { innerTextField ->
             Box(
                 modifier = Modifier
@@ -95,14 +86,21 @@ fun CommentTextField(
         Spacer(Modifier.width(8.dp))
         Box(
             modifier = Modifier
-                .clickable {
+                .clickable(
+                    enabled = value.isNotBlank()
+                ) {
                     onClickSend()
                 }
                 .background(
-                    color = OnmoimTheme.colors.primaryBlue,
+                    color = if (value.isNotBlank()) {
+                        OnmoimTheme.colors.primaryBlue
+                    } else {
+                        OnmoimTheme.colors.gray04
+                    },
                     shape = RoundedCornerShape(10.dp)
                 )
-                .size(60.dp, 32.dp),
+                .size(60.dp, 32.dp)
+                .clip(RoundedCornerShape(10.dp)),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -122,8 +120,7 @@ private fun CommentTextFieldPreview() {
         CommentTextField(
             value = "",
             onValueChange = {},
-            onClickSend = {},
-            onSend = {}
+            onClickSend = {}
         )
     }
 }

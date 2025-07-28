@@ -13,6 +13,7 @@ import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.PostApi
 import com.onmoim.core.network.model.post.CreatePostRequestDto
+import com.onmoim.core.network.model.post.WriteCommentRequestDto
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -144,6 +145,23 @@ class PostRepositoryImpl @Inject constructor(
 
         return if (resp.isSuccessful && data != null) {
             Result.success(data.isLiked)
+        } else {
+            Result.failure(Exception(resp.message()))
+        }
+    }
+
+    override suspend fun writeComment(
+        groupId: Int,
+        postId: Int,
+        content: String
+    ): Result<Unit> {
+        val writeCommentRequestDto = WriteCommentRequestDto(WriteCommentRequestDto.Request(content))
+        val resp = withContext(ioDispatcher) {
+            postApi.createComment(groupId, postId, writeCommentRequestDto)
+        }
+
+        return if (resp.isSuccessful) {
+            Result.success(Unit)
         } else {
             Result.failure(Exception(resp.message()))
         }

@@ -20,4 +20,5 @@ interface PostRepository {
     fun getPost(groupId: Int, postId: Int): Flow<Post>
     fun getCommentPagingData(groupId: Int, postId: Int, size: Int = 20): Flow<PagingData<Comment>>
     suspend fun likePost(groupId: Int, postId: Int): Result<Boolean>
+    suspend fun writeComment(groupId: Int, postId: Int, content: String): Result<Unit>
 }

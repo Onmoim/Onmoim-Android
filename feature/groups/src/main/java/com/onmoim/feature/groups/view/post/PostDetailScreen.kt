@@ -73,6 +73,7 @@ fun PostDetailRoute(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val postDetailUiState by postDetailViewModel.postDetailUiState.collectAsStateWithLifecycle()
     val commentPagingItems = postDetailViewModel.commentPagingData.collectAsLazyPagingItems()
+    val comment by postDetailViewModel.commentState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     PostDetailScreen(
@@ -90,7 +91,10 @@ fun PostDetailRoute(
 
         },
         postDetailUiState = postDetailUiState,
-        commentPagingItems = commentPagingItems
+        commentPagingItems = commentPagingItems,
+        comment = comment,
+        onCommentChange = postDetailViewModel::onCommentChange,
+        onSendComment = postDetailViewModel::writeComment
     )
 
     LaunchedEffect(Unit) {
@@ -98,6 +102,14 @@ fun PostDetailRoute(
             when (event) {
                 is PostDetailEvent.PostLikeFailure -> {
                     Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is PostDetailEvent.CommentWriteFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                PostDetailEvent.CommentWriteSuccess -> {
+                    commentPagingItems.refresh()
                 }
             }
         }
@@ -112,7 +124,10 @@ private fun PostDetailScreen(
     onClickCommentMenu: () -> Unit,
     onClickReply: () -> Unit,
     postDetailUiState: PostDetailUiState,
-    commentPagingItems: LazyPagingItems<Comment>
+    commentPagingItems: LazyPagingItems<Comment>,
+    comment: String,
+    onCommentChange: (String) -> Unit,
+    onSendComment: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -233,11 +248,10 @@ private fun PostDetailScreen(
                     }
                 }
                 CommentTextField(
-                    value = "",
-                    onValueChange = {},
-                    onClickSend = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    onSend = {}
+                    value = comment,
+                    onValueChange = onCommentChange,
+                    onClickSend = onSendComment,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
@@ -622,7 +636,10 @@ private fun PostDetailScreenPreview() {
                     type = PostType.FREE
                 )
             ),
-            commentPagingItems = commentPagingItems
+            commentPagingItems = commentPagingItems,
+            comment = "",
+            onCommentChange = {},
+            onSendComment = {}
         )
     }
 }

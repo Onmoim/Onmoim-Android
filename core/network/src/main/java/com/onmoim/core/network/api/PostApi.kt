@@ -5,9 +5,11 @@ import com.onmoim.core.network.model.post.BasePostPageDto
 import com.onmoim.core.network.model.post.CommentDto
 import com.onmoim.core.network.model.post.LikePostDto
 import com.onmoim.core.network.model.post.PostDto
+import com.onmoim.core.network.model.post.WriteCommentRequestDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -50,4 +52,11 @@ interface PostApi {
         @Path("groupId") groupId: Int,
         @Path("postId") postId: Int,
     ): Response<BaseResponse<LikePostDto>>
+
+    @POST("api/v1/groups/{groupId}/posts/{postId}/comments")
+    suspend fun createComment(
+        @Path("groupId") groupId: Int,
+        @Path("postId") postId: Int,
+        @Body writeCommentRequestDto: WriteCommentRequestDto
+    ): Response<BaseResponse<Int>>
 }
