@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import com.onmoim.core.data.repository.AppSettingRepository
 import com.onmoim.core.data.repository.TokenRepository
 import com.onmoim.core.designsystem.theme.OnmoimTheme
+import com.onmoim.core.domain.usecase.GetUserLocationUseCase
 import com.onmoim.core.event.AuthEventBus
 import com.onmoim.ui.OnmoimApp
 import com.onmoim.ui.rememberOnmoimAppState
@@ -30,6 +31,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var authEventBus: AuthEventBus
 
+    @Inject
+    lateinit var getUserLocationUseCase: GetUserLocationUseCase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -39,7 +43,8 @@ class MainActivity : AppCompatActivity() {
                 coroutineScope = rememberCoroutineScope(),
                 tokenRepository = tokenRepository,
                 appSettingRepository = appSettingRepository,
-                authEventBus = authEventBus
+                authEventBus = authEventBus,
+                getUserLocationUseCase = getUserLocationUseCase
             )
 
             DisposableEffect(Unit) {

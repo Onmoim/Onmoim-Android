@@ -5,6 +5,7 @@ import com.onmoim.core.data.repository.AuthRepository
 import com.onmoim.core.data.repository.TokenRepository
 import com.onmoim.core.data.repository.UserRepository
 import com.onmoim.core.domain.usecase.GetUserIdUseCase
+import com.onmoim.core.domain.usecase.GetUserLocationUseCase
 import com.onmoim.core.domain.usecase.SignInUseCase
 import com.onmoim.core.domain.usecase.SignUpUseCase
 import dagger.Module
@@ -34,4 +35,10 @@ object UseCaseModule {
         appSettingRepository: AppSettingRepository,
         userRepository: UserRepository
     ) = GetUserIdUseCase(appSettingRepository, userRepository)
+
+    @Provides
+    fun provideGetUserLocationUseCase(
+        appSettingRepository: AppSettingRepository,
+        userRepository: UserRepository
+    ) = GetUserLocationUseCase(appSettingRepository, userRepository)
 }

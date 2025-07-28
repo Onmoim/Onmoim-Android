@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.onmoim.core.designsystem.component.TopLevelAppBar
 import com.onmoim.core.designsystem.theme.OnmoimTheme
@@ -14,6 +16,8 @@ import com.onmoim.navigation.OnmoimNavHost
 fun OnmoimApp(
     appState: OnmoimAppState
 ) {
+    val userLocation by appState.userLocationState.collectAsStateWithLifecycle()
+
     Box(
         modifier = Modifier
             .background(
@@ -25,16 +29,10 @@ fun OnmoimApp(
             navController = appState.navController,
             topBar = {
                 TopLevelAppBar(
-                    dongTitle = "연남동", // FIXME: 추후 수정 해야함
-                    onClickDong = {
-                        // TODO: 동 선택?
-                    },
-                    onClickSearch = {
-                        // TODO: 검색 화면으로 이동
-                    },
-                    onClickNotification = {
-                        // TODO: 알림 화면으로 이동
-                    }
+                    dongTitle = userLocation?.second ?: "",
+                    onClickDong = {},
+                    onClickSearch = {},
+                    onClickNotification = {}
                 )
             },
             bottomBar = {

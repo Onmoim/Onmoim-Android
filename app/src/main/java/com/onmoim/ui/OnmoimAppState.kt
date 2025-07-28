@@ -10,12 +10,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
 import com.onmoim.core.data.repository.AppSettingRepository
 import com.onmoim.core.data.repository.TokenRepository
+import com.onmoim.core.domain.usecase.GetUserLocationUseCase
 import com.onmoim.core.event.AuthEvent
 import com.onmoim.core.event.AuthEventBus
 import com.onmoim.feature.home.navigateToHome
 import com.onmoim.feature.login.navigation.navigateToLogin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @Composable
@@ -24,7 +27,8 @@ fun rememberOnmoimAppState(
     coroutineScope: CoroutineScope,
     tokenRepository: TokenRepository,
     appSettingRepository: AppSettingRepository,
-    authEventBus: AuthEventBus
+    authEventBus: AuthEventBus,
+    getUserLocationUseCase: GetUserLocationUseCase
 ): OnmoimAppState {
     return remember(
         navController,
@@ -35,7 +39,8 @@ fun rememberOnmoimAppState(
             coroutineScope = coroutineScope,
             tokenRepository = tokenRepository,
             appSettingRepository = appSettingRepository,
-            authEventBus = authEventBus
+            authEventBus = authEventBus,
+            getUserLocationUseCase = getUserLocationUseCase
         )
     }
 }
@@ -46,7 +51,8 @@ class OnmoimAppState(
     internal val coroutineScope: CoroutineScope,
     internal val tokenRepository: TokenRepository,
     internal val appSettingRepository: AppSettingRepository,
-    internal val authEventBus: AuthEventBus
+    internal val authEventBus: AuthEventBus,
+    internal val getUserLocationUseCase: GetUserLocationUseCase
 ) {
     private val previousDestination = mutableStateOf<NavDestination?>(null)
 
@@ -64,6 +70,12 @@ class OnmoimAppState(
                 }
             } ?: previousDestination.value
         }
+
+    val userLocationState = getUserLocationUseCase().stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
 
     init {
         handleAuthEvent()
