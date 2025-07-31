@@ -73,6 +73,7 @@ fun ComingScheduleCard(
     )
     val painterState by painter.state.collectAsStateWithLifecycle()
     val nowDateTime = LocalDateTime.now()
+    val period = ChronoUnit.DAYS.between(startDate.toLocalDate(), nowDateTime.toLocalDate())
 
     Box(
         modifier = modifier
@@ -154,12 +155,11 @@ fun ComingScheduleCard(
                 )
                 Spacer(Modifier.width(12.dp))
                 Text(
-                    text = "D${
-                        ChronoUnit.DAYS.between(
-                            startDate.toLocalDate(),
-                            nowDateTime.toLocalDate()
-                        )
-                    }",
+                    text = when {
+                        period >= 1 -> "D+$period"
+                        period < 0 -> "D$period"
+                        else -> "D-day"
+                    },
                     style = OnmoimTheme.typography.body1SemiBold.copy(
                         color = OnmoimTheme.colors.alertRed
                     )

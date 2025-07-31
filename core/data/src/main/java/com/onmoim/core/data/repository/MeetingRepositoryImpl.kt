@@ -6,7 +6,9 @@ import androidx.paging.PagingData
 import com.onmoim.core.data.constant.JoinMeetingResult
 import com.onmoim.core.data.constant.LeaveMeetingResult
 import com.onmoim.core.data.constant.MeetingType
+import com.onmoim.core.data.constant.UpcomingMeetingsFilter
 import com.onmoim.core.data.model.Meeting
+import com.onmoim.core.data.pagingsource.ComingSchedulePagingSource
 import com.onmoim.core.data.pagingsource.MeetingPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
@@ -162,7 +164,7 @@ class MeetingRepositoryImpl @Inject constructor(
         )
         val data = resp.body()?.data
 
-        if(resp.isSuccessful && data != null) {
+        if (resp.isSuccessful && data != null) {
             val meetings = data.content.map {
                 Meeting(
                     id = it.id,
@@ -189,4 +191,18 @@ class MeetingRepositoryImpl @Inject constructor(
             throw Exception(resp.message())
         }
     }.flowOn(ioDispatcher)
+
+    override fun getUpcomingMeetingPagingData(
+        filters: Set<UpcomingMeetingsFilter>,
+        groupId: Int?,
+        size: Int
+    ): Flow<PagingData<Meeting>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { ComingSchedulePagingSource(meetingApi, filters, groupId) }
+        ).flow.flowOn(ioDispatcher)
+    }
 }
