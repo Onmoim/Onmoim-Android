@@ -171,16 +171,15 @@ fun MyGroupContainer(
         Column(
             modifier = Modifier
                 .background(OnmoimTheme.colors.gray01)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .fillMaxWidth()
         ) {
-            Spacer(Modifier.height(20.dp))
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(68.dp),
+                    .height(108.dp),
                 contentPadding = PaddingValues(horizontal = 15.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 val now = LocalDate.now()
                 val comingDates = buildList {
@@ -268,9 +267,7 @@ fun MyGroupContainer(
                                 capacity = meeting.capacity,
                                 imageUrl = meeting.imgUrl
                             )
-                            if (index == meetings.lastIndex) {
-                                Spacer(Modifier.height(20.dp))
-                            }
+                            Spacer(Modifier.height(20.dp))
                         }
                     }
                 }
