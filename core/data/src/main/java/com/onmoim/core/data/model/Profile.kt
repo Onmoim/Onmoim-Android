@@ -11,7 +11,10 @@ data class Profile(
     val interestCategories: List<Category>,
     val locationId: Int,
     val location: String,
-    val profileImgUrl: String?
+    val profileImgUrl: String?,
+    val favoriteGroupsCount: Int,
+    val recentViewedGroupsCount: Int,
+    val joinedGroupsCount: Int
 ) {
     data class Category(
         val id: Int,

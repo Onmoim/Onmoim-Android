@@ -23,7 +23,13 @@ data class ProfileDto(
     @SerialName("profileImgUrl")
     val profileImgUrl: String?,
     @SerialName("gender")
-    val gender: String
+    val gender: String,
+    @SerialName("likedGroupsCount")
+    val likedGroupsCount: Int,
+    @SerialName("joinedGroupsCount")
+    val joinedGroupsCount: Int,
+    @SerialName("recentViewedGroupsCount")
+    val recentViewedGroupsCount: Int,
 ) {
 
     @Serializable

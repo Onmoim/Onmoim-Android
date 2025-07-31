@@ -169,9 +169,9 @@ private fun ProfileScreen(
         MyGroupStatus(
             onClickGroup = onClickGroup,
             modifier = Modifier.fillMaxWidth(),
-            favoriteGroupCount = 1,
-            recentGroupCount = 2,
-            joinGroupCount = 3
+            favoriteGroupsCount = profile?.favoriteGroupsCount ?: 0,
+            recentViewedGroupsCount = profile?.recentViewedGroupsCount ?: 0,
+            joinedGroupsCount = profile?.joinedGroupsCount ?: 0
         )
         Spacer(Modifier.height(8.dp))
         CommonListItem(
@@ -345,9 +345,9 @@ private fun ProfileCard(
 private fun MyGroupStatus(
     onClickGroup: (GroupType) -> Unit,
     modifier: Modifier = Modifier,
-    favoriteGroupCount: Int,
-    recentGroupCount: Int,
-    joinGroupCount: Int
+    favoriteGroupsCount: Int,
+    recentViewedGroupsCount: Int,
+    joinedGroupsCount: Int
 ) {
     Column(
         modifier = modifier
@@ -387,7 +387,7 @@ private fun MyGroupStatus(
                 horizontalAlignment = groupStatusItemHorizontalArrangement
             ) {
                 Text(
-                    text = favoriteGroupCount.toString(),
+                    text = favoriteGroupsCount.toString(),
                     style = groupStatusItemCountTextStyle
                 )
                 Text(
@@ -409,7 +409,7 @@ private fun MyGroupStatus(
                 horizontalAlignment = groupStatusItemHorizontalArrangement
             ) {
                 Text(
-                    text = recentGroupCount.toString(),
+                    text = recentViewedGroupsCount.toString(),
                     style = groupStatusItemCountTextStyle
                 )
                 Text(
@@ -431,7 +431,7 @@ private fun MyGroupStatus(
                 horizontalAlignment = groupStatusItemHorizontalArrangement
             ) {
                 Text(
-                    text = joinGroupCount.toString(),
+                    text = joinedGroupsCount.toString(),
                     style = groupStatusItemCountTextStyle
                 )
                 Text(
@@ -468,7 +468,10 @@ private fun ProfileScreenPreview() {
                 gender = "M",
                 locationId = 0,
                 location = "location",
-                profileImgUrl = null
+                profileImgUrl = null,
+                favoriteGroupsCount = 1,
+                recentViewedGroupsCount = 2,
+                joinedGroupsCount = 3
             )
         )
     }

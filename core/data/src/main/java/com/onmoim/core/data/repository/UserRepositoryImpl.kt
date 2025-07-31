@@ -101,7 +101,10 @@ class UserRepositoryImpl @Inject constructor(
                 },
                 locationId = data.locationId,
                 location = data.locationName,
-                profileImgUrl = data.profileImgUrl
+                profileImgUrl = data.profileImgUrl,
+                favoriteGroupsCount = data.likedGroupsCount,
+                recentViewedGroupsCount = data.recentViewedGroupsCount,
+                joinedGroupsCount = data.joinedGroupsCount
             )
 
             emit(profile)
