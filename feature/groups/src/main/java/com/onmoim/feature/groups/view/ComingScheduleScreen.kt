@@ -1,5 +1,6 @@
 package com.onmoim.feature.groups.view
 
+import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,9 +17,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +41,7 @@ import com.onmoim.core.designsystem.component.group.ComingScheduleCardButtonType
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.ComingScheduleFilter
+import com.onmoim.feature.groups.state.ComingScheduleEvent
 import com.onmoim.feature.groups.viewmodel.ComingScheduleViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDateTime
@@ -52,6 +56,9 @@ fun ComingScheduleRoute(
     val selectedFilters by comingScheduleViewModel.filtersState.collectAsStateWithLifecycle()
     val comingSchedulePagingDataFlow by comingScheduleViewModel.comingSchedulePagingDataState.collectAsStateWithLifecycle()
     val comingSchedulePagingItems = comingSchedulePagingDataFlow.collectAsLazyPagingItems()
+    val cachedAttendMeetingIds by comingScheduleViewModel.cachedAttendMeetingIdsState.collectAsStateWithLifecycle()
+    val cachedLeaveMeetingIds by comingScheduleViewModel.cachedLeaveMeetingIdsState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     ComingScheduleScreen(
         onBack = {
@@ -64,9 +71,51 @@ fun ComingScheduleRoute(
         onClickCreateSchedule = onNavigateToCreateSchedule,
         onClickSchedule = onNavigateToMeetingLocation,
         comingSchedulePagingItems = comingSchedulePagingItems,
+        cachedAttendMeetingIds = cachedAttendMeetingIds,
+        cachedLeaveMeetingIds = cachedLeaveMeetingIds,
         onClickAttend = comingScheduleViewModel::attendMeeting,
         onClickLeave = comingScheduleViewModel::leaveMeeting
     )
+
+    LaunchedEffect(Unit) {
+        comingScheduleViewModel.event.collect { event ->
+            when (event) {
+                is ComingScheduleEvent.AttendMeetingFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                ComingScheduleEvent.AttendMeetingOverCapacity -> {
+                    Toast.makeText(
+                        context,
+                        R.string.attend_meeting_over_capacity,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                ComingScheduleEvent.AttendMeetingSuccess -> {
+                    Toast.makeText(context, R.string.attend_meeting_success, Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                is ComingScheduleEvent.FilterChangeAndLoadDateFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                is ComingScheduleEvent.LeaveMeetingFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                ComingScheduleEvent.LeaveMeetingSuccess -> {
+                    Toast.makeText(context, R.string.leave_meeting_success, Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                ComingScheduleEvent.MeetingNotFound -> {
+                    Toast.makeText(context, R.string.meeting_not_found, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -79,6 +128,8 @@ private fun ComingScheduleScreen(
     onClickCreateSchedule: () -> Unit,
     onClickSchedule: (meetingId: Int) -> Unit,
     comingSchedulePagingItems: LazyPagingItems<Meeting>,
+    cachedAttendMeetingIds: Set<Int>,
+    cachedLeaveMeetingIds: Set<Int>,
     onClickAttend: (meetingId: Int, groupId: Int) -> Unit,
     onClickLeave: (meetingId: Int, groupId: Int) -> Unit
 ) {
@@ -199,16 +250,40 @@ private fun ComingScheduleScreen(
                                     ComingScheduleCard(
                                         modifier = Modifier.fillMaxWidth(),
                                         onClickButton = {
-                                            if (meeting.attendance) {
-                                                onClickLeave(meeting.id, meeting.groupId)
-                                            } else {
-                                                onClickAttend(meeting.id, meeting.groupId)
+                                            when {
+                                                cachedAttendMeetingIds.contains(meeting.id) -> {
+                                                    onClickLeave(meeting.id, meeting.groupId)
+                                                }
+
+                                                cachedLeaveMeetingIds.contains(meeting.id) -> {
+                                                    onClickAttend(meeting.id, meeting.groupId)
+                                                }
+
+                                                meeting.attendance -> {
+                                                    onClickLeave(meeting.id, meeting.groupId)
+                                                }
+
+                                                else -> {
+                                                    onClickAttend(meeting.id, meeting.groupId)
+                                                }
                                             }
                                         },
-                                        buttonType = if (meeting.attendance) {
-                                            ComingScheduleCardButtonType.ATTEND_CANCEL
-                                        } else {
-                                            ComingScheduleCardButtonType.ATTEND
+                                        buttonType = when {
+                                            cachedAttendMeetingIds.contains(meeting.id) -> {
+                                                ComingScheduleCardButtonType.ATTEND_CANCEL
+                                            }
+
+                                            cachedLeaveMeetingIds.contains(meeting.id) -> {
+                                                ComingScheduleCardButtonType.ATTEND
+                                            }
+
+                                            meeting.attendance -> {
+                                                ComingScheduleCardButtonType.ATTEND_CANCEL
+                                            }
+
+                                            else -> {
+                                                ComingScheduleCardButtonType.ATTEND
+                                            }
                                         },
                                         isLightning = meeting.type == MeetingType.LIGHTNING,
                                         startDate = meeting.startDate,
@@ -265,6 +340,8 @@ private fun ComingScheduleScreenPreview() {
             onClickCreateSchedule = {},
             onClickSchedule = {},
             comingSchedulePagingItems = dummyPagingItems,
+            cachedAttendMeetingIds = emptySet(),
+            cachedLeaveMeetingIds = emptySet(),
             onClickAttend = { _, _ -> },
             onClickLeave = { _, _ -> }
         )
