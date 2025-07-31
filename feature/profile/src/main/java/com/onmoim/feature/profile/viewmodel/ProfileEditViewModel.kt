@@ -43,23 +43,22 @@ class ProfileEditViewModel @Inject constructor(
             userRepository.getMyProfile().catch {
                 Log.e("ProfileEditViewModel", "fetchProfile error", it)
                 _isLoadingState.value = false
-            }.collectLatest {
+            }.collectLatest { profile ->
                 _uiState.update { state ->
                     state.copy(
-                        id = it.id,
-                        name = it.name,
-                        gender = when (it.gender) {
+                        id = profile.id,
+                        name = profile.name,
+                        gender = when (profile.gender) {
                             "M" -> Gender.MALE
                             "F" -> Gender.FEMALE
                             else -> null
                         },
-                        birth = it.birth,
-                        locationId = it.locationId,
-                        locationName = it.location,
-                        introduction = it.introduction ?: "",
-                        categoryIds = it.interestCategoryIds,
-                        categoryNames = it.interestCategories,
-                        originImageUrl = it.profileImgUrl
+                        birth = profile.birth,
+                        locationId = profile.locationId,
+                        locationName = profile.location,
+                        introduction = profile.introduction ?: "",
+                        categories = profile.interestCategories.map { Pair(it.id, it.name) },
+                        originImageUrl = profile.profileImgUrl
                     )
                 }
                 _isLoadingState.value = false
@@ -110,7 +109,7 @@ class ProfileEditViewModel @Inject constructor(
         val birth = _uiState.value.birth ?: return
         val locationId = _uiState.value.locationId ?: return
         val introduction = _uiState.value.introduction
-        val categoryIds = _uiState.value.categoryIds
+        val categoryIds = _uiState.value.categories.map { it.first }
         val originImageUrl = _uiState.value.originImageUrl
         val newImagePath = _uiState.value.newImagePath
 

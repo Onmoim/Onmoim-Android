@@ -90,11 +90,15 @@ class UserRepositoryImpl @Inject constructor(
             val profile = Profile(
                 id = data.id,
                 name = data.name,
-                gender = "MALE", // FIXME: api 수정되면 확인
+                gender = data.gender,
                 birth = birthDateTime.toLocalDate(),
                 introduction = data.introduction,
-                interestCategories = data.categoryList,
-                interestCategoryIds = emptyList(), // FIXME: api 수정되면 확인
+                interestCategories = data.categoryList.map {
+                    Profile.Category(
+                        id = it.categoryId,
+                        name = it.categoryName
+                    )
+                },
                 locationId = data.locationId,
                 location = data.locationName,
                 profileImgUrl = data.profileImgUrl

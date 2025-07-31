@@ -163,7 +163,7 @@ private fun ProfileScreen(
             location = profile?.location ?: "",
             birthDate = profile?.birth,
             introduction = profile?.introduction ?: "",
-            interestCategories = profile?.interestCategories ?: emptyList()
+            interestCategories = profile?.interestCategories?.map { it.name } ?: emptyList()
         )
         Spacer(Modifier.height(8.dp))
         MyGroupStatus(
@@ -464,8 +464,7 @@ private fun ProfileScreenPreview() {
                 name = "name",
                 birth = LocalDate.now(),
                 introduction = "introduction",
-                interestCategories = List(5) { "interest$it" },
-                interestCategoryIds = List(5) { it },
+                interestCategories = List(5) { Profile.Category(it, "category$it") },
                 gender = "M",
                 locationId = 0,
                 location = "location",

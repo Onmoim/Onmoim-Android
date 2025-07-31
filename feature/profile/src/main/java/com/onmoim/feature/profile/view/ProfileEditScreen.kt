@@ -371,9 +371,9 @@ private fun ProfileEditScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            uiState.categoryNames.forEach {
+            uiState.categories.forEach {
                 CommonChip(
-                    label = it,
+                    label = it.second,
                     textColor = OnmoimTheme.colors.gray05,
                     shape = RoundedCornerShape(20.dp)
                 )

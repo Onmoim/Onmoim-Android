@@ -9,7 +9,7 @@ data class ProfileDto(
     @SerialName("birth")
     val birth: String,
     @SerialName("categoryList")
-    val categoryList: List<String>,
+    val categoryList: List<Category>,
     @SerialName("id")
     val id: Int,
     @SerialName("introduction")
@@ -21,5 +21,16 @@ data class ProfileDto(
     @SerialName("name")
     val name: String,
     @SerialName("profileImgUrl")
-    val profileImgUrl: String?
-)
+    val profileImgUrl: String?,
+    @SerialName("gender")
+    val gender: String
+) {
+
+    @Serializable
+    data class Category(
+        @SerialName("categoryId")
+        val categoryId: Int,
+        @SerialName("categoryName")
+        val categoryName: String,
+    )
+}

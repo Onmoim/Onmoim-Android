@@ -8,9 +8,13 @@ data class Profile(
     val gender: String,
     val birth: LocalDate,
     val introduction: String?,
-    val interestCategories: List<String>,
-    val interestCategoryIds: List<Int>,
+    val interestCategories: List<Category>,
     val locationId: Int,
     val location: String,
     val profileImgUrl: String?
-)
+) {
+    data class Category(
+        val id: Int,
+        val name: String
+    )
+}

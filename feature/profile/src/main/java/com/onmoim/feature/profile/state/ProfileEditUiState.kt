@@ -11,13 +11,12 @@ data class ProfileEditUiState(
     val locationId: Int? = null,
     val locationName: String = "",
     val introduction: String = "",
-    val categoryIds: List<Int> = emptyList(),
-    val categoryNames: List<String> = emptyList(),
+    val categories: List<Pair<Int, String>> = emptyList(),
     val originImageUrl: String? = null,
     val newImagePath: String? = null
 ) {
     val isValid: Boolean
-        get() = isValidName() && gender != null && birth != null && locationId != null && locationName.isNotBlank() && categoryIds.isNotEmpty()
+        get() = isValidName() && gender != null && birth != null && locationId != null && locationName.isNotBlank() && categories.isNotEmpty()
 
     private fun isValidName(minLength: Int = 2, maxLength: Int = 12): Boolean {
         if (name.isBlank()) {
