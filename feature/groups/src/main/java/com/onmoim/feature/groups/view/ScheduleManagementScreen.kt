@@ -172,47 +172,23 @@ private fun ScheduleManagementScreen(
 @Preview(showBackground = true)
 @Composable
 fun ScheduleManagementScreenPreview() {
-    val dummyMeetings = listOf(
+    val dummyMeetings = List(3) {
         Meeting(
-            id = 1,
-            title = "코딩 스터디",
-            placeName = "강남역 카페",
-            startDate = LocalDateTime.now().plusDays(2),
+            id = it,
+            groupId = it,
+            title = "title $it",
+            placeName = "place name $it",
+            startDate = LocalDateTime.now().plusDays(it.toLong()),
             cost = 0,
             joinCount = 5,
             capacity = 10,
             type = MeetingType.REGULAR,
             imgUrl = null,
-            latitude = 0,
-            longitude = 0
-        ),
-        Meeting(
-            id = 2,
-            title = "저녁 식사",
-            placeName = "홍대 맛집",
-            startDate = LocalDateTime.now().plusDays(5),
-            cost = 20000,
-            joinCount = 3,
-            capacity = 6,
-            type = MeetingType.REGULAR,
-            imgUrl = null,
-            latitude = 0,
-            longitude = 0
-        ),
-        Meeting(
-            id = 3,
-            title = "농구 번개",
-            placeName = "여의도 공원",
-            startDate = LocalDateTime.now().plusWeeks(1),
-            cost = 0,
-            joinCount = 8,
-            capacity = 15,
-            type = MeetingType.LIGHTNING,
-            imgUrl = null,
-            latitude = 0,
-            longitude = 0
+            latitude = 0.0,
+            longitude = 0.0,
+            attendance = false
         )
-    )
+    }
 
     OnmoimTheme {
         ScheduleManagementScreen(

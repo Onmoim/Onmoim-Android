@@ -14,6 +14,7 @@ import com.onmoim.core.network.api.MeetingApi
 import com.onmoim.core.network.model.meeting.CreateMeetingRequestDto
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -22,8 +23,10 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class MeetingRepositoryImpl @Inject constructor(
@@ -152,4 +155,38 @@ class MeetingRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override fun getUpcomingMeetingsByDate(date: LocalDate): Flow<List<Meeting>> = flow {
+        val resp = meetingApi.getUpcomingMeetings(
+            date = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(date)
+        )
+        val data = resp.body()?.data
+
+        if(resp.isSuccessful && data != null) {
+            val meetings = data.content.map {
+                Meeting(
+                    id = it.id,
+                    groupId = it.groupId,
+                    title = it.title,
+                    placeName = it.placeName,
+                    startDate = LocalDateTime.parse(it.startAt),
+                    cost = it.cost,
+                    joinCount = it.joinCount,
+                    capacity = it.capacity,
+                    type = when (it.type) {
+                        "REGULAR" -> MeetingType.REGULAR
+                        "FLASH" -> MeetingType.LIGHTNING
+                        else -> MeetingType.REGULAR
+                    },
+                    imgUrl = it.imgUrl,
+                    latitude = it.location.y,
+                    longitude = it.location.x,
+                    attendance = it.attendance
+                )
+            }
+            emit(meetings)
+        } else {
+            throw Exception(resp.message())
+        }
+    }.flowOn(ioDispatcher)
 }

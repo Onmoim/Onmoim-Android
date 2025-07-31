@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 
 data class Meeting(
     val id: Int,
+    val groupId: Int,
     val title: String,
     val placeName: String,
     val startDate: LocalDateTime,
@@ -13,6 +14,7 @@ data class Meeting(
     val capacity: Int,
     val type: MeetingType,
     val imgUrl: String?,
-    val latitude: Int,
-    val longitude: Int,
+    val latitude: Double,
+    val longitude: Double,
+    val attendance: Boolean,
 )

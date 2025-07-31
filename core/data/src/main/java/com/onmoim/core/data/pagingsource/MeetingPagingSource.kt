@@ -34,6 +34,7 @@ class MeetingPagingSource(
             val meetings = data?.content?.map {
                 Meeting(
                     id = it.id,
+                    groupId = it.id,
                     title = it.title,
                     placeName = it.placeName,
                     startDate = LocalDateTime.parse(it.startAt),
@@ -47,7 +48,8 @@ class MeetingPagingSource(
                     },
                     imgUrl = it.imgUrl,
                     latitude = it.latitude,
-                    longitude = it.longitude
+                    longitude = it.longitude,
+                    attendance = false // TODO: 당장은 false로 넣어도 상관없으나 필요시 수정 요청 해야함
                 )
             } ?: emptyList()
             val nextCursorId = data?.nextCursorId

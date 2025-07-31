@@ -3,6 +3,7 @@ package com.onmoim.core.network.api
 import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.meeting.BaseMeetingPageDto
 import com.onmoim.core.network.model.meeting.MeetingDto
+import com.onmoim.core.network.model.meeting.UpcomingMeetingsDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -48,4 +49,17 @@ interface MeetingApi {
         @Path("groupId") groupId: Int,
         @Path("meetingId") meetingId: Int
     ): Response<BaseResponse<String>>
+
+    @GET("api/v1/meetings/upcoming")
+    suspend fun getUpcomingMeetings(
+        @Query("date") date: String? = null,
+        @Query("thisWeekYn") thisWeekYn: Boolean? = null,
+        @Query("thisMonthYn") thisMonthYn: Boolean? = null,
+        @Query("joinedYn") joinedYn: Boolean? = null,
+        @Query("regularYn") regularYn: Boolean? = null,
+        @Query("flashYn") flashYn: Boolean? = null,
+        @Query("cursorStartAt") cursorStartAt: String? = null,
+        @Query("cursorId") cursorId: Int? = null,
+        @Query("size") size: Int? = null
+    ): Response<BaseResponse<UpcomingMeetingsDto>>
 }

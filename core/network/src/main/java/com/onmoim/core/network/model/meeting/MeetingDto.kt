@@ -23,9 +23,9 @@ data class MeetingDto(
     @SerialName("joinCount")
     val joinCount: Int,
     @SerialName("latitude")
-    val latitude: Int,
+    val latitude: Double,
     @SerialName("longitude")
-    val longitude: Int,
+    val longitude: Double,
     @SerialName("placeName")
     val placeName: String,
     @SerialName("startAt")

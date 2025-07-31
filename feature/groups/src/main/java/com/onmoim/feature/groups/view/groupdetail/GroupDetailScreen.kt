@@ -299,7 +299,7 @@ private fun GroupDetailEventHandler(
                 GroupDetailEvent.AttendMeetingOverCapacity -> {
                     Toast.makeText(
                         context,
-                        context.getString(R.string.group_detail_attend_meeting_over_capacity),
+                        context.getString(R.string.attend_meeting_over_capacity),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -307,7 +307,7 @@ private fun GroupDetailEventHandler(
                 GroupDetailEvent.AttendMeetingSuccess -> {
                     Toast.makeText(
                         context,
-                        context.getString(R.string.group_detail_attend_meeting_success),
+                        context.getString(R.string.attend_meeting_success),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -319,7 +319,7 @@ private fun GroupDetailEventHandler(
                 GroupDetailEvent.LeaveMeetingSuccess -> {
                     Toast.makeText(
                         context,
-                        context.getString(R.string.group_detail_leave_meeting_success),
+                        context.getString(R.string.leave_meeting_success),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -327,7 +327,7 @@ private fun GroupDetailEventHandler(
                 GroupDetailEvent.MeetingNotFound -> {
                     Toast.makeText(
                         context,
-                        context.getString(R.string.group_detail_meeting_not_found),
+                        context.getString(R.string.meeting_not_found),
                         Toast.LENGTH_SHORT
                     ).show()
                 }

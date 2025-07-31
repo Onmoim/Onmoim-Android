@@ -6,6 +6,7 @@ import com.onmoim.core.data.constant.LeaveMeetingResult
 import com.onmoim.core.data.constant.MeetingType
 import com.onmoim.core.data.model.Meeting
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 interface MeetingRepository {
@@ -35,4 +36,5 @@ interface MeetingRepository {
 
     suspend fun joinMeeting(groupId: Int, meetingId: Int): Result<JoinMeetingResult>
     suspend fun leaveMeeting(groupId: Int, meetingId: Int): Result<LeaveMeetingResult>
+    fun getUpcomingMeetingsByDate(date: LocalDate): Flow<List<Meeting>>
 }

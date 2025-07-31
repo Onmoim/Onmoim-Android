@@ -1,5 +1,6 @@
 package com.onmoim.feature.groups.view.mygroup
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,22 +9,31 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.onmoim.core.data.constant.MeetingType
 import com.onmoim.core.data.constant.MemberStatus
 import com.onmoim.core.data.model.Group
+import com.onmoim.core.data.model.Meeting
 import com.onmoim.core.designsystem.component.CommonTab
 import com.onmoim.core.designsystem.component.CommonTabRow
 import com.onmoim.core.designsystem.theme.OnmoimTheme
+import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.MyGroupTab
 import com.onmoim.feature.groups.state.JoinedGroupUiState
+import com.onmoim.feature.groups.state.MyGroupEvent
+import com.onmoim.feature.groups.state.UpcomingMeetingUiState
 import com.onmoim.feature.groups.viewmodel.MyGroupViewModel
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Composable
 fun MyGroupRoute(
@@ -36,25 +46,74 @@ fun MyGroupRoute(
 ) {
     val selectedTab by myGroupViewModel.selectedTabState.collectAsStateWithLifecycle()
     val joinedGroupUiState by myGroupViewModel.joinedGroupUiState.collectAsStateWithLifecycle()
+    val selectedDate by myGroupViewModel.selectedDateState.collectAsStateWithLifecycle()
+    val upcomingMeetingUiState by myGroupViewModel.upcomingMeetingUiState.collectAsStateWithLifecycle()
+    val isLoading by myGroupViewModel.isLoading.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(OnmoimTheme.colors.backgroundColor)
+    LoadingOverlayBox(
+        loading = isLoading
     ) {
-        topBar()
-        MyGroupScreen(
+        Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            selectedTab = selectedTab,
-            onTabChange = myGroupViewModel::onSelectedTabChange,
-            onClickCreateGroup = onNavigateToGroupCategorySelect,
-            onClickComingSchedule = onNavigateToComingSchedule,
-            joinedGroupUiState = joinedGroupUiState,
-            onClickGroup = onNavigateToGroupDetail
-        )
-        bottomBar()
+                .fillMaxSize()
+                .background(OnmoimTheme.colors.backgroundColor)
+        ) {
+            topBar()
+            MyGroupScreen(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                selectedTab = selectedTab,
+                onTabChange = myGroupViewModel::onSelectedTabChange,
+                onClickCreateGroup = onNavigateToGroupCategorySelect,
+                onClickComingSchedule = onNavigateToComingSchedule,
+                joinedGroupUiState = joinedGroupUiState,
+                onClickGroup = onNavigateToGroupDetail,
+                selectedDate = selectedDate,
+                onSelectedDateChange = myGroupViewModel::onSelectedDateChange,
+                upcomingMeetingUiState = upcomingMeetingUiState,
+                onClickMeetAttend = myGroupViewModel::attendMeeting,
+                onClickMeetLeave = myGroupViewModel::leaveMeeting
+            )
+            bottomBar()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        myGroupViewModel.event.collect { event ->
+            when (event) {
+                is MyGroupEvent.AttendMeetingFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                MyGroupEvent.AttendMeetingOverCapacity -> {
+                    Toast.makeText(
+                        context,
+                        R.string.attend_meeting_over_capacity,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                MyGroupEvent.AttendMeetingSuccess -> {
+                    Toast.makeText(context, R.string.attend_meeting_success, Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                is MyGroupEvent.LeaveMeetingFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                MyGroupEvent.LeaveMeetingSuccess -> {
+                    Toast.makeText(context, R.string.leave_meeting_success, Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                MyGroupEvent.MeetingNotFound -> {
+                    Toast.makeText(context, R.string.meeting_not_found, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 }
 
@@ -66,7 +125,12 @@ private fun MyGroupScreen(
     onClickCreateGroup: () -> Unit,
     onClickComingSchedule: () -> Unit,
     joinedGroupUiState: JoinedGroupUiState,
-    onClickGroup: (groupId: Int) -> Unit
+    onClickGroup: (groupId: Int) -> Unit,
+    selectedDate: LocalDate,
+    onSelectedDateChange: (LocalDate) -> Unit,
+    upcomingMeetingUiState: UpcomingMeetingUiState,
+    onClickMeetAttend: (meetingId: Int, groupId: Int) -> Unit,
+    onClickMeetLeave: (meetingId: Int, groupId: Int) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -101,7 +165,12 @@ private fun MyGroupScreen(
                     onClickCreateGroup = onClickCreateGroup,
                     onClickComingSchedule = onClickComingSchedule,
                     joinedGroupUiState = joinedGroupUiState,
-                    onClickGroup = onClickGroup
+                    onClickGroup = onClickGroup,
+                    selectedDate = selectedDate,
+                    onSelectedDateChange = onSelectedDateChange,
+                    upcomingMeetingUiState = upcomingMeetingUiState,
+                    onClickMeetAttend = onClickMeetAttend,
+                    onClickMeetLeave = onClickMeetLeave
                 )
             }
 
@@ -128,6 +197,23 @@ private fun MyGroupScreenForMyGroupPreview() {
         isFavorite = false,
         isRecommend = false
     )
+    val dummyMeetings = List(3) {
+        Meeting(
+            id = it,
+            groupId = it,
+            title = "title $it",
+            placeName = "place name $it",
+            startDate = LocalDateTime.now().plusDays(it.toLong()),
+            cost = 0,
+            joinCount = 5,
+            capacity = 10,
+            type = MeetingType.REGULAR,
+            imgUrl = null,
+            latitude = 0.0,
+            longitude = 0.0,
+            attendance = false
+        )
+    }
 
     OnmoimTheme {
         MyGroupScreen(
@@ -139,7 +225,12 @@ private fun MyGroupScreenForMyGroupPreview() {
             onClickCreateGroup = {},
             onClickComingSchedule = {},
             joinedGroupUiState = JoinedGroupUiState.Success(listOf(sampleGroup)),
-            onClickGroup = {}
+            onClickGroup = {},
+            selectedDate = LocalDate.now(),
+            onSelectedDateChange = {},
+            upcomingMeetingUiState = UpcomingMeetingUiState.Success(dummyMeetings),
+            onClickMeetAttend = { _, _ -> },
+            onClickMeetLeave = { _, _ -> }
         )
     }
 }
@@ -157,7 +248,12 @@ private fun MyGroupScreenForGroupChatPreview() {
             onClickCreateGroup = {},
             onClickComingSchedule = {},
             joinedGroupUiState = JoinedGroupUiState.Loading,
-            onClickGroup = {}
+            onClickGroup = {},
+            selectedDate = LocalDate.now(),
+            onSelectedDateChange = {},
+            upcomingMeetingUiState = UpcomingMeetingUiState.Loading,
+            onClickMeetAttend = { _, _ -> },
+            onClickMeetLeave = { _, _ -> }
         )
     }
 }

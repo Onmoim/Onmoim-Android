@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.onmoim.core.data.constant.MeetingType
 import com.onmoim.core.data.constant.MemberStatus
 import com.onmoim.core.designsystem.component.DayCard
 import com.onmoim.core.designsystem.component.group.ComingScheduleCard
@@ -33,8 +35,8 @@ import com.onmoim.core.designsystem.component.group.GroupItem
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.state.JoinedGroupUiState
+import com.onmoim.feature.groups.state.UpcomingMeetingUiState
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Composable
 fun MyGroupContainer(
@@ -42,7 +44,12 @@ fun MyGroupContainer(
     onClickCreateGroup: () -> Unit,
     onClickComingSchedule: () -> Unit,
     joinedGroupUiState: JoinedGroupUiState,
-    onClickGroup: (groupId: Int) -> Unit
+    onClickGroup: (groupId: Int) -> Unit,
+    selectedDate: LocalDate,
+    onSelectedDateChange: (LocalDate) -> Unit,
+    upcomingMeetingUiState: UpcomingMeetingUiState,
+    onClickMeetAttend: (meetingId: Int, groupId: Int) -> Unit,
+    onClickMeetLeave: (meetingId: Int, groupId: Int) -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -164,10 +171,10 @@ fun MyGroupContainer(
         Column(
             modifier = Modifier
                 .background(OnmoimTheme.colors.gray01)
-                .fillMaxWidth()
-                .padding(vertical = 20.dp),
+                .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            Spacer(Modifier.height(20.dp))
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -184,31 +191,89 @@ fun MyGroupContainer(
                 }
                 items(comingDates) {
                     DayCard(
-                        onClick = {},
-                        selected = it == now,
+                        onClick = {
+                            onSelectedDateChange(it)
+                        },
+                        selected = it == selectedDate,
                         date = it
                     )
                 }
             }
-            // TODO: api 연동시 수정
-            List(2) {
-                ComingScheduleCard(
-                    modifier = Modifier
-                        .padding(horizontal = 15.dp)
-                        .fillMaxWidth(),
-                    onClickButton = {
+            when (upcomingMeetingUiState) {
+                is UpcomingMeetingUiState.Error -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(upcomingMeetingUiState.t.message.toString())
+                    }
+                }
 
-                    },
-                    buttonType = ComingScheduleCardButtonType.ATTEND,
-                    isLightning = false,
-                    startDate = LocalDateTime.now().plusDays(2),
-                    title = "퇴근 후 독서 정모: 각자 독서",
-                    placeName = "카페 언노운",
-                    cost = 10000,
-                    joinCount = 6,
-                    capacity = 8,
-                    imageUrl = "https://picsum.photos/200"
-                )
+                UpcomingMeetingUiState.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                is UpcomingMeetingUiState.Success -> {
+                    val meetings = upcomingMeetingUiState.data
+
+                    if (meetings.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 15.dp),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+                            Text(
+                                text = stringResource(R.string.my_group_joined_group_meeting_empty),
+                                modifier = Modifier.padding(vertical = 80.dp),
+                                style = OnmoimTheme.typography.body2Regular.copy(
+                                    color = OnmoimTheme.colors.gray04
+                                )
+                            )
+                        }
+
+                    } else {
+                        meetings.forEachIndexed { index, meeting ->
+                            ComingScheduleCard(
+                                modifier = Modifier
+                                    .padding(horizontal = 15.dp)
+                                    .fillMaxWidth(),
+                                onClickButton = {
+                                    if (meeting.attendance) {
+                                        onClickMeetLeave(meeting.id, meeting.groupId)
+                                    } else {
+                                        onClickMeetAttend(meeting.id, meeting.groupId)
+                                    }
+                                },
+                                buttonType = if (meeting.attendance) {
+                                    ComingScheduleCardButtonType.ATTEND_CANCEL
+                                } else {
+                                    ComingScheduleCardButtonType.ATTEND
+                                },
+                                isLightning = meeting.type == MeetingType.LIGHTNING,
+                                startDate = meeting.startDate,
+                                title = meeting.title,
+                                placeName = meeting.placeName,
+                                cost = meeting.cost,
+                                joinCount = meeting.joinCount,
+                                capacity = meeting.capacity,
+                                imageUrl = meeting.imgUrl
+                            )
+                            if (index == meetings.lastIndex) {
+                                Spacer(Modifier.height(20.dp))
+                            }
+                        }
+                    }
+                }
             }
         }
     }
