@@ -4,8 +4,8 @@ import com.onmoim.core.datastore.DataStorePreferences
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.event.AuthEventBus
-import com.onmoim.core.network.BuildConfig
 import com.onmoim.core.network.ApiType
+import com.onmoim.core.network.BuildConfig
 import com.onmoim.core.network.OnmoimApiType
 import com.onmoim.core.network.OnmoimAuthInterceptor
 import com.onmoim.core.network.OnmoimAuthenticator
@@ -18,6 +18,8 @@ import okhttp3.Authenticator
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.hildan.krossbow.websocket.okhttp.OkHttpWebSocketClient
+import java.time.Duration
 import javax.inject.Singleton
 
 @Module
@@ -50,6 +52,8 @@ object OkHttpClientModule {
         addInterceptor(httpLoggingInterceptor)
         addInterceptor(onmoimAuthInterceptor)
         authenticator(onmoimAuthenticator)
+        callTimeout(Duration.ofMinutes(1))
+        pingInterval(Duration.ofSeconds(10))
     }.build()
 
     @ApiType(OnmoimApiType.KAKAO)
@@ -88,4 +92,10 @@ object OkHttpClientModule {
         dataStorePreferences: DataStorePreferences,
         @Dispatcher(OnmoimDispatcher.IO) ioDispatcher: CoroutineDispatcher
     ): Interceptor = OnmoimAuthInterceptor(dataStorePreferences, ioDispatcher)
+
+    @Provides
+    @Singleton
+    fun provideOkHttpWebSocketClient(
+        @ApiType(OnmoimApiType.AUTH) okHttpClient: OkHttpClient
+    ) = OkHttpWebSocketClient(okHttpClient)
 }

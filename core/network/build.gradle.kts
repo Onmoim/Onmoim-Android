@@ -11,6 +11,7 @@ android {
 
     defaultConfig {
         buildConfigField("String", "BASE_URL", "\"https://onmoim.store\"")
+        buildConfigField("String", "BASE_URL_WS", "\"wss://onmoim.store\"")
         buildConfigField(
             "String",
             "KAKAO_REST_API_KEY",
@@ -32,4 +33,8 @@ dependencies {
     implementation(libs.okHttp.logging)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.kotlinx.serialization)
+    implementation(libs.krossbow.stomp.core)
+    implementation(libs.krossbow.stomp.kxserialization)
+    implementation(libs.krossbow.stomp.kxserialization.json)
+    implementation(libs.krossbow.websocket.okhttp)
 }
