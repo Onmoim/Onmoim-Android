@@ -41,4 +41,9 @@
     <!-- CommentItem -->
     <string name="comment_write_reply">답글 달기</string>
     <string name="comment_more_reply">답글 %d개 더보기</string>
+    
+    <!-- ChatRoomItem -->
+    <string name="chat_room_item_now">방금</string>
+    <string name="chat_room_item_hours_ago">%d시간 전</string>
+    <string name="chat_room_item_days_ago">%d일 전</string>
 </resources>
