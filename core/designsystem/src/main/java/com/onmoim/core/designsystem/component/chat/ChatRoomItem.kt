@@ -23,8 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -62,7 +60,6 @@ fun ChatRoomItem(
     val nowDateTime = LocalDateTime.now()
     val periodHours = ChronoUnit.HOURS.between(lastMessageDateTime, nowDateTime)
     val periodDays = ChronoUnit.DAYS.between(lastMessageDateTime, nowDateTime)
-    val borderColor = OnmoimTheme.colors.gray02
 
     Row(
         modifier = modifier
@@ -72,14 +69,6 @@ fun ChatRoomItem(
                 onClick = onClick
             )
             .heightIn(min = 70.dp)
-            .drawBehind {
-                drawLine(
-                    color = borderColor,
-                    strokeWidth = 1.dp.toPx(),
-                    start = Offset(0f, size.height),
-                    end = Offset(size.width, size.height)
-                )
-            }
     ) {
         Box(
             modifier = Modifier

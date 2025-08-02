@@ -175,7 +175,11 @@ private fun MyGroupScreen(
             }
 
             MyGroupTab.GROUP_CHAT -> {
-
+                GroupChatContainer(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                )
             }
         }
     }
