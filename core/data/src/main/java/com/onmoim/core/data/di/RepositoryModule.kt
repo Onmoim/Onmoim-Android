@@ -6,6 +6,8 @@ import com.onmoim.core.data.repository.AuthRepository
 import com.onmoim.core.data.repository.AuthRepositoryImpl
 import com.onmoim.core.data.repository.CategoryRepository
 import com.onmoim.core.data.repository.CategoryRepositoryImpl
+import com.onmoim.core.data.repository.ChatRepository
+import com.onmoim.core.data.repository.ChatRepositoryImpl
 import com.onmoim.core.data.repository.GroupRepository
 import com.onmoim.core.data.repository.GroupRepositoryImpl
 import com.onmoim.core.data.repository.KakaoRepository
@@ -76,4 +78,9 @@ abstract class RepositoryModule {
     abstract fun bindPostRepository(
         postRepositoryImpl: PostRepositoryImpl
     ): PostRepository
+
+    @Binds
+    abstract fun bindChatRepository(
+        chatRepositoryImpl: ChatRepositoryImpl
+    ): ChatRepository
 }
