@@ -1,6 +1,6 @@
 package com.onmoim.core.data.repository
 
-import com.onmoim.core.data.constant.SocketConnectionEvent
+import com.onmoim.core.data.constant.SocketConnectionState
 import com.onmoim.core.data.constant.SystemMessageType
 import com.onmoim.core.data.model.Message
 import com.onmoim.core.data.model.SystemMessage
@@ -80,15 +80,15 @@ class ChatRepositoryImpl @Inject constructor(
             )
         }.flowOn(ioDispatcher)
 
-    override suspend fun receiveConnectionEvent(): Flow<SocketConnectionEvent> =
+    override suspend fun receiveConnectionEvent(): Flow<SocketConnectionState> =
         groupChatSocket.event.map {
             when (it) {
-                GroupChatConnectionEvent.Connected -> SocketConnectionEvent.Connected
-                GroupChatConnectionEvent.Connecting -> SocketConnectionEvent.Connecting
-                GroupChatConnectionEvent.Disconnected -> SocketConnectionEvent.Disconnected
-                GroupChatConnectionEvent.Disconnecting -> SocketConnectionEvent.Disconnecting
-                is GroupChatConnectionEvent.Error -> SocketConnectionEvent.Error(it.t)
-                GroupChatConnectionEvent.NotAuthenticated -> SocketConnectionEvent.NotAuthenticated
+                GroupChatConnectionEvent.Connected -> SocketConnectionState.Connected
+                GroupChatConnectionEvent.Connecting -> SocketConnectionState.Connecting
+                GroupChatConnectionEvent.Disconnected -> SocketConnectionState.Disconnected
+                GroupChatConnectionEvent.Disconnecting -> SocketConnectionState.Disconnecting
+                is GroupChatConnectionEvent.Error -> SocketConnectionState.Error(it.t)
+                GroupChatConnectionEvent.NotAuthenticated -> SocketConnectionState.NotAuthenticated
             }
         }
 }
