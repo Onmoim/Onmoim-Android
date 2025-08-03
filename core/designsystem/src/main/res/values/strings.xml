@@ -35,8 +35,8 @@
     <!-- CommonTimePickerDialog -->
     <string name="common_time_picker_dialog">시간 선택</string>
 
-    <!-- CommentTextField -->
-    <string name="comment_text_field_hint">텍스트 입력</string>
+    <!-- SendTextField -->
+    <string name="send_text_field_hint">텍스트 입력</string>
 
     <!-- CommentItem -->
     <string name="comment_write_reply">답글 달기</string>

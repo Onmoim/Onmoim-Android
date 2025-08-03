@@ -27,7 +27,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.onmoim.core.data.model.Comment
 import com.onmoim.core.data.model.CommentThread
-import com.onmoim.core.designsystem.component.CommentTextField
+import com.onmoim.core.designsystem.component.SendTextField
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.component.post.CommentItem
@@ -169,7 +169,7 @@ private fun ReplyScreen(
                         }
                     }
                 }
-                CommentTextField(
+                SendTextField(
                     value = reply,
                     onValueChange = onReplyChange,
                     onClickSend = onSendReply,

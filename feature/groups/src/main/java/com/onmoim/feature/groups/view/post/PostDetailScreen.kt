@@ -52,7 +52,7 @@ import coil3.request.ImageRequest
 import com.onmoim.core.data.constant.PostType
 import com.onmoim.core.data.model.Comment
 import com.onmoim.core.data.model.Post
-import com.onmoim.core.designsystem.component.CommentTextField
+import com.onmoim.core.designsystem.component.SendTextField
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.component.post.CommentItem
@@ -248,7 +248,7 @@ private fun PostDetailScreen(
                         }
                     }
                 }
-                CommentTextField(
+                SendTextField(
                     value = comment,
                     onValueChange = onCommentChange,
                     onClickSend = onSendComment,

@@ -28,11 +28,12 @@ import com.onmoim.core.designsystem.R
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 
 @Composable
-fun CommentTextField(
+fun SendTextField(
     value: String,
     onValueChange: (String) -> Unit,
     onClickSend: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    placeHolder: String = stringResource(R.string.send_text_field_hint)
 ) {
     val borderColor = OnmoimTheme.colors.gray04
 
@@ -74,7 +75,7 @@ fun CommentTextField(
             ) {
                 if (value.isEmpty()) {
                     Text(
-                        text = stringResource(R.string.comment_text_field_hint),
+                        text = placeHolder,
                         style = OnmoimTheme.typography.body2Regular.copy(
                             color = OnmoimTheme.colors.gray04
                         )
@@ -115,9 +116,9 @@ fun CommentTextField(
 
 @Preview
 @Composable
-private fun CommentTextFieldPreview() {
+private fun SendTextFieldPreview() {
     OnmoimTheme {
-        CommentTextField(
+        SendTextField(
             value = "",
             onValueChange = {},
             onClickSend = {}
