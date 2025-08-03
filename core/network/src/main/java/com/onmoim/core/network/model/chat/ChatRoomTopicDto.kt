@@ -17,7 +17,9 @@ data class ChatRoomTopicDto(
     @SerialName("timestamp")
     val timestamp: List<Int>,
     @SerialName("type")
-    val type: String
+    val type: String,
+    @SerialName("senderId")
+    val senderId: Int
 ) {
     @Serializable
     data class ChatUserDto(
