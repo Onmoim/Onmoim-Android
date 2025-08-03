@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -38,8 +39,10 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.onmoim.core.data.constant.MemberStatus
 import com.onmoim.core.data.constant.PostType
+import com.onmoim.core.data.constant.SocketConnectionState
 import com.onmoim.core.data.model.GroupDetail
 import com.onmoim.core.data.model.MeetingDetail
+import com.onmoim.core.data.model.Message
 import com.onmoim.core.data.model.Post
 import com.onmoim.core.designsystem.component.CommonButton
 import com.onmoim.core.designsystem.component.CommonDialog
@@ -60,6 +63,8 @@ import com.onmoim.feature.groups.state.GroupDetailEvent
 import com.onmoim.feature.groups.state.GroupDetailUiState
 import com.onmoim.feature.groups.viewmodel.GroupDetailViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import java.time.LocalDateTime
 
@@ -81,6 +86,9 @@ fun GroupDetailRoute(
     val introPostPagingItems = groupDetailViewModel.introPostPagingData.collectAsLazyPagingItems()
     val reviewPostPagingItems = groupDetailViewModel.reviewPostPagingData.collectAsLazyPagingItems()
     val freePostPagingItems = groupDetailViewModel.freePostPagingData.collectAsLazyPagingItems()
+    val chatConnectionState by groupDetailViewModel.chatConnectionState.collectAsStateWithLifecycle()
+    val newChatMessages by groupDetailViewModel.newChatMessagesState.collectAsStateWithLifecycle()
+    val message by groupDetailViewModel.messageState.collectAsStateWithLifecycle()
     var showMenuDialog by remember { mutableStateOf(false) }
     var showHostLeaveDialog by remember { mutableStateOf(false) }
     var showMemberLeaveDialog by remember { mutableStateOf(false) }
@@ -230,7 +238,12 @@ fun GroupDetailRoute(
                 GroupDetailPostType.REVIEW -> reviewPostPagingItems
                 GroupDetailPostType.FREE -> freePostPagingItems
             },
-            onClickPostWrite = onNavigateToPostWrite
+            onClickPostWrite = onNavigateToPostWrite,
+            chatConnectionState = chatConnectionState,
+            newChatMessages = newChatMessages,
+            message = message,
+            onMessageChange = groupDetailViewModel::onMessageChange,
+            onClickSendMessage = groupDetailViewModel::sendMessage
         )
     }
 
@@ -393,7 +406,12 @@ private fun GroupDetailScreen(
     postFilter: GroupDetailPostType,
     onPostFilterChange: (GroupDetailPostType) -> Unit,
     postPagingItems: LazyPagingItems<Post>,
-    onClickPostWrite: (isOwner: Boolean) -> Unit
+    onClickPostWrite: (isOwner: Boolean) -> Unit,
+    chatConnectionState: SocketConnectionState,
+    newChatMessages: List<Message>,
+    message: String,
+    onMessageChange: (String) -> Unit,
+    onClickSendMessage: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -532,7 +550,18 @@ private fun GroupDetailScreen(
                         }
 
                         GroupDetailTab.CHAT -> {
-
+                            GroupDetailChatContainer(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .imePadding(),
+                                userId = groupDetailUiState.userId,
+                                chatConnectionState = chatConnectionState,
+                                newChatMessages = newChatMessages,
+                                onClickProfile = {},
+                                message = message,
+                                onMessageChange = onMessageChange,
+                                onClickSend = onClickSendMessage
+                            )
                         }
                     }
                 }
@@ -679,7 +708,10 @@ private fun GroupDetailScreenForHomePreview1() {
             onTabChange = {},
             onClickComingSchedule = {},
             onClickPost = {},
-            groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.NONE)),
+            groupDetailUiState = GroupDetailUiState.Success(
+                getFakeGroupoDetail(MemberStatus.NONE),
+                0
+            ),
             onClickGroupJoin = {},
             onClickGroupSetting = {},
             onClickMenu = {},
@@ -689,7 +721,12 @@ private fun GroupDetailScreenForHomePreview1() {
             postFilter = GroupDetailPostType.ALL,
             onPostFilterChange = {},
             postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems(),
-            onClickPostWrite = {}
+            onClickPostWrite = {},
+            chatConnectionState = SocketConnectionState.Connected,
+            newChatMessages = emptyList(),
+            message = "",
+            onMessageChange = {},
+            onClickSendMessage = {}
         )
     }
 }
@@ -704,7 +741,10 @@ private fun GroupDetailScreenForHomePreview2() {
             onTabChange = {},
             onClickComingSchedule = {},
             onClickPost = {},
-            groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.OWNER)),
+            groupDetailUiState = GroupDetailUiState.Success(
+                getFakeGroupoDetail(MemberStatus.OWNER),
+                0
+            ),
             onClickGroupJoin = {},
             onClickGroupSetting = {},
             onClickMenu = {},
@@ -714,7 +754,12 @@ private fun GroupDetailScreenForHomePreview2() {
             postFilter = GroupDetailPostType.ALL,
             onPostFilterChange = {},
             postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems(),
-            onClickPostWrite = {}
+            onClickPostWrite = {},
+            chatConnectionState = SocketConnectionState.Connected,
+            newChatMessages = emptyList(),
+            message = "",
+            onMessageChange = {},
+            onClickSendMessage = {}
         )
     }
 }
@@ -729,7 +774,10 @@ private fun GroupDetailScreenForPostPreview() {
             onTabChange = {},
             onClickComingSchedule = {},
             onClickPost = {},
-            groupDetailUiState = GroupDetailUiState.Success(getFakeGroupoDetail(MemberStatus.OWNER)),
+            groupDetailUiState = GroupDetailUiState.Success(
+                getFakeGroupoDetail(MemberStatus.OWNER),
+                0
+            ),
             onClickGroupJoin = {},
             onClickGroupSetting = {},
             onClickMenu = {},
@@ -738,8 +786,46 @@ private fun GroupDetailScreenForPostPreview() {
             onClickMeetLeave = {},
             postFilter = GroupDetailPostType.ALL,
             onPostFilterChange = {},
-            postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems(),
-            onClickPostWrite = {}
+            postPagingItems = MutableStateFlow(PagingData.from(getFakePosts())).collectAsLazyPagingItems(),
+            onClickPostWrite = {},
+            chatConnectionState = SocketConnectionState.Connected,
+            newChatMessages = emptyList(),
+            message = "",
+            onMessageChange = {},
+            onClickSendMessage = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun GroupDetailScreenForChatPreview() {
+    OnmoimTheme {
+        GroupDetailScreen(
+            onBack = {},
+            selectedTab = GroupDetailTab.CHAT,
+            onTabChange = {},
+            onClickComingSchedule = {},
+            onClickPost = {},
+            groupDetailUiState = GroupDetailUiState.Success(
+                getFakeGroupoDetail(MemberStatus.OWNER),
+                0
+            ),
+            onClickGroupJoin = {},
+            onClickGroupSetting = {},
+            onClickMenu = {},
+            onClickFavorite = {},
+            onClickMeetAttend = {},
+            onClickMeetLeave = {},
+            postFilter = GroupDetailPostType.ALL,
+            onPostFilterChange = {},
+            postPagingItems = emptyFlow<PagingData<Post>>().collectAsLazyPagingItems(),
+            onClickPostWrite = {},
+            chatConnectionState = SocketConnectionState.Connected,
+            newChatMessages = emptyList(),
+            message = "",
+            onMessageChange = {},
+            onClickSendMessage = {}
         )
     }
 }

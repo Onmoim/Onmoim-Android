@@ -8,9 +8,13 @@ import com.onmoim.core.data.constant.JoinGroupResult
 import com.onmoim.core.data.constant.JoinMeetingResult
 import com.onmoim.core.data.constant.LeaveMeetingResult
 import com.onmoim.core.data.constant.PostType
+import com.onmoim.core.data.constant.SocketConnectionState
+import com.onmoim.core.data.model.Message
+import com.onmoim.core.data.repository.ChatRepository
 import com.onmoim.core.data.repository.GroupRepository
 import com.onmoim.core.data.repository.MeetingRepository
 import com.onmoim.core.data.repository.PostRepository
+import com.onmoim.core.domain.usecase.GetUserIdUseCase
 import com.onmoim.feature.groups.constant.BoardType
 import com.onmoim.feature.groups.constant.GroupDetailPostType
 import com.onmoim.feature.groups.state.GroupDetailEvent
@@ -20,11 +24,15 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = GroupDetailViewModel.Factory::class)
@@ -32,7 +40,9 @@ class GroupDetailViewModel @AssistedInject constructor(
     @Assisted("groupId") private val groupId: Int,
     private val groupRepository: GroupRepository,
     private val meetingRepository: MeetingRepository,
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    private val chatRepository: ChatRepository,
+    private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
     @AssistedFactory
     interface Factory {
@@ -63,18 +73,46 @@ class GroupDetailViewModel @AssistedInject constructor(
     val freePostPagingData =
         postRepository.getPostPagingData(groupId, PostType.FREE).cachedIn(viewModelScope)
 
+    private val _chatConnectionState =
+        MutableStateFlow<SocketConnectionState>(SocketConnectionState.Disconnected)
+    val chatConnectionState = _chatConnectionState.asStateFlow()
+
+    private val _newChatMessagesState = MutableStateFlow<List<Message>>(emptyList())
+    val newChatMessagesState = _newChatMessagesState.asStateFlow()
+
+    private val _messageState = MutableStateFlow("")
+    val messageState = _messageState.asStateFlow()
+
     init {
-        fetchGroupDetail()
+        fetchGroupDetailAndUserId()
+        viewModelScope.launch {
+            receiveConnectionState()
+            chatRepository.connect()
+            receiveSystemMessages()
+            receiveChatMessages()
+        }
     }
 
-    fun fetchGroupDetail(refresh: Boolean = false) {
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.launch {
+            chatRepository.disconnect()
+        }
+    }
+
+    fun fetchGroupDetailAndUserId(refresh: Boolean = false) {
         viewModelScope.launch {
             if (refresh) {
                 _isLoading.value = true
             }
 
-            groupRepository.getGroupDetail(groupId).catch {
-                Log.e("GroupDetailViewModel", "fetchGroupDetail error", it)
+            combine(
+                groupRepository.getGroupDetail(groupId),
+                flowOf(getUserIdUseCase())
+            ) { groupDetail, userId ->
+                GroupDetailUiState.Success(groupDetail, userId)
+            }.catch {
+                Log.e("GroupDetailViewModel", "fetchGroupDetailAndUserId error", it)
                 if (refresh) {
                     _isLoading.value = false
                 }
@@ -83,7 +121,7 @@ class GroupDetailViewModel @AssistedInject constructor(
                 if (refresh) {
                     _isLoading.value = false
                 }
-                _groupDetailUiState.value = GroupDetailUiState.Success(it)
+                _groupDetailUiState.value = it
             }
         }
     }
@@ -119,22 +157,23 @@ class GroupDetailViewModel @AssistedInject constructor(
     }
 
     fun favoriteGroup(favorite: Boolean) {
-        val groupDetail =
-            (_groupDetailUiState.value as? GroupDetailUiState.Success)?.groupDetail ?: return
+        val state = _groupDetailUiState.value as? GroupDetailUiState.Success ?: return
 
         viewModelScope.launch {
             _groupDetailUiState.value = GroupDetailUiState.Success(
-                groupDetail.copy(
+                groupDetail = state.groupDetail.copy(
                     isFavorite = !favorite
-                )
+                ),
+                userId = state.userId
             )
 
             groupRepository.favoriteGroup(groupId).onFailure {
                 Log.e("GroupDetailViewModel", "favoriteGroup error", it)
                 _groupDetailUiState.value = GroupDetailUiState.Success(
-                    groupDetail.copy(
+                    groupDetail = state.groupDetail.copy(
                         isFavorite = favorite
-                    )
+                    ),
+                    userId = state.userId
                 )
                 _event.send(GroupDetailEvent.FavoriteGroupFailure(it))
             }
@@ -152,7 +191,7 @@ class GroupDetailViewModel @AssistedInject constructor(
             }.onSuccess { result ->
                 when (result) {
                     JoinGroupResult.SUCCESS -> {
-                        fetchGroupDetail(true)
+                        fetchGroupDetailAndUserId(true)
                         _event.send(GroupDetailEvent.JoinGroupSuccess)
                     }
 
@@ -185,7 +224,7 @@ class GroupDetailViewModel @AssistedInject constructor(
                 _isLoading.value = false
                 _event.send(GroupDetailEvent.AttendMeetingFailure(it))
             }.onSuccess { result ->
-                fetchGroupDetail(refresh = true)
+                fetchGroupDetailAndUserId(refresh = true)
 
                 when (result) {
                     JoinMeetingResult.SUCCESS -> {
@@ -213,7 +252,7 @@ class GroupDetailViewModel @AssistedInject constructor(
                 _isLoading.value = false
                 _event.send(GroupDetailEvent.LeaveMeetingFailure(it))
             }.onSuccess { result ->
-                fetchGroupDetail(refresh = true)
+                fetchGroupDetailAndUserId(refresh = true)
 
                 when (result) {
                     LeaveMeetingResult.SUCCESS -> {
@@ -235,6 +274,63 @@ class GroupDetailViewModel @AssistedInject constructor(
     fun sendRefreshBoardEvent(type: BoardType) {
         viewModelScope.launch {
             _event.send(GroupDetailEvent.RefreshBoard(type))
+        }
+    }
+
+    private fun receiveConnectionState() {
+        viewModelScope.launch {
+            chatRepository.receiveConnectionEvent().collect {
+                Log.i("GroupDetailViewModel", "[receiveConnectionState] $it")
+                _chatConnectionState.value = it
+            }
+        }
+    }
+
+    private fun receiveSystemMessages() {
+        viewModelScope.launch {
+            chatRepository.receiveSystemMessages().retryWhen { cause, attempt ->
+                Log.e("GroupDetailViewModel", "receiveSystemMessages retry", cause)
+                delay(1000)
+                attempt < 10
+            }.catch {
+                Log.e("GroupDetailViewModel", "receiveSystemMessages error", it)
+            }.collect {
+                Log.i("GroupDetailViewModel", "[receiveSystemMessages] [${it.type}] ${it.message}")
+            }
+        }
+    }
+
+    private fun receiveChatMessages() {
+        viewModelScope.launch {
+            chatRepository.receiveMessages(groupId).retryWhen { cause, attempt ->
+                Log.e("GroupDetailViewModel", "receiveChatMessages retry", cause)
+                delay(1000)
+                attempt < 10
+            }.catch {
+                Log.e("GroupDetailViewModel", "receiveChatMessages error", it)
+            }.collect {
+                Log.i("GroupDetailViewModel", "[receiveChatMessages] $it")
+                val copyList = _newChatMessagesState.value.toMutableList()
+                copyList.add(0, it)
+                _newChatMessagesState.value = copyList
+            }
+        }
+    }
+
+    fun onMessageChange(value: String) {
+        _messageState.value = value
+    }
+
+    fun sendMessage() {
+        viewModelScope.launch {
+            val message = _messageState.value
+
+            try {
+                chatRepository.sendMessage(groupId, message)
+                _messageState.value = ""
+            } catch (e: Exception) {
+                Log.e("GroupDetailViewModel", "sendMessage error", e)
+            }
         }
     }
 }

@@ -142,7 +142,7 @@ fun NavGraphBuilder.groupsGraph(
                 }
 
                 if (isRefresh) {
-                    groupDetailViewModel.fetchGroupDetail(true)
+                    groupDetailViewModel.fetchGroupDetailAndUserId(true)
                 }
 
                 if (boardType != null) {
