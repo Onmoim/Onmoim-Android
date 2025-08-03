@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 
 data class Message(
     val messageSequence: Int,
+    val groupId: Int,
     val senderId: Int,
     val userName: String,
     val profileImageUrl: String?,

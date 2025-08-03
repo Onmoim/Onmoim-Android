@@ -52,13 +52,21 @@ class ChatRepositoryImpl @Inject constructor(
     override suspend fun receiveMessages(groupId: Int): Flow<Message> =
         groupChatSocket.subscribeChatRoomTopic(groupId).map {
             val systemZoneId = ZoneId.systemDefault()
-            val timestamp =
-                "${it.timestamp[0]}-${it.timestamp[1]}-${it.timestamp[2]}T${it.timestamp[3]}:${it.timestamp[4]}:${it.timestamp[5]}.${it.timestamp[6]}Z"
-            val sendLocalDateTimeUTC = LocalDateTime.parse(timestamp)
-            val sendZonedDateTime = sendLocalDateTimeUTC.atZone(systemZoneId)
+            val sendLocalDateTime = LocalDateTime.of(
+                it.timestamp[0],
+                it.timestamp[1],
+                it.timestamp[2],
+                it.timestamp[3],
+                it.timestamp[4],
+                it.timestamp[5],
+                it.timestamp[6]
+            )
+            val sendZonedDateTimeUTC = sendLocalDateTime.atZone(ZoneId.of("UTC"))
+            val sendZonedDateTime = sendZonedDateTimeUTC.withZoneSameInstant(systemZoneId)
 
             Message(
                 messageSequence = it.messageSequence,
+                groupId = it.groupId,
                 senderId = it.chatUserDto.id,
                 userName = it.chatUserDto.username,
                 profileImageUrl = it.chatUserDto.profileImageUrl,
