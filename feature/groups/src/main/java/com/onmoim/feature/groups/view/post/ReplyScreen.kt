@@ -1,5 +1,6 @@
 package com.onmoim.feature.groups.view.post
 
+import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,9 +14,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,12 +30,13 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.onmoim.core.data.model.Comment
 import com.onmoim.core.data.model.CommentThread
-import com.onmoim.core.designsystem.component.SendTextField
 import com.onmoim.core.designsystem.component.CommonAppBar
 import com.onmoim.core.designsystem.component.NavigationIconButton
+import com.onmoim.core.designsystem.component.SendTextField
 import com.onmoim.core.designsystem.component.post.CommentItem
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.feature.groups.R
+import com.onmoim.feature.groups.state.ReplyEvent
 import com.onmoim.feature.groups.viewmodel.ReplyViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDateTime
@@ -44,6 +48,7 @@ fun ReplyRoute(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val reply by replyViewModel.replyState.collectAsStateWithLifecycle()
     val commentThreadPagingItems = replyViewModel.commentThreadPagingData.collectAsLazyPagingItems()
+    val context = LocalContext.current
 
     ReplyScreen(
         onBack = {
@@ -57,6 +62,20 @@ fun ReplyRoute(
         onSendReply = replyViewModel::writeReply,
         commentThreadPagingItems = commentThreadPagingItems
     )
+
+    LaunchedEffect(Unit) {
+        replyViewModel.event.collect { event ->
+            when (event) {
+                is ReplyEvent.WriteReplyFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                ReplyEvent.WriteReplySuccess -> {
+                    commentThreadPagingItems.refresh()
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -126,12 +145,12 @@ private fun ReplyScreen(
                 )
             }
         )
-        when (loadState) {
-            is LoadState.Error -> {
+        when {
+            loadState is LoadState.Error -> {
                 Text(loadState.error.message.toString())
             }
 
-            LoadState.Loading -> {
+            commentThreadPagingItems.itemCount == 0 && loadState == LoadState.Loading -> {
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -142,7 +161,7 @@ private fun ReplyScreen(
                 }
             }
 
-            is LoadState.NotLoading -> {
+            else -> {
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)

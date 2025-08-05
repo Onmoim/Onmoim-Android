@@ -213,4 +213,19 @@ class PostRepositoryImpl @Inject constructor(
             throw Exception(resp.message())
         }
     }
+
+    override suspend fun writeReply(
+        groupId: Int,
+        postId: Int,
+        commentId: Int,
+        content: String
+    ) {
+        val resp = withContext(ioDispatcher) {
+            postApi.createReply(groupId, postId, commentId, CommentRequestDto(content))
+        }
+
+        if (!resp.isSuccessful) {
+            throw Exception(resp.message())
+        }
+    }
 }

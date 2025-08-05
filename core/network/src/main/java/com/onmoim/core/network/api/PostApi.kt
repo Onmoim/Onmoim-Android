@@ -85,4 +85,12 @@ interface PostApi {
         @Path("postId") postId: Int,
         @Path("commentId") commentId: Int,
     ): Response<BaseResponse<String>>
+
+    @POST("api/v1/groups/{groupId}/posts/{postId}/comments/{commentId}/replies")
+    suspend fun createReply(
+        @Path("groupId") groupId: Int,
+        @Path("postId") postId: Int,
+        @Path("commentId") commentId: Int,
+        @Body commentRequestDto: CommentRequestDto
+    ): Response<BaseResponse<Int>>
 }

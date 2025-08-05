@@ -35,4 +35,10 @@ interface PostRepository {
         content: String
     )
     suspend fun deleteComment(groupId: Int, postId: Int, commentId: Int)
+    suspend fun writeReply(
+        groupId: Int,
+        postId: Int,
+        commentId: Int,
+        content: String
+    )
 }
