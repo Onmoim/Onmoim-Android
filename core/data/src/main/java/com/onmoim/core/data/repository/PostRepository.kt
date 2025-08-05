@@ -28,4 +28,11 @@ interface PostRepository {
         commentId: Int,
         size: Int = 20
     ): Flow<PagingData<CommentThread>>
+    suspend fun updateComment(
+        groupId: Int,
+        postId: Int,
+        commentId: Int,
+        content: String
+    )
+    suspend fun deleteComment(groupId: Int, postId: Int, commentId: Int)
 }

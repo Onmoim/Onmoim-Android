@@ -64,12 +64,14 @@ import com.onmoim.core.designsystem.component.NavigationIconButton
 import com.onmoim.core.designsystem.component.SendTextField
 import com.onmoim.core.designsystem.component.post.CommentItem
 import com.onmoim.core.designsystem.theme.OnmoimTheme
+import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.core.ui.shimmerBackground
 import com.onmoim.feature.groups.R
 import com.onmoim.feature.groups.constant.BoardType
 import com.onmoim.feature.groups.state.PostDetailEvent
 import com.onmoim.feature.groups.state.PostDetailUiState
 import com.onmoim.feature.groups.viewmodel.PostDetailViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -84,7 +86,7 @@ fun PostDetailRoute(
     val commentPagingItems = postDetailViewModel.commentPagingData.collectAsLazyPagingItems()
     val comment by postDetailViewModel.commentState.collectAsStateWithLifecycle()
     val userId by postDetailViewModel.userIdState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+    val isLoading by postDetailViewModel.isLoading.collectAsStateWithLifecycle()
     var showCommentMenuDialog by remember { mutableStateOf(false) }
     var selectedCommentId by remember { mutableIntStateOf(0) }
     var selectedCommentAuthorId by remember { mutableIntStateOf(0) }
@@ -141,7 +143,7 @@ fun PostDetailRoute(
             },
             onClickConfirm = {
                 showCommentEditDialog = false
-                postDetailViewModel.editComment(selectedCommentId, editCommentValue)
+                postDetailViewModel.updateComment(selectedCommentId, editCommentValue)
             },
             onClickDismiss = {
                 showCommentEditDialog = false
@@ -175,29 +177,52 @@ fun PostDetailRoute(
         )
     }
 
-    PostDetailScreen(
-        onBack = {
-            onBackPressedDispatcher?.onBackPressed()
-        },
-        onClickPostMenu = {
+    LoadingOverlayBox(
+        loading = isLoading
+    ) {
+        PostDetailScreen(
+            onBack = {
+                onBackPressedDispatcher?.onBackPressed()
+            },
+            onClickPostMenu = {
 
-        },
-        onClickLike = postDetailViewModel::likePostToggle,
-        onClickCommentMenu = { commentId, authorId ->
-            selectedCommentId = commentId
-            selectedCommentAuthorId = authorId
-            showCommentMenuDialog = true
-        },
-        onClickReply = onNavigateToReply,
-        postDetailUiState = postDetailUiState,
-        commentPagingItems = commentPagingItems,
-        comment = comment,
-        onCommentChange = postDetailViewModel::onCommentChange,
-        onSendComment = postDetailViewModel::writeComment
+            },
+            onClickLike = postDetailViewModel::likePostToggle,
+            onClickCommentMenu = { commentId, authorId ->
+                selectedCommentId = commentId
+                selectedCommentAuthorId = authorId
+                showCommentMenuDialog = true
+            },
+            onClickReply = onNavigateToReply,
+            postDetailUiState = postDetailUiState,
+            commentPagingItems = commentPagingItems,
+            comment = comment,
+            onCommentChange = postDetailViewModel::onCommentChange,
+            onSendComment = postDetailViewModel::writeComment
+        )
+    }
+
+    PostDetailEventHandler(
+        eventFlow = postDetailViewModel.event,
+        onRefreshCommentPagingItems = {
+            commentPagingItems.refresh()
+        }
     )
 
+    LaunchedEffect(commentPagingItems.loadState.refresh is LoadState.Loading) {
+        postDetailViewModel.clearCache()
+    }
+}
+
+@Composable
+private fun PostDetailEventHandler(
+    eventFlow: Flow<PostDetailEvent>,
+    onRefreshCommentPagingItems: () -> Unit
+) {
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
-        postDetailViewModel.event.collect { event ->
+        eventFlow.collect { event ->
             when (event) {
                 is PostDetailEvent.PostLikeFailure -> {
                     Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
@@ -208,7 +233,31 @@ fun PostDetailRoute(
                 }
 
                 PostDetailEvent.CommentWriteSuccess -> {
-                    commentPagingItems.refresh()
+                    onRefreshCommentPagingItems()
+                }
+
+                is PostDetailEvent.CommentDeleteFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                PostDetailEvent.CommentDeleteSuccess -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.comment_delete_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is PostDetailEvent.CommentUpdateFailure -> {
+                    Toast.makeText(context, event.t.message, Toast.LENGTH_SHORT).show()
+                }
+
+                PostDetailEvent.CommentUpdateSuccess -> {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.comment_edit_success),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }

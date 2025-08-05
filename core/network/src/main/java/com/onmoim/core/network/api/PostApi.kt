@@ -3,17 +3,19 @@ package com.onmoim.core.network.api
 import com.onmoim.core.network.model.BaseResponse
 import com.onmoim.core.network.model.post.BasePostPageDto
 import com.onmoim.core.network.model.post.CommentDto
+import com.onmoim.core.network.model.post.CommentRequestDto
 import com.onmoim.core.network.model.post.CommentThreadDto
 import com.onmoim.core.network.model.post.LikePostDto
 import com.onmoim.core.network.model.post.PostDto
-import com.onmoim.core.network.model.post.WriteCommentRequestDto
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -58,7 +60,7 @@ interface PostApi {
     suspend fun createComment(
         @Path("groupId") groupId: Int,
         @Path("postId") postId: Int,
-        @Body writeCommentRequestDto: WriteCommentRequestDto
+        @Body commentRequestDto: CommentRequestDto
     ): Response<BaseResponse<Int>>
 
     @GET("api/v1/groups/{groupId}/posts/{postId}/comments/{commentId}/thread")
@@ -68,4 +70,19 @@ interface PostApi {
         @Path("commentId") commentId: Int,
         @Query("cursor") cursor: Int? = null
     ): Response<BaseResponse<CommentThreadDto>>
+
+    @PUT("api/v1/groups/{groupId}/posts/{postId}/comments/{commentId}")
+    suspend fun updateComment(
+        @Path("groupId") groupId: Int,
+        @Path("postId") postId: Int,
+        @Path("commentId") commentId: Int,
+        @Body commentRequestDto: CommentRequestDto
+    ): Response<BaseResponse<Int>>
+
+    @DELETE("api/v1/groups/{groupId}/posts/{postId}/comments/{commentId}")
+    suspend fun deleteComment(
+        @Path("groupId") groupId: Int,
+        @Path("postId") postId: Int,
+        @Path("commentId") commentId: Int,
+    ): Response<BaseResponse<String>>
 }

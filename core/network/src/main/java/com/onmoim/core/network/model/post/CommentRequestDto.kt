@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class WriteCommentRequestDto(
+data class CommentRequestDto(
     @SerialName("content")
     val content: String
 )

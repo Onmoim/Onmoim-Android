@@ -14,8 +14,8 @@ import com.onmoim.core.data.pagingsource.PostPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
 import com.onmoim.core.network.api.PostApi
+import com.onmoim.core.network.model.post.CommentRequestDto
 import com.onmoim.core.network.model.post.CreatePostRequestDto
-import com.onmoim.core.network.model.post.WriteCommentRequestDto
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -157,9 +157,9 @@ class PostRepositoryImpl @Inject constructor(
         postId: Int,
         content: String
     ): Result<Unit> {
-        val writeCommentRequestDto = WriteCommentRequestDto(content)
+        val commentRequestDto = CommentRequestDto(content)
         val resp = withContext(ioDispatcher) {
-            postApi.createComment(groupId, postId, writeCommentRequestDto)
+            postApi.createComment(groupId, postId, commentRequestDto)
         }
 
         return if (resp.isSuccessful) {
@@ -182,5 +182,35 @@ class PostRepositoryImpl @Inject constructor(
             ),
             pagingSourceFactory = { CommentThreadPagingSource(postApi, groupId, postId, commentId) }
         ).flow.flowOn(ioDispatcher)
+    }
+
+    override suspend fun updateComment(
+        groupId: Int,
+        postId: Int,
+        commentId: Int,
+        content: String
+    ) {
+        val commentRequestDto = CommentRequestDto(content)
+        val resp = withContext(ioDispatcher) {
+            postApi.updateComment(groupId, postId, commentId, commentRequestDto)
+        }
+
+        if (!resp.isSuccessful) {
+            throw Exception(resp.message())
+        }
+    }
+
+    override suspend fun deleteComment(
+        groupId: Int,
+        postId: Int,
+        commentId: Int
+    ) {
+        val resp = withContext(ioDispatcher) {
+            postApi.deleteComment(groupId, postId, commentId)
+        }
+
+        if (!resp.isSuccessful) {
+            throw Exception(resp.message())
+        }
     }
 }
