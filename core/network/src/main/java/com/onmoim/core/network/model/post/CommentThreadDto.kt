@@ -20,7 +20,7 @@ data class CommentThreadDto(
         @SerialName("authorName")
         val authorName: String,
         @SerialName("authorProfileImg")
-        val authorProfileImg: String,
+        val authorProfileImg: String?,
         @SerialName("content")
         val content: String,
         @SerialName("createdAt")
@@ -38,7 +38,7 @@ data class CommentThreadDto(
         @SerialName("authorName")
         val authorName: String,
         @SerialName("authorProfileImg")
-        val authorProfileImg: String,
+        val authorProfileImg: String?,
         @SerialName("content")
         val content: String,
         @SerialName("createdAt")
