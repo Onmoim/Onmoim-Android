@@ -119,6 +119,7 @@ class PostDetailViewModel @AssistedInject constructor(
                 Log.e("PostDetailViewModel", "writeComment error", it)
                 _event.send(PostDetailEvent.CommentWriteFailure(it))
             }.onSuccess {
+                _commentState.value = ""
                 _event.send(PostDetailEvent.CommentWriteSuccess)
             }
         }
