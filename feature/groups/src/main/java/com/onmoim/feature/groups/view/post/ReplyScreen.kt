@@ -118,7 +118,7 @@ private fun ReplyScreen(
                 CommonAppBar(
                     title = {
                         Text(
-                            text = stringResource(R.string.post),
+                            text = stringResource(R.string.reply_post_reply),
                             style = OnmoimTheme.typography.body1SemiBold
                         )
                     },
