@@ -157,7 +157,7 @@ class PostRepositoryImpl @Inject constructor(
         postId: Int,
         content: String
     ): Result<Unit> {
-        val writeCommentRequestDto = WriteCommentRequestDto(WriteCommentRequestDto.Request(content))
+        val writeCommentRequestDto = WriteCommentRequestDto(content)
         val resp = withContext(ioDispatcher) {
             postApi.createComment(groupId, postId, writeCommentRequestDto)
         }

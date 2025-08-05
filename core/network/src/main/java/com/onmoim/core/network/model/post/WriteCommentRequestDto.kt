@@ -6,12 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class WriteCommentRequestDto(
-    @SerialName("request")
-    val request: Request
-) {
-    @Serializable
-    data class Request(
-        @SerialName("content")
-        val content: String
-    )
-}
+    @SerialName("content")
+    val content: String
+)
