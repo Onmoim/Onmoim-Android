@@ -29,7 +29,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,9 +55,13 @@ import coil3.request.ImageRequest
 import com.onmoim.core.data.constant.PostType
 import com.onmoim.core.data.model.Comment
 import com.onmoim.core.data.model.Post
-import com.onmoim.core.designsystem.component.SendTextField
 import com.onmoim.core.designsystem.component.CommonAppBar
+import com.onmoim.core.designsystem.component.CommonDialog
+import com.onmoim.core.designsystem.component.CommonMenuDialog
+import com.onmoim.core.designsystem.component.CommonMenuItem
+import com.onmoim.core.designsystem.component.CommonTextField
 import com.onmoim.core.designsystem.component.NavigationIconButton
+import com.onmoim.core.designsystem.component.SendTextField
 import com.onmoim.core.designsystem.component.post.CommentItem
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.shimmerBackground
@@ -76,7 +83,97 @@ fun PostDetailRoute(
     val postDetailUiState by postDetailViewModel.postDetailUiState.collectAsStateWithLifecycle()
     val commentPagingItems = postDetailViewModel.commentPagingData.collectAsLazyPagingItems()
     val comment by postDetailViewModel.commentState.collectAsStateWithLifecycle()
+    val userId by postDetailViewModel.userIdState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    var showCommentMenuDialog by remember { mutableStateOf(false) }
+    var selectedCommentId by remember { mutableIntStateOf(0) }
+    var selectedCommentAuthorId by remember { mutableIntStateOf(0) }
+    var showCommentEditDialog by remember { mutableStateOf(false) }
+    var showCommentDeleteDialog by remember { mutableStateOf(false) }
+
+    if (showCommentMenuDialog) {
+        CommonMenuDialog(
+            onDismissRequest = {
+                showCommentMenuDialog = false
+            },
+            onClickCancel = {
+                showCommentMenuDialog = false
+            }
+        ) {
+            if (userId == selectedCommentAuthorId) {
+                CommonMenuItem(
+                    onClick = {
+                        showCommentMenuDialog = false
+                        showCommentEditDialog = true
+                    },
+                    label = stringResource(R.string.comment_edit)
+                )
+                CommonMenuItem(
+                    onClick = {
+                        showCommentMenuDialog = false
+                        showCommentDeleteDialog = true
+                    },
+                    label = stringResource(R.string.comment_delete)
+                )
+            } else {
+                CommonMenuItem(
+                    onClick = {
+                        showCommentMenuDialog = false
+                        // TODO: api 나오면 구현
+                    },
+                    label = stringResource(R.string.comment_report)
+                )
+            }
+        }
+    }
+
+    if (showCommentEditDialog) {
+        var editCommentValue by remember {
+            val value =
+                commentPagingItems.itemSnapshotList.find { it?.id == selectedCommentId }?.content
+                    ?: ""
+            mutableStateOf(value)
+        }
+
+        CommonDialog(
+            onDismissRequest = {
+                showCommentEditDialog = false
+            },
+            onClickConfirm = {
+                showCommentEditDialog = false
+                postDetailViewModel.editComment(selectedCommentId, editCommentValue)
+            },
+            onClickDismiss = {
+                showCommentEditDialog = false
+            },
+            title = stringResource(R.string.comment_edit_dialog_title)
+        ) {
+            CommonTextField(
+                value = editCommentValue,
+                onValueChange = {
+                    editCommentValue = it
+                },
+                singleLine = false,
+                modifier = Modifier.height(100.dp)
+            )
+        }
+    }
+
+    if (showCommentDeleteDialog) {
+        CommonDialog(
+            onDismissRequest = {
+                showCommentDeleteDialog = false
+            },
+            content = stringResource(R.string.comment_delete_dialog_content),
+            onClickConfirm = {
+                showCommentDeleteDialog = false
+                postDetailViewModel.deleteComment(selectedCommentId)
+            },
+            onClickDismiss = {
+                showCommentDeleteDialog = false
+            }
+        )
+    }
 
     PostDetailScreen(
         onBack = {
@@ -86,8 +183,10 @@ fun PostDetailRoute(
 
         },
         onClickLike = postDetailViewModel::likePostToggle,
-        onClickCommentMenu = {
-
+        onClickCommentMenu = { commentId, authorId ->
+            selectedCommentId = commentId
+            selectedCommentAuthorId = authorId
+            showCommentMenuDialog = true
         },
         onClickReply = onNavigateToReply,
         postDetailUiState = postDetailUiState,
@@ -121,7 +220,7 @@ private fun PostDetailScreen(
     onBack: () -> Unit,
     onClickPostMenu: () -> Unit,
     onClickLike: () -> Unit,
-    onClickCommentMenu: () -> Unit,
+    onClickCommentMenu: (commentId: Int, authorId: Int) -> Unit,
     onClickReply: (commentId: Int) -> Unit,
     postDetailUiState: PostDetailUiState,
     commentPagingItems: LazyPagingItems<Comment>,
@@ -234,7 +333,9 @@ private fun PostDetailScreen(
                             items(commentPagingItems.itemCount) { index ->
                                 commentPagingItems[index]?.let {
                                     CommentItem(
-                                        onClickMenu = onClickCommentMenu,
+                                        onClickMenu = {
+                                            onClickCommentMenu(it.id, it.authorId)
+                                        },
                                         onClickReply = {
                                             onClickReply(it.id)
                                         },
@@ -505,7 +606,7 @@ private fun PostDetailScreenPreview() {
             onBack = {},
             onClickPostMenu = {},
             onClickLike = {},
-            onClickCommentMenu = {},
+            onClickCommentMenu = { _, _ -> },
             onClickReply = {},
             postDetailUiState = PostDetailUiState.Success(
                 post = Post(

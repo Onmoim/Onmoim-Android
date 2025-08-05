@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.onmoim.core.data.repository.PostRepository
+import com.onmoim.core.domain.usecase.GetUserIdUseCase
 import com.onmoim.feature.groups.state.PostDetailEvent
 import com.onmoim.feature.groups.state.PostDetailUiState
 import dagger.assisted.Assisted
@@ -23,7 +24,8 @@ import kotlinx.coroutines.launch
 class PostDetailViewModel @AssistedInject constructor(
     @Assisted("groupId") private val groupId: Int,
     @Assisted("postId") private val postId: Int,
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
     @AssistedFactory
@@ -46,8 +48,12 @@ class PostDetailViewModel @AssistedInject constructor(
     private val _commentState = MutableStateFlow("")
     val commentState = _commentState.asStateFlow()
 
+    private val _userIdState = MutableStateFlow<Int?>(null)
+    val userIdState = _userIdState.asStateFlow()
+
     init {
         fetchPostDetail()
+        fetchUserId()
     }
 
     fun fetchPostDetail() {
@@ -57,6 +63,12 @@ class PostDetailViewModel @AssistedInject constructor(
             }.collectLatest {
                 _postDetailUiState.value = PostDetailUiState.Success(it)
             }
+        }
+    }
+
+    private fun fetchUserId() {
+        viewModelScope.launch {
+            _userIdState.value = getUserIdUseCase()
         }
     }
 
@@ -92,5 +104,13 @@ class PostDetailViewModel @AssistedInject constructor(
                 _event.send(PostDetailEvent.CommentWriteSuccess)
             }
         }
+    }
+
+    fun editComment(commentId: Int, comment: String) {
+        // TODO: 댓글 수정 api 연동
+    }
+
+    fun deleteComment(commentId: Int) {
+        // TODO: 댓글 삭제 api 연동
     }
 }
