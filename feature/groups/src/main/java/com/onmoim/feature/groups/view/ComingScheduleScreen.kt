@@ -113,6 +113,10 @@ fun ComingScheduleRoute(
                 ComingScheduleEvent.MeetingNotFound -> {
                     Toast.makeText(context, R.string.meeting_not_found, Toast.LENGTH_SHORT).show()
                 }
+
+                ComingScheduleEvent.RefreshComingSchedule -> {
+                    comingSchedulePagingItems.refresh()
+                }
             }
         }
     }
@@ -224,18 +228,18 @@ private fun ComingScheduleScreen(
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                when (loadState) {
-                    is LoadState.Error -> {
+                when {
+                    loadState is LoadState.Error -> {
                         Text(loadState.error.message.toString())
                     }
 
-                    LoadState.Loading -> {
+                    comingSchedulePagingItems.itemCount == 0 && loadState is LoadState.Loading -> {
                         CircularProgressIndicator(
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }
 
-                    is LoadState.NotLoading -> {
+                    else -> {
                         LazyColumn(
                             modifier = Modifier.matchParentSize(),
                             contentPadding = PaddingValues(

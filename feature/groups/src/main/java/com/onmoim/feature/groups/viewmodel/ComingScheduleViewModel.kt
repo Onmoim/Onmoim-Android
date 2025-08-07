@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.onmoim.core.data.constant.JoinMeetingResult
 import com.onmoim.core.data.constant.LeaveMeetingResult
 import com.onmoim.core.data.constant.UpcomingMeetingsFilter
@@ -76,7 +77,7 @@ class ComingScheduleViewModel @AssistedInject constructor(
             }.collectLatest {
                 _cachedAttendMeetingIdsState.value = emptySet()
                 _cachedLeaveMeetingIdsState.value = emptySet()
-                _comingSchedulePagingDataState.value = flowOf(it)
+                _comingSchedulePagingDataState.value = flowOf(it).cachedIn(viewModelScope)
             }
         }
     }
@@ -163,6 +164,12 @@ class ComingScheduleViewModel @AssistedInject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun sendRefreshComingScheduleEvent() {
+        viewModelScope.launch {
+            _event.send(ComingScheduleEvent.RefreshComingSchedule)
         }
     }
 }

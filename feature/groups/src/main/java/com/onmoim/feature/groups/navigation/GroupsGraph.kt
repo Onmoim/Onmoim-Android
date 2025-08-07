@@ -39,6 +39,9 @@ import com.onmoim.feature.groups.viewmodel.ReplyViewModel
 import com.onmoim.feature.groups.viewmodel.ScheduleManagementViewModel
 import com.onmoim.feature.location.navigation.LocationNavigationBundleKey
 import com.onmoim.feature.location.navigation.navigateToLocationSearch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 fun NavGraphBuilder.groupsGraph(
     navController: NavController,
@@ -99,7 +102,10 @@ fun NavGraphBuilder.groupsGraph(
 
             LaunchedEffect(Unit) {
                 if (isRefresh) {
-                    // TODO: 일정 목록 새로고침
+                    withContext(Dispatchers.Default) {
+                        delay(20)
+                        comingScheduleViewModel.sendRefreshComingScheduleEvent()
+                    }
                 }
             }
         }

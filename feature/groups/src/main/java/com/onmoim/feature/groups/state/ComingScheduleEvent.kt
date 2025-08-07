@@ -8,4 +8,5 @@ sealed class ComingScheduleEvent {
     data class AttendMeetingFailure(val t: Throwable) : ComingScheduleEvent()
     data object LeaveMeetingSuccess : ComingScheduleEvent()
     data class LeaveMeetingFailure(val t: Throwable) : ComingScheduleEvent()
+    data object RefreshComingSchedule: ComingScheduleEvent()
 }
