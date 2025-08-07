@@ -52,6 +52,7 @@ interface MeetingApi {
 
     @GET("api/v1/meetings/upcoming")
     suspend fun getUpcomingMeetings(
+        @Query("groupId") groupId: Int? = null,
         @Query("date") date: String? = null,
         @Query("thisWeekYn") thisWeekYn: Boolean? = null,
         @Query("thisMonthYn") thisMonthYn: Boolean? = null,

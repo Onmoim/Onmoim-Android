@@ -27,7 +27,7 @@ class ComingSchedulePagingSource(
         return try {
             val key = params.key
             val resp = meetingApi.getUpcomingMeetings(
-//                groupId = groupId,  // FIXME: api 수정되면 확인
+                groupId = groupId,
                 thisWeekYn = if (filters.contains(UpcomingMeetingsFilter.WEEK)) true else null,
                 thisMonthYn = if (filters.contains(UpcomingMeetingsFilter.MONTH)) true else null,
                 joinedYn = if (filters.contains(UpcomingMeetingsFilter.JOINED)) true else null,
