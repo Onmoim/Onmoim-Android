@@ -3,9 +3,11 @@ package com.onmoim.feature.groups.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.onmoim.core.data.constant.JoinMeetingResult
 import com.onmoim.core.data.constant.LeaveMeetingResult
 import com.onmoim.core.data.model.Meeting
+import com.onmoim.core.data.repository.ChatRepository
 import com.onmoim.core.data.repository.GroupRepository
 import com.onmoim.core.data.repository.MeetingRepository
 import com.onmoim.feature.groups.constant.MyGroupTab
@@ -27,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MyGroupViewModel @Inject constructor(
     private val groupRepository: GroupRepository,
-    private val meetingRepository: MeetingRepository
+    private val meetingRepository: MeetingRepository,
+    private val chatRepository: ChatRepository
 ) : ViewModel() {
     private val _selectedTabState = MutableStateFlow(MyGroupTab.MY_GROUP)
     val selectedTabState = _selectedTabState.asStateFlow()
@@ -52,6 +55,8 @@ class MyGroupViewModel @Inject constructor(
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
+
+    val chatRoomPagingData = chatRepository.getChatRoomPagingData().cachedIn(viewModelScope)
 
     init {
         fetchJoinedGroup()

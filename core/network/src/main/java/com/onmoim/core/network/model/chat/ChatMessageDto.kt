@@ -6,20 +6,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ChatMessageDto(
+    @SerialName("chatUserDto")
+    val chatUserDto: ChatUserDto,
     @SerialName("content")
     val content: String,
-    @SerialName("createdDate")
-    val createdDate: String,
-    @SerialName("deleted")
-    val deleted: Boolean,
-    @SerialName("deletedDate")
-    val deletedDate: String?,
-    @SerialName("deliveryStatus")
-    val deliveryStatus: String,
-    @SerialName("id")
-    val id: Id,
-    @SerialName("modifiedDate")
-    val modifiedDate: String,
+    @SerialName("groupId")
+    val groupId: Int,
+    @SerialName("messageSequence")
+    val messageSequence: Int,
     @SerialName("senderId")
     val senderId: Int,
     @SerialName("timestamp")
@@ -28,10 +22,14 @@ data class ChatMessageDto(
     val type: String
 ) {
     @Serializable
-    data class Id(
-        @SerialName("messageSequence")
-        val messageSequence: Int,
-        @SerialName("roomId")
-        val roomId: Int
+    data class ChatUserDto(
+        @SerialName("id")
+        val id: Int,
+        @SerialName("owner")
+        val owner: Boolean,
+        @SerialName("profileImageUrl")
+        val profileImageUrl: String?,
+        @SerialName("username")
+        val username: String
     )
 }

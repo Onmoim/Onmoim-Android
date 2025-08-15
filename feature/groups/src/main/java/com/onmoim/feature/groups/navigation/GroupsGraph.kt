@@ -66,8 +66,8 @@ fun NavGraphBuilder.groupsGraph(
                 onNavigateToComingSchedule = {
                     navController.navigateToComingSchedule()
                 },
-                onNavigateToGroupDetail = {
-                    navController.navigateToGroupDetail(it)
+                onNavigateToGroupDetail = { groupId, tab ->
+                    navController.navigateToGroupDetail(groupId, tab)
                 }
             )
         }
@@ -111,9 +111,10 @@ fun NavGraphBuilder.groupsGraph(
         }
         composable<GroupDetailRoute> { backStackEntry ->
             val groupId = backStackEntry.toRoute<GroupDetailRoute>().id
+            val tab = backStackEntry.toRoute<GroupDetailRoute>().tab
             val groupDetailViewModel =
                 hiltViewModel<GroupDetailViewModel, GroupDetailViewModel.Factory> {
-                    it.create(groupId)
+                    it.create(groupId, tab)
                 }
 
             GroupDetailRoute(
@@ -204,7 +205,7 @@ fun NavGraphBuilder.groupsGraph(
 
             GroupOpenCompleteRoute(
                 onNavigateToGroupDetail = {
-                    navController.navigateToGroupDetail(groupId, navOptions {
+                    navController.navigateToGroupDetail(groupId, navOptions = navOptions {
                         popUpTo(MyGroupRoute)
                     })
                 }

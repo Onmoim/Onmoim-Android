@@ -18,8 +18,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.onmoim.core.data.constant.MeetingType
 import com.onmoim.core.data.constant.MemberStatus
+import com.onmoim.core.data.model.ChatRoom
 import com.onmoim.core.data.model.Group
 import com.onmoim.core.data.model.Meeting
 import com.onmoim.core.designsystem.component.CommonTab
@@ -27,11 +31,13 @@ import com.onmoim.core.designsystem.component.CommonTabRow
 import com.onmoim.core.designsystem.theme.OnmoimTheme
 import com.onmoim.core.ui.LoadingOverlayBox
 import com.onmoim.feature.groups.R
+import com.onmoim.feature.groups.constant.GroupDetailTab
 import com.onmoim.feature.groups.constant.MyGroupTab
 import com.onmoim.feature.groups.state.JoinedGroupUiState
 import com.onmoim.feature.groups.state.MyGroupEvent
 import com.onmoim.feature.groups.state.UpcomingMeetingUiState
 import com.onmoim.feature.groups.viewmodel.MyGroupViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -42,7 +48,7 @@ fun MyGroupRoute(
     bottomBar: @Composable () -> Unit,
     onNavigateToGroupCategorySelect: () -> Unit,
     onNavigateToComingSchedule: () -> Unit,
-    onNavigateToGroupDetail: (groupId: Int) -> Unit
+    onNavigateToGroupDetail: (groupId: Int, tab: GroupDetailTab) -> Unit
 ) {
     val selectedTab by myGroupViewModel.selectedTabState.collectAsStateWithLifecycle()
     val joinedGroupUiState by myGroupViewModel.joinedGroupUiState.collectAsStateWithLifecycle()
@@ -50,6 +56,7 @@ fun MyGroupRoute(
     val upcomingMeetingUiState by myGroupViewModel.upcomingMeetingUiState.collectAsStateWithLifecycle()
     val isLoading by myGroupViewModel.isLoading.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val chatRoomPagingItems = myGroupViewModel.chatRoomPagingData.collectAsLazyPagingItems()
 
     LoadingOverlayBox(
         loading = isLoading
@@ -69,12 +76,18 @@ fun MyGroupRoute(
                 onClickCreateGroup = onNavigateToGroupCategorySelect,
                 onClickComingSchedule = onNavigateToComingSchedule,
                 joinedGroupUiState = joinedGroupUiState,
-                onClickGroup = onNavigateToGroupDetail,
+                onClickGroup = {
+                    onNavigateToGroupDetail(it, GroupDetailTab.HOME)
+                },
                 selectedDate = selectedDate,
                 onSelectedDateChange = myGroupViewModel::onSelectedDateChange,
                 upcomingMeetingUiState = upcomingMeetingUiState,
                 onClickMeetAttend = myGroupViewModel::attendMeeting,
-                onClickMeetLeave = myGroupViewModel::leaveMeeting
+                onClickMeetLeave = myGroupViewModel::leaveMeeting,
+                chatRoomPagingItems = chatRoomPagingItems,
+                onClickChatRoom = {
+                    onNavigateToGroupDetail(it, GroupDetailTab.CHAT)
+                }
             )
             bottomBar()
         }
@@ -130,7 +143,9 @@ private fun MyGroupScreen(
     onSelectedDateChange: (LocalDate) -> Unit,
     upcomingMeetingUiState: UpcomingMeetingUiState,
     onClickMeetAttend: (meetingId: Int, groupId: Int) -> Unit,
-    onClickMeetLeave: (meetingId: Int, groupId: Int) -> Unit
+    onClickMeetLeave: (meetingId: Int, groupId: Int) -> Unit,
+    chatRoomPagingItems: LazyPagingItems<ChatRoom>,
+    onClickChatRoom: (groupId: Int) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -178,7 +193,9 @@ private fun MyGroupScreen(
                 GroupChatContainer(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    chatRoomPagingItems = chatRoomPagingItems,
+                    onClickChatRoom = onClickChatRoom
                 )
             }
         }
@@ -218,6 +235,8 @@ private fun MyGroupScreenForMyGroupPreview() {
             attendance = false
         )
     }
+    val chatRoom =
+        MutableStateFlow(PagingData.from(emptyList<ChatRoom>())).collectAsLazyPagingItems()
 
     OnmoimTheme {
         MyGroupScreen(
@@ -234,7 +253,9 @@ private fun MyGroupScreenForMyGroupPreview() {
             onSelectedDateChange = {},
             upcomingMeetingUiState = UpcomingMeetingUiState.Success(dummyMeetings),
             onClickMeetAttend = { _, _ -> },
-            onClickMeetLeave = { _, _ -> }
+            onClickMeetLeave = { _, _ -> },
+            chatRoomPagingItems = chatRoom,
+            onClickChatRoom = {}
         )
     }
 }
@@ -242,6 +263,19 @@ private fun MyGroupScreenForMyGroupPreview() {
 @Preview
 @Composable
 private fun MyGroupScreenForGroupChatPreview() {
+    val chatRoom = MutableStateFlow(
+        PagingData.from(List(10) {
+            ChatRoom(
+                groupId = it,
+                title = "title $it",
+                lastSentMessage = "last sent message $it",
+                lastSentDateTime = LocalDateTime.now(),
+                roomMemberCount = 10,
+                imageUrl = null
+            )
+        })
+    ).collectAsLazyPagingItems()
+
     OnmoimTheme {
         MyGroupScreen(
             modifier = Modifier
@@ -257,7 +291,9 @@ private fun MyGroupScreenForGroupChatPreview() {
             onSelectedDateChange = {},
             upcomingMeetingUiState = UpcomingMeetingUiState.Loading,
             onClickMeetAttend = { _, _ -> },
-            onClickMeetLeave = { _, _ -> }
+            onClickMeetLeave = { _, _ -> },
+            chatRoomPagingItems = chatRoom,
+            onClickChatRoom = {}
         )
     }
 }

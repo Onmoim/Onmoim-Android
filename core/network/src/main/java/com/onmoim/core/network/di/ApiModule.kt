@@ -4,6 +4,7 @@ import com.onmoim.core.network.ApiType
 import com.onmoim.core.network.OnmoimApiType
 import com.onmoim.core.network.api.AuthApi
 import com.onmoim.core.network.api.CategoryApi
+import com.onmoim.core.network.api.ChatApi
 import com.onmoim.core.network.api.GroupApi
 import com.onmoim.core.network.api.KakaoApi
 import com.onmoim.core.network.api.LocationApi
@@ -51,4 +52,8 @@ object ApiModule {
     @Provides
     fun providePostApi(@ApiType(OnmoimApiType.AUTH) retrofit: Retrofit): PostApi =
         retrofit.create(PostApi::class.java)
+
+    @Provides
+    fun provideChatApi(@ApiType(OnmoimApiType.AUTH) retrofit: Retrofit): ChatApi =
+        retrofit.create(ChatApi::class.java)
 }

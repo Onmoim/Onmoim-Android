@@ -1,11 +1,18 @@
 package com.onmoim.core.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.onmoim.core.data.constant.SocketConnectionState
 import com.onmoim.core.data.constant.SystemMessageType
+import com.onmoim.core.data.model.ChatRoom
 import com.onmoim.core.data.model.Message
 import com.onmoim.core.data.model.SystemMessage
+import com.onmoim.core.data.pagingsource.ChatMessagePagingSource
+import com.onmoim.core.data.pagingsource.ChatRoomPagingSource
 import com.onmoim.core.dispatcher.Dispatcher
 import com.onmoim.core.dispatcher.OnmoimDispatcher
+import com.onmoim.core.network.api.ChatApi
 import com.onmoim.core.network.model.chat.ChatSendTextDto
 import com.onmoim.core.network.socket.GroupChatConnectionEvent
 import com.onmoim.core.network.socket.GroupChatSocket
@@ -19,6 +26,7 @@ import java.time.ZoneId
 import javax.inject.Inject
 
 class ChatRepositoryImpl @Inject constructor(
+    private val chatApi: ChatApi,
     private val groupChatSocket: GroupChatSocket,
     @Dispatcher(OnmoimDispatcher.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ChatRepository {
@@ -99,4 +107,24 @@ class ChatRepositoryImpl @Inject constructor(
                 GroupChatConnectionEvent.NotAuthenticated -> SocketConnectionState.NotAuthenticated
             }
         }
+
+    override fun getChatRoomPagingData(size: Int): Flow<PagingData<ChatRoom>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { ChatRoomPagingSource(chatApi) }
+        ).flow.flowOn(ioDispatcher)
+    }
+
+    override fun getChatRoomMessagePagingData(groupId: Int, size: Int): Flow<PagingData<Message>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = size,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { ChatMessagePagingSource(chatApi, groupId) }
+        ).flow.flowOn(ioDispatcher)
+    }
 }

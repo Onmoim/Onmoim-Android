@@ -77,7 +77,7 @@ fun GroupDetailRoute(
     onNavigateToPostWrite: (isOwner: Boolean) -> Unit,
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-    var selectedTab by remember { mutableStateOf(GroupDetailTab.HOME) }
+    val selectedTab by groupDetailViewModel.selectedTab.collectAsStateWithLifecycle()
     val groupDetailUiState by groupDetailViewModel.groupDetailUiState.collectAsStateWithLifecycle()
     val groupDetail = (groupDetailUiState as? GroupDetailUiState.Success)?.groupDetail
     val postFilter by groupDetailViewModel.postFilterState.collectAsStateWithLifecycle()
@@ -87,6 +87,8 @@ fun GroupDetailRoute(
     val reviewPostPagingItems = groupDetailViewModel.reviewPostPagingData.collectAsLazyPagingItems()
     val freePostPagingItems = groupDetailViewModel.freePostPagingData.collectAsLazyPagingItems()
     val chatConnectionState by groupDetailViewModel.chatConnectionState.collectAsStateWithLifecycle()
+    val prevChatMessagePagingItems =
+        groupDetailViewModel.prevChatMessagePagingData.collectAsLazyPagingItems()
     val newChatMessages by groupDetailViewModel.newChatMessagesState.collectAsStateWithLifecycle()
     val message by groupDetailViewModel.messageState.collectAsStateWithLifecycle()
     var showMenuDialog by remember { mutableStateOf(false) }
@@ -215,9 +217,7 @@ fun GroupDetailRoute(
                 onBackPressedDispatcher?.onBackPressed()
             },
             selectedTab = selectedTab,
-            onTabChange = {
-                selectedTab = it
-            },
+            onTabChange = groupDetailViewModel::onTabChange,
             onClickComingSchedule = onNavigateToComingSchedule,
             onClickPost = onNavigateToPostDetail,
             groupDetailUiState = groupDetailUiState,
@@ -240,6 +240,7 @@ fun GroupDetailRoute(
             },
             onClickPostWrite = onNavigateToPostWrite,
             chatConnectionState = chatConnectionState,
+            prevChatMessagePagingItems = prevChatMessagePagingItems,
             newChatMessages = newChatMessages,
             message = message,
             onMessageChange = groupDetailViewModel::onMessageChange,
@@ -408,6 +409,7 @@ private fun GroupDetailScreen(
     postPagingItems: LazyPagingItems<Post>,
     onClickPostWrite: (isOwner: Boolean) -> Unit,
     chatConnectionState: SocketConnectionState,
+    prevChatMessagePagingItems: LazyPagingItems<Message>,
     newChatMessages: List<Message>,
     message: String,
     onMessageChange: (String) -> Unit,
@@ -556,6 +558,7 @@ private fun GroupDetailScreen(
                                     .imePadding(),
                                 userId = groupDetailUiState.userId,
                                 chatConnectionState = chatConnectionState,
+                                prevChatMessagePagingItems = prevChatMessagePagingItems,
                                 newChatMessages = newChatMessages,
                                 onClickProfile = {},
                                 message = message,
@@ -698,9 +701,27 @@ private fun getFakeGroupoDetail(memberStatus: MemberStatus): GroupDetail {
     )
 }
 
+private fun getFakeChatMessages(): List<Message> {
+    return List(20) {
+        Message(
+            messageSequence = it,
+            groupId = it,
+            senderId = it,
+            userName = "userName $it",
+            profileImageUrl = null,
+            content = "content $it",
+            sendDateTime = LocalDateTime.now(),
+            isOwner = it % 2 == 0
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun GroupDetailScreenForHomePreview1() {
+    val messagePagingItems =
+        MutableStateFlow(PagingData.from(getFakeChatMessages())).collectAsLazyPagingItems()
+
     OnmoimTheme {
         GroupDetailScreen(
             onBack = {},
@@ -723,6 +744,7 @@ private fun GroupDetailScreenForHomePreview1() {
             postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems(),
             onClickPostWrite = {},
             chatConnectionState = SocketConnectionState.Connected,
+            prevChatMessagePagingItems = messagePagingItems,
             newChatMessages = emptyList(),
             message = "",
             onMessageChange = {},
@@ -734,6 +756,9 @@ private fun GroupDetailScreenForHomePreview1() {
 @Preview(showBackground = true)
 @Composable
 private fun GroupDetailScreenForHomePreview2() {
+    val messagePagingItems =
+        MutableStateFlow(PagingData.from(getFakeChatMessages())).collectAsLazyPagingItems()
+
     OnmoimTheme {
         GroupDetailScreen(
             onBack = {},
@@ -756,6 +781,7 @@ private fun GroupDetailScreenForHomePreview2() {
             postPagingItems = flowOf(PagingData.from(getFakePosts())).collectAsLazyPagingItems(),
             onClickPostWrite = {},
             chatConnectionState = SocketConnectionState.Connected,
+            prevChatMessagePagingItems = messagePagingItems,
             newChatMessages = emptyList(),
             message = "",
             onMessageChange = {},
@@ -767,6 +793,9 @@ private fun GroupDetailScreenForHomePreview2() {
 @Preview(showBackground = true)
 @Composable
 private fun GroupDetailScreenForPostPreview() {
+    val messagePagingItems =
+        MutableStateFlow(PagingData.from(getFakeChatMessages())).collectAsLazyPagingItems()
+
     OnmoimTheme {
         GroupDetailScreen(
             onBack = {},
@@ -789,6 +818,7 @@ private fun GroupDetailScreenForPostPreview() {
             postPagingItems = MutableStateFlow(PagingData.from(getFakePosts())).collectAsLazyPagingItems(),
             onClickPostWrite = {},
             chatConnectionState = SocketConnectionState.Connected,
+            prevChatMessagePagingItems = messagePagingItems,
             newChatMessages = emptyList(),
             message = "",
             onMessageChange = {},
@@ -800,6 +830,9 @@ private fun GroupDetailScreenForPostPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun GroupDetailScreenForChatPreview() {
+    val messagePagingItems =
+        MutableStateFlow(PagingData.from(getFakeChatMessages())).collectAsLazyPagingItems()
+
     OnmoimTheme {
         GroupDetailScreen(
             onBack = {},
@@ -822,6 +855,7 @@ private fun GroupDetailScreenForChatPreview() {
             postPagingItems = emptyFlow<PagingData<Post>>().collectAsLazyPagingItems(),
             onClickPostWrite = {},
             chatConnectionState = SocketConnectionState.Connected,
+            prevChatMessagePagingItems = messagePagingItems,
             newChatMessages = emptyList(),
             message = "",
             onMessageChange = {},

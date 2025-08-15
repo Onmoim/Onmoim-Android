@@ -17,6 +17,7 @@ import com.onmoim.core.data.repository.PostRepository
 import com.onmoim.core.domain.usecase.GetUserIdUseCase
 import com.onmoim.feature.groups.constant.BoardType
 import com.onmoim.feature.groups.constant.GroupDetailPostType
+import com.onmoim.feature.groups.constant.GroupDetailTab
 import com.onmoim.feature.groups.state.GroupDetailEvent
 import com.onmoim.feature.groups.state.GroupDetailUiState
 import dagger.assisted.Assisted
@@ -38,6 +39,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = GroupDetailViewModel.Factory::class)
 class GroupDetailViewModel @AssistedInject constructor(
     @Assisted("groupId") private val groupId: Int,
+    @Assisted("initialTab") private val initialTab: GroupDetailTab,
     private val groupRepository: GroupRepository,
     private val meetingRepository: MeetingRepository,
     private val postRepository: PostRepository,
@@ -46,8 +48,14 @@ class GroupDetailViewModel @AssistedInject constructor(
 ) : ViewModel() {
     @AssistedFactory
     interface Factory {
-        fun create(@Assisted("groupId") groupId: Int): GroupDetailViewModel
+        fun create(
+            @Assisted("groupId") groupId: Int,
+            @Assisted("initialTab") initialTab: GroupDetailTab
+        ): GroupDetailViewModel
     }
+
+    private val _selectedTab = MutableStateFlow(initialTab)
+    val selectedTab = _selectedTab.asStateFlow()
 
     private val _groupDetailUiState =
         MutableStateFlow<GroupDetailUiState>(GroupDetailUiState.Loading)
@@ -77,6 +85,9 @@ class GroupDetailViewModel @AssistedInject constructor(
         MutableStateFlow<SocketConnectionState>(SocketConnectionState.Disconnected)
     val chatConnectionState = _chatConnectionState.asStateFlow()
 
+    val prevChatMessagePagingData =
+        chatRepository.getChatRoomMessagePagingData(groupId).cachedIn(viewModelScope)
+
     private val _newChatMessagesState = MutableStateFlow<List<Message>>(emptyList())
     val newChatMessagesState = _newChatMessagesState.asStateFlow()
 
@@ -98,6 +109,10 @@ class GroupDetailViewModel @AssistedInject constructor(
         viewModelScope.launch {
             chatRepository.disconnect()
         }
+    }
+
+    fun onTabChange(tab: GroupDetailTab) {
+        _selectedTab.value = tab
     }
 
     fun fetchGroupDetailAndUserId(refresh: Boolean = false) {

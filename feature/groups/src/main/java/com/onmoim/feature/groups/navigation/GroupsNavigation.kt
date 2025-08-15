@@ -2,6 +2,7 @@ package com.onmoim.feature.groups.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
+import com.onmoim.feature.groups.constant.GroupDetailTab
 import com.onmoim.feature.groups.constant.GroupMemberRole
 import kotlinx.serialization.Serializable
 
@@ -13,7 +14,8 @@ object MyGroupRoute
 
 @Serializable
 data class GroupDetailRoute(
-    val id: Int
+    val id: Int,
+    val tab: GroupDetailTab
 )
 
 @Serializable
@@ -88,8 +90,12 @@ fun NavController.navigateToComingSchedule(
     navigate(ComingScheduleRoute(groupId, groupMemberRole), navOptions)
 }
 
-fun NavController.navigateToGroupDetail(id: Int, navOptions: NavOptions? = null) {
-    navigate(GroupDetailRoute(id), navOptions)
+fun NavController.navigateToGroupDetail(
+    id: Int,
+    tab: GroupDetailTab = GroupDetailTab.HOME,
+    navOptions: NavOptions? = null
+) {
+    navigate(GroupDetailRoute(id, tab), navOptions)
 }
 
 fun NavController.navigateToGroupCategorySelect(navOptions: NavOptions? = null) {

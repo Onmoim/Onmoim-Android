@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemKey
 import com.onmoim.core.data.constant.SocketConnectionState
 import com.onmoim.core.data.model.Message
 import com.onmoim.core.designsystem.component.SendTextField
@@ -25,6 +27,7 @@ fun GroupDetailChatContainer(
     modifier: Modifier = Modifier,
     userId: Int,
     chatConnectionState: SocketConnectionState,
+    prevChatMessagePagingItems: LazyPagingItems<Message>,
     newChatMessages: List<Message>,
     onClickProfile: (userId: Int) -> Unit,
     message: String,
@@ -45,6 +48,36 @@ fun GroupDetailChatContainer(
             reverseLayout = true,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            items(
+                count = prevChatMessagePagingItems.itemCount,
+                key = prevChatMessagePagingItems.itemKey { it.messageSequence }
+            ) { index ->
+                prevChatMessagePagingItems[index]?.let { message ->
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (message.senderId == userId) {
+                            MyChatBubble(
+                                message = message.content,
+                                sendDateTime = message.sendDateTime,
+                                modifier = Modifier.align(Alignment.CenterEnd)
+                            )
+                        } else {
+                            ChatBubbleWithProfile(
+                                onClickProfile = {
+                                    onClickProfile(message.senderId)
+                                },
+                                modifier = Modifier.align(Alignment.CenterStart),
+                                userName = message.userName,
+                                message = message.content,
+                                sendDateTime = message.sendDateTime,
+                                profileImageUrl = message.profileImageUrl,
+                                isOwner = message.isOwner
+                            )
+                        }
+                    }
+                }
+            }
             items(
                 items = newChatMessages,
                 key = { it.messageSequence }
